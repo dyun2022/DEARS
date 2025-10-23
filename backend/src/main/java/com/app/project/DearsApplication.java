@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DearsApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ProjectApplication.class, args);
+		SpringApplication.run(DearsApplication.class, args);
 		System.out.println("server started successfully.");
 	}
 
