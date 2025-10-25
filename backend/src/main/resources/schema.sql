@@ -8,18 +8,13 @@ CREATE TABLE Users(
     avatar VARCHAR(25) NOT NULL
 );
 
-CREATE TABLE Pet(
-    pet_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    name VARCHAR(25) NOT NULL,
-    type VARCHAR(25) NOT NULL,
-    hunger INT NOT NULL,
-    happiness INT NOT NULL,
-    energy INT NOT NULL,
-    growthPoints INT NOT NULL,
-    ageStage VARCHAR(25) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE PetType(
+	type_id INT AUTO_INCREMENT PRIMARY KEY,
+    type_name VARCHAR(25) NOT NULL
 );
+INSERT INTO PetType(type_name) VALUES
+    ('Deer'),
+    ('Bear');
 
 CREATE TABLE Food(
     food_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -33,6 +28,21 @@ INSERT INTO Food(type, food_points) VALUES
     ('honey', 5),
     ('salmon', 20);
 
+CREATE TABLE PetFood(
+	type_id INT NOT NULL, 
+    food_id INT NOT NULL, 
+    PRIMARY KEY (type_id, food_id), 
+    FOREIGN KEY (type_id) REFERENCES PetTYpe(type_id), 
+    FOREIGN KEY (food_id) REFERENCES Food(food_id)
+); 
+INSERT INTO PetFood(type_id, food_id) VALUES 
+	(1, 1),
+    (1, 2), 
+    (1, 3),
+    (2, 2), 
+    (2, 4), 
+    (2, 5); 
+
 CREATE TABLE AgeStage(
     age_id INT AUTO_INCREMENT PRIMARY KEY,
     age_stage VARCHAR(25) NOT NULL,
@@ -42,6 +52,17 @@ INSERT INTO AgeStage(age_stage, meter_max) VALUES
     ('baby', 10),
     ('teen', 20),
     ('adult', 40);
+
+CREATE TABLE Pet(
+    pet_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    type_id INT NOT NULL,
+    growth_points INT NOT NULL,
+    age_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (type_id) REFERENCES PetType(type_id),
+    FOREIGN KEY (age_id) REFERENCES AgeStage(age_id)
+);
 
 CREATE TABLE Happiness(
     happiness_id INT AUTO_INCREMENT PRIMARY KEY,

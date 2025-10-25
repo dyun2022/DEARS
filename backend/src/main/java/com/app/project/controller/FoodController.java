@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/status")
+@RequestMapping("/api/food")
 public class FoodController {
 
     @Autowired
