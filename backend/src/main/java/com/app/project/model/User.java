@@ -2,6 +2,7 @@ package com.app.project.model;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -20,6 +21,9 @@ public class User{
     @Column(name = "password", length = 25, nullable = false, unique = true)
     private String password;
 
+    @Column(name = "birthday", length = 25, nullable = false)
+    private Date birthday;
+
     @Column(name = "avatar", length = 25, nullable = false)
     private String avatar;
 
@@ -30,10 +34,11 @@ public class User{
     // empty constructor for JPA
     public User() {}
 
-    public User(int user_id, String username, String password, String avatar) {
+    public User(int user_id, String username, String password, Date birthday, String avatar) {
         this.user_id = user_id;
         this.username = username;
         this.password = password;
+        this.birthday = birthday;
         this.avatar = avatar;
     }
 
@@ -62,6 +67,12 @@ public class User{
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public Date getBirthday() {
+        return birthday;
+    }
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
     public String getAvatar() {
         return avatar;

@@ -30,6 +30,7 @@ public class UserController {
         // Basic validation
         if (user.getUsername() == null || user.getUsername().isEmpty() ||
                 user.getPassword() == null || user.getPassword().isEmpty() ||
+                user.getBirthday() == null || user.getBirthday().toString().isEmpty() ||
                 user.getAvatar() == null || user.getAvatar().isEmpty()) {
 
             Map<String, String> errorResponse = new HashMap<>();

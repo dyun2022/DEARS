@@ -42,7 +42,9 @@ public class PetController {
     public ResponseEntity<?> createPet(@PathVariable("user_id") int user_id, @RequestBody Pet petRequest) {
 
         String name = petRequest.getName();
-        if (name == null || name.isEmpty()) {
+        String type = petRequest.getType();
+
+        if (name == null || name.isEmpty() || type == null || type.isEmpty()) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "All fields are required");
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -56,7 +58,7 @@ public class PetController {
         }
 
         // create pet
-        Pet newPet = petService.createPet(user_id, name);
+        Pet newPet = petService.createPet(user_id, type, name);
         if (newPet == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to create pet");

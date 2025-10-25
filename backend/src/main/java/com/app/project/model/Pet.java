@@ -16,34 +16,33 @@ public class Pet {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "type", nullable = false)
+    private String type;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
-    private PetType type;
+    @JoinColumn(name = "age_id", nullable = false)
+    private AgeStage age;
 
     @ManyToOne
-    @JoinColumn(name = "age_id", nullable = false)
-    private AgeStage ageStage;
+    @JoinColumn(name = "hunger_id", nullable = false)
+    private Hunger hunger;
 
-    @Column(name = "growthPoints", nullable = false)
-    private int growthPoints;
+    @ManyToOne
+    @JoinColumn(name = "happiness_id", nullable = false)
+    private Happiness happiness;
 
-    @Column(name = "hunger", nullable = false)
-    private int hunger;
-
-    @Column(name = "happiness", nullable = false)
-    private int happiness;
-
-    @Column(name = "energy", nullable = false)
-    private int energy;
+    @ManyToOne
+    @JoinColumn(name = "energy_id", nullable = false)
+    private Energy energy;
 
     // empty constructor for JPA
     public Pet() {}
 
-    public Pet(User user, String name) {
+    public Pet(User user, String type, String name) {
         this.user = user;
         this.name = name;
     }
@@ -67,10 +66,10 @@ public class Pet {
     public void setName(String name) {
         this.name = name;
     }
-    public PetType getType() {
+    public String getType() {
         return type;
     }
-    public void setType(PetType type) {
+    public void setType(String type) {
         this.type = type;
     }
     public Happiness getHappiness() {

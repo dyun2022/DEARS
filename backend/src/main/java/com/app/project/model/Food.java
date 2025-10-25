@@ -17,7 +17,8 @@ public class Food {
     @Column(name = "food_points")
     private int food_points;
 
-    @ManyToOne(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
+    @JoinColumn(name = "type")
     private Pet pet;
 
     // empty constructor for JPA
@@ -27,7 +28,7 @@ public class Food {
     public Food(int food_id, String type, int food_points) {
         this.food_id = food_id;
         this.type = type;
-        this.food_points = food_points
+        this.food_points = food_points;
     }
 
     // Getters and Setters
