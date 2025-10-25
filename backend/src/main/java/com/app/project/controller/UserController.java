@@ -67,7 +67,7 @@ public class UserController {
 
         try {
             // First try to find by username
-            User user = userService.getUserByUsername(usernameOrEmail);
+            User user = userService.findByUsername(username);
 
             // If user found, check password
             if (user != null && user.verify(username, password)) {
@@ -105,7 +105,7 @@ public class UserController {
     @GetMapping("{id}")
     // localhost:8080/api/Users/1
     public ResponseEntity<User> getUserById(@PathVariable("id") int userID){
-        return new ResponseEntity<User>(userService.getUserByID(userID),HttpStatus.OK);
+        return new ResponseEntity<User>(userService.getUserById(userID),HttpStatus.OK);
     }
 }
 
