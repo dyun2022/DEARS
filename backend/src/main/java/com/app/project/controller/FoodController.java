@@ -19,7 +19,7 @@ public class FoodController {
     @Autowired
     private FoodService foodService;
 
-    @Getmapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getFoodById(@PathVariable int id) {
         Food food = foodService.getFoodById(id);
         if (food != null) {
@@ -27,7 +27,10 @@ public class FoodController {
             foodDto.put("food_id", food.getFoodID());
             foodDto.put("food_type", food.getType());
             foodDto.put("food_points", food.getFoodPoints());
-            return ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
