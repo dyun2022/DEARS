@@ -1,0 +1,50 @@
+package com.app.project.service.impl;
+
+import com.app.project.model.AgeStage;
+import com.app.project.model.Energy;
+import com.app.project.repository.EnergyRepository;
+import com.app.project.service.AgeStageService;
+import com.app.project.service.EnergyService;
+
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EnergyServiceImpl implements EnergyService {
+    @Autowired
+    private EnergyRepository energyRepository;
+    @Autowired
+    private AgeStageService ageStageService;
+
+    @Override
+    public Energy getEnergyById(int id) {
+        return energyRepository.findById(id).orElseThrow(() -> new RuntimeException("Energy not found with id: " + id));
+    }
+
+    @Override
+    public List<Energy> getAllEnergy() {
+        return energyRepository.findAll();
+    }
+
+    @Override
+    public int getEnergyMeter(AgeStage age) {
+        Energy energy = energyRepository.findByAge(age);
+        if (energy == null) {
+            throw new RuntimeException("Energy not found for age: " + age.getAgeStage());
+        }
+        return energy.getEnergyPoints();
+    }
+
+    @PostConstruct
+    public void init() {
+        if (energyRepository.count() == 0) {
+            energyRepository.save(new Energy(energyRepository.findByID(1), 5));
+            energyRepository.save(new Energy(energyRepository.findByID(2), 10));
+            energyRepository.save(new Energy(energyRepository.findByID(3), 20));
+        }
+    }
+}

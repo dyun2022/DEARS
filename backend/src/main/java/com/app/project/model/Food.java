@@ -1,8 +1,6 @@
 package com.app.project.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "Food")
@@ -19,7 +17,7 @@ public class Food {
     @Column(name = "food_points")
     private int food_points;
 
-    @ManyToOne(mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
     private Pet pet;
 
     // empty constructor for JPA
