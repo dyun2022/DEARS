@@ -2,7 +2,7 @@ package com.app.project.model;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 @Entity
 @Table(name = "Users")
 public class User{
-    @Id // PRIAMARY KEY
+    @Id // PRIMARY KEY
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO-INCREMENT
     @Column(name = "user_id", nullable = false)
     private int user_id;
@@ -22,7 +22,7 @@ public class User{
     private String password;
 
     @Column(name = "birthday", length = 25, nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name = "avatar", length = 25, nullable = false)
     private String avatar;
@@ -34,7 +34,7 @@ public class User{
     // empty constructor for JPA
     public User() {}
 
-    public User(int user_id, String username, String password, Date birthday, String avatar) {
+    public User(int user_id, String username, String password, LocalDate birthday, String avatar) {
         this.user_id = user_id;
         this.username = username;
         this.password = password;
@@ -68,10 +68,10 @@ public class User{
     public void setPassword(String password) {
         this.password = password;
     }
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
     public String getAvatar() {

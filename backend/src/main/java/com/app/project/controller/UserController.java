@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,9 +106,75 @@ public class UserController {
 
     //Get by Id Rest Api
     @GetMapping("{id}")
-    // localhost:8080/api/Users/1
+    // localhost:8080/api/User/1
     public ResponseEntity<User> getUserById(@PathVariable("id") int userID){
         return new ResponseEntity<User>(userService.getUserById(userID),HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> editPassword(@PathVariable("id") int userID, @RequestBody Map<String, String> request) {
+        // check if user exists by id
+        try {
+            User user = userService.getUserById(userID);
+            if (user == null) {
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            }
+            String password = request.get("password");
+            if (password == null || password.isEmpty()) {
+                return new ResponseEntity<>("Password is required", HttpStatus.BAD_REQUEST);
+            }
+
+            User updatedUser = userService.updatePassword(userID, password);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error updating password: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}/birthday")
+    public ResponseEntity<?> editBirthday(@PathVariable("id") int userID, @RequestBody Map<String, LocalDate> request) {
+        // check if user exists by id
+        try {
+            User user = userService.getUserById(userID);
+            if (user == null) {
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            }
+            LocalDate birthday = request.get("birthday");
+            if (birthday == null) {
+                return new ResponseEntity<>("Birthday is required", HttpStatus.BAD_REQUEST);
+            }
+
+            User updatedUser = userService.updateBirthday(userID, birthday);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error updating birthday: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}/avatar")
+    public ResponseEntity<?> editAvatar(@PathVariable("id") int userID, @RequestBody Map<String, String> request) {
+        // check if user exists by id
+        try {
+            User user = userService.getUserById(userID);
+            if (user == null) {
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            }
+            String avatar = request.get("avatar");
+            if (avatar == null || avatar.isEmpty()) {
+                return new ResponseEntity<>("Avatar is required", HttpStatus.BAD_REQUEST);
+            }
+
+            User updatedUser = userService.updateAvatar(userID, avatar);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error updating birthday: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
 

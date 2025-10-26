@@ -5,7 +5,8 @@ CREATE TABLE Users(
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(25) NOT NULL,
     password VARCHAR(25) NOT NULL,
-    avatar VARCHAR(25) NOT NULL
+    avatar VARCHAR(25) NOT NULL,
+    birthday DATE NOT NULL
 );
 
 CREATE TABLE PetType(
