@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F1E4D4">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/register_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to ChatPet!"
+            android:textColor="#6B3A2E"
+            android:textSize="18sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Username"
+            app:boxBackgroundMode="outline"
+            app:layout_constraintTop_toBottomOf="@id/tvWelcome"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            app:boxBackgroundMode="outline"
+            app:endIconMode="password_toggle"
+            app:layout_constraintTop_toBottomOf="@id/tilUsername"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilBirthday"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Birthday"
+            app:boxBackgroundMode="outline"
+            app:layout_constraintTop_toBottomOf="@id/tilPassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etBirthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="date" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvAvatarLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select\nyour\navatar!"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/tilBirthday"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp" />
+
+        <View
+            android:id="@+id/avatarBox"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="#D3D3D3"
+            app:layout_constraintStart_toEndOf="@id/tvAvatarLabel"
+            app:layout_constraintTop_toTopOf="@id/tvAvatarLabel"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/tvPickPet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick a pet!"
+            app:layout_constraintTop_toBottomOf="@id/avatarBox"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp" />
+
+        <Button
+            android:id="@+id/btnDeer"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="12dp"
+            android:text="Deer"
+            android:textColor="#000000"
+            android:backgroundTint="#D9D9D9"
+            app:layout_constraintTop_toBottomOf="@id/tvPickPet"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnBear"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnBear"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:text="Bear"
+            android:textColor="#000000"
+            android:backgroundTint="#D9D9D9"
+            app:layout_constraintTop_toTopOf="@id/btnDeer"
+            app:layout_constraintBottom_toBottomOf="@id/btnDeer"
+            app:layout_constraintStart_toEndOf="@id/btnDeer"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPetName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Name Your Pet!"
+            app:boxBackgroundMode="outline"
+            app:layout_constraintTop_toBottomOf="@id/btnBear"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPetName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:text="Let’s get started!"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#3F5743"
+            app:layout_constraintTop_toBottomOf="@id/tilPetName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
