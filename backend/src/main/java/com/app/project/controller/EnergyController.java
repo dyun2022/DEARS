@@ -26,7 +26,7 @@ public class EnergyController {
             Map<String, Object> energyDto = new HashMap<>();
             energyDto.put("energy_id", energy.getEnergyID());
             energyDto.put("age_id", energy.getAge());
-            energyDto.put("energy_points", energy.getEnergyPoints());
+            energyDto.put("meter_max", energy.getMeterMax());
             return new ResponseEntity<>(energyDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -42,7 +42,7 @@ public class EnergyController {
                     Map<String, Object> dto = new HashMap<>();
                     dto.put("energy_id", energy.getEnergyID());
                     dto.put("age_id", energy.getAge());
-                    dto.put("energy_points", energy.getEnergyPoints());
+                    dto.put("meter_max", energy.getMeterMax());
                     return dto;
                 })
                 .collect(Collectors.toList());

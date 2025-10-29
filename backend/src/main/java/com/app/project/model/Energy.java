@@ -14,15 +14,15 @@ public class Energy {
     @JoinColumn(name = "age_id", nullable = false)
     private AgeStage age;
 
-    @Column(name = "energy_points", nullable = false)
-    private int energy_points;
+    @Column(name = "meter_max", nullable = false)
+    private int meter_max;
 
     // empty constructor for JPA
     public Energy() {}
 
-    public Energy(AgeStage age, int energy_points) {
+    public Energy(AgeStage age, int meter_max) {
         this.age = age;
-        this.energy_points = energy_points;
+        this.meter_max = meter_max;
     }
 
     // Getters and Setters
@@ -38,10 +38,10 @@ public class Energy {
     public void setAge(AgeStage age) {
         this.age = age;
     }
-    public int getEnergyPoints() {
-        return energy_points;
+    public int getMeterMax() {
+        return meter_max;
     }
-    public void setEnergyPoints(int energy_points) {
-        this.energy_points = energy_points;
+    public void setEnergyPoints(int meter_max) {
+        this.meter_max = meter_max;
     }
 }

@@ -36,15 +36,15 @@ public class EnergyServiceImpl implements EnergyService {
         if (energy == null) {
             throw new RuntimeException("Energy not found for age: " + age.getAgeStage());
         }
-        return energy.getEnergyPoints();
+        return energy.getMeterMax();
     }
 
     @PostConstruct
     public void init() {
         if (energyRepository.count() == 0) {
-            energyRepository.save(new Energy(energyRepository.findByID(1), 5));
-            energyRepository.save(new Energy(energyRepository.findByID(2), 10));
-            energyRepository.save(new Energy(energyRepository.findByID(3), 20));
+            energyRepository.save(new Energy(energyRepository.findByID(1), 10));
+            energyRepository.save(new Energy(energyRepository.findByID(2), 20));
+            energyRepository.save(new Energy(energyRepository.findByID(3), 40));
         }
     }
 }
