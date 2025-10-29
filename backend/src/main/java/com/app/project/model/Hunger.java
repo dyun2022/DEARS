@@ -14,15 +14,15 @@ public class Hunger {
     @JoinColumn(name = "age_id", nullable = false)
     private AgeStage age;
 
-    @Column(name = "hunger_points", nullable = false)
-    private int hunger_points;
+    @Column(name = "meter_max", nullable = false)
+    private int meter_max;
 
     // empty constructor for JPA
     public Hunger() {}
 
-    public Hunger(AgeStage age, int hunger_points) {
+    public Hunger(AgeStage age, int meter_max) {
         this.age = age;
-        this.hunger_points = hunger_points;
+        this.meter_max = meter_max;
     }
 
     // Getters and Setters
@@ -38,10 +38,10 @@ public class Hunger {
     public void setAge(AgeStage age) {
         this.age = age;
     }
-    public int getHungerPoints() {
-        return hunger_points;
+    public int getMeterMax() {
+        return meter_max;
     }
-    public void setHungerPoints(int hunger_points) {
-        this.hunger_points = hunger_points;
+    public void setHungerPoints(int meter_max) {
+        this.meter_max = meter_max;
     }
 }

@@ -68,35 +68,35 @@ CREATE TABLE Pet(
 CREATE TABLE Happiness(
     happiness_id INT AUTO_INCREMENT PRIMARY KEY,
     age_id INT NOT NULL,
-    happiness_points INT NOT NULL,
+    meter_max INT NOT NULL,
     FOREIGN KEY (age_id) REFERENCES AgeStage(age_id)
 );
-INSERT INTO Happiness(happiness_points, age_id) VALUES
-    (5, 1),
-    (10, 2),
-    (20, 3);
+INSERT INTO Happiness(meter_max, age_id) VALUES
+    (10, 1),
+    (20, 2),
+    (40, 3);
 
 CREATE TABLE Energy(
     energy_id INT AUTO_INCREMENT PRIMARY KEY,
     age_id INT NOT NULL,
-    energy_points INT NOT NULL,
+    meter_max INT NOT NULL,
     FOREIGN KEY (age_id) REFERENCES AgeStage(age_id)
 );
-INSERT INTO Energy(energy_points, age_id) VALUES
-    (5, 1),
-    (10, 2),
-    (20, 3);
+INSERT INTO Energy(meter_max, age_id) VALUES
+    (10, 1),
+    (20, 2),
+    (40, 3);
 
 CREATE TABLE Hunger(
     hunger_id INT AUTO_INCREMENT PRIMARY KEY,
     age_id INT NOT NULL,
-    hunger_points INT NOT NULL,
+    meter_max INT NOT NULL,
     FOREIGN KEY (age_id) REFERENCES AgeStage(age_id)
 );
-INSERT INTO Hunger(hunger_points, age_id) VALUES
-    (5, 1),
-    (10, 2),
-    (20, 3);
+INSERT INTO Hunger(meter_max, age_id) VALUES
+    (10, 1),
+    (20, 2),
+    (40, 3);
 
 CREATE TABLE Journal(
     journal_id INT AUTO_INCREMENT PRIMARY KEY,

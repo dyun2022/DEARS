@@ -107,9 +107,12 @@ public class PetController {
             switch (key) {
                 case "name": existingPet.setName((String)value); break;
                 case "hunger": existingPet.setHunger((Hunger)value); break;
+                case "hunger_meter": existingPet.setHungerMeter((int) value); break;
                 case "happiness": existingPet.setHappiness((Happiness)value); break;
+                case "happiness_meter": existingPet.setHappinessMeter((int) value); break;
                 case "energy": existingPet.setEnergy((Energy)value); break;
-                case "growthPoints": existingPet.getAge().setMeterMax((Integer)value); break;
+                case "energy_meter": existingPet.setEnergyMeter((int) value); break;
+                case "growthPoints": existingPet.setGrowthPoints((int) value); break;
                 case "ageStage": existingPet.setAge((AgeStage)value); break;
             }
         });

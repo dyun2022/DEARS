@@ -36,15 +36,15 @@ public class HungerServiceImpl implements HungerService {
         if (hunger == null) {
             throw new RuntimeException("Hunger not found for age: " + age.getAgeStage());
         }
-        return hunger.getHungerPoints();
+        return hunger.getMeterMax();
     }
 
     @PostConstruct
     public void init() {
         if (hungerRepository.count() == 0) {
-            hungerRepository.save(new Hunger(hungerRepository.findByID(1), 5));
-            hungerRepository.save(new Hunger(hungerRepository.findByID(2), 10));
-            hungerRepository.save(new Hunger(hungerRepository.findByID(3), 20));
+            hungerRepository.save(new Hunger(hungerRepository.findByID(1), 10));
+            hungerRepository.save(new Hunger(hungerRepository.findByID(2), 20));
+            hungerRepository.save(new Hunger(hungerRepository.findByID(3), 40));
         }
     }
 }

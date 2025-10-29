@@ -25,7 +25,7 @@ public class HungerController {
             Map<String, Object> hungerDto = new HashMap<>();
             hungerDto.put("hunger_id", hunger.getHungerID());
             hungerDto.put("age_id", hunger.getAge());
-            hungerDto.put("hunger_points", hunger.getHungerPoints());
+            hungerDto.put("meter_max", hunger.getMeterMax());
             return new ResponseEntity<>(hungerDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -41,7 +41,7 @@ public class HungerController {
                     Map<String, Object> dto = new HashMap<>();
                     dto.put("hunger_id", hunger.getHungerID());
                     dto.put("age_id", hunger.getAge());
-                    dto.put("hunger_points", hunger.getHungerPoints());
+                    dto.put("meter_max", hunger.getMeterMax());
                     return dto;
                 })
                 .collect(Collectors.toList());
