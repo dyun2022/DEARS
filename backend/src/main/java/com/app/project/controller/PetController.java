@@ -126,13 +126,13 @@ public class PetController {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
         Food food = foodRepository.findById(food_id).orElseThrow(() -> new RuntimeException("Food not found"));
 
-        int newGrowth = pet.getGrowthPoints() + food.getFoodPoints();
+        int newGrowth = pet.getGrowthPoints() + 5;
         pet.setGrowthPoints(newGrowth);
         checkGrowth(pet);
 
         int newHunger = pet.getHungerMeter() + food.getFoodPoints();
-        if (newHunger >= 100) {
-            pet.setHungerMeter(100);
+        if (newHunger >= pet.getHunger().getMeterMax()) {
+            pet.setHungerMeter(pet.getHunger().getMeterMax());
         }
         else {
             pet.setHungerMeter(newHunger);
@@ -147,13 +147,13 @@ public class PetController {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
         Energy energy = energyRepository.findById(energy_id).orElseThrow(() -> new RuntimeException("Energy not found"));
 
-        int newGrowth = pet.getGrowthPoints() + energy.getEnergyPoints();
+        int newGrowth = pet.getGrowthPoints() + 5;
         pet.setGrowthPoints(newGrowth);
         checkGrowth(pet);
 
-        int newEnergy = pet.getEnergyMeter() + energy.getEnergyPoints();
-        if (newEnergy >= 100) {
-            pet.setEnergyMeter(100);
+        int newEnergy = pet.getEnergyMeter() + 5;
+        if (newEnergy >= pet.getEnergy().getMeterMax()) {
+            pet.setEnergyMeter(pet.getEnergy().getMeterMax());
         }
         else {
             pet.setEnergyMeter(newEnergy);
@@ -169,7 +169,7 @@ public class PetController {
         Happiness currHappy = pet.getHappiness();
         Hunger currHunger = pet.getHunger();
         Energy currEnergy = pet.getEnergy();
-        if (pet.getGrowthPoints() >= 100) {
+        if (pet.getGrowthPoints() >= pet.getAge().getMeterMax()) {
             int nextAge = currAge.getAgeID() + 1;
             ageStageRepository.findById(nextAge).ifPresent(nextStage -> {
                 pet.setAge(nextStage);

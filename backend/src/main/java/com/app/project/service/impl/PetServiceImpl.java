@@ -26,7 +26,7 @@ public class PetServiceImpl implements PetService {
     public Optional<Pet> getPetByUserID(int user_id) {
         return petRepository.findByUser(user_id);
     }
-    public Pet createPet(int user_id, String type, String name, int growthPoints) {
+    public Pet createPet(int user_id, String type, String name, int growthPoints, int hungerMeter, int happinessMeter, int energyMeter) {
         // find user by userID
         User user = userRepository.findById(user_id).orElseThrow(() -> new RuntimeException("User not found"));
 
