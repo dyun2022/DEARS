@@ -2,7 +2,7 @@
 
 Navigate to `src.main.resources`
 
-Run `schema.sql` in your MySQL Workbench to create a database called `project201` on your local machine.
+Run `schema.sql` in your MySQL Workbench to create a database called `dears` on your local machine.
 
 Change `application.properties` to match your local instance of MySQL.
 

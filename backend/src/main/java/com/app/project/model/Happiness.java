@@ -14,15 +14,15 @@ public class Happiness {
     @JoinColumn(name = "age_id", nullable = false)
     private AgeStage age;
 
-    @Column(name = "happiness_points", nullable = false)
-    private int happiness_points;
+    @Column(name = "meter_max", nullable = false)
+    private int meter_max;
 
     // empty constructor for JPA
     public Happiness() {}
 
-    public Happiness(AgeStage age, int happiness_points) {
+    public Happiness(AgeStage age, int meter_max) {
         this.age = age;
-        this.happiness_points = happiness_points;
+        this.meter_max = meter_max;
     }
 
     // Getters and Setters
@@ -38,10 +38,10 @@ public class Happiness {
     public void setAge(AgeStage age) {
         this.age = age;
     }
-    public int getHappinessPoints() {
-        return happiness_points;
+    public int getMeterMax() {
+        return meter_max;
     }
-    public void setHappinessPoints(int happiness_points) {
-        this.happiness_points = happiness_points;
+    public void setMeterMax(int meter_max) {
+        this.meter_max = meter_max;
     }
 }

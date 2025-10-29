@@ -36,15 +36,15 @@ public class HappinessServiceImpl implements HappinessService {
         if (happy == null) {
             throw new RuntimeException("Happiness not found for age: " + age.getAgeStage());
         }
-        return happy.getHappinessPoints();
+        return happy.getMeterMax();
     }
 
     @PostConstruct
     public void init() {
         if (happinessRepository.count() == 0) {
-            happinessRepository.save(new Happiness(happinessRepository.findByID(1), 5));
-            happinessRepository.save(new Happiness(happinessRepository.findByID(2), 10));
-            happinessRepository.save(new Happiness(happinessRepository.findByID(3), 20));
+            happinessRepository.save(new Happiness(happinessRepository.findByID(1), 10));
+            happinessRepository.save(new Happiness(happinessRepository.findByID(2), 20));
+            happinessRepository.save(new Happiness(happinessRepository.findByID(3), 40));
         }
     }
 }

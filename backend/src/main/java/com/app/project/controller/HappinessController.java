@@ -25,7 +25,7 @@ public class HappinessController {
             Map<String, Object> happyDto = new HashMap<>();
             happyDto.put("happiness_id", happy.getHappinessID());
             happyDto.put("age_id", happy.getAge());
-            happyDto.put("happiness_points", happy.getHappinessPoints());
+            happyDto.put("meter_max", happy.getMeterMax());
             return new ResponseEntity<>(happyDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -41,7 +41,7 @@ public class HappinessController {
                     Map<String, Object> dto = new HashMap<>();
                     dto.put("happiness_id", happy.getHappinessID());
                     dto.put("age_id", happy.getAge());
-                    dto.put("happiness_points", happy.getHappinessPoints());
+                    dto.put("meter_max", happy.getMeterMax());
                     return dto;
                 })
                 .collect(Collectors.toList());
