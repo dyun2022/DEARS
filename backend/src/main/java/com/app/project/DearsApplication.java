@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@ComponentScae
+@ComponentScan
 @EntityScan(basePackages = "com.app.project.model")
 @RestController
 public class DearsApplication {

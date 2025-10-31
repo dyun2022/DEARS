@@ -126,10 +126,6 @@ public class PetController {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
         Food food = foodRepository.findById(food_id).orElseThrow(() -> new RuntimeException("Food not found"));
 
-        int newGrowth = pet.getGrowthPoints() + 5;
-        pet.setGrowthPoints(newGrowth);
-        checkGrowth(pet);
-
         int newHunger = pet.getHungerMeter() + food.getFoodPoints();
         if (newHunger >= pet.getHunger().getMeterMax()) {
             pet.setHungerMeter(pet.getHunger().getMeterMax());
@@ -137,6 +133,8 @@ public class PetController {
         else {
             pet.setHungerMeter(newHunger);
         }
+
+        checkMeters(pet);
 
         Pet updated = petRepository.save(pet);
         return ResponseEntity.ok(updated);
@@ -147,10 +145,6 @@ public class PetController {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
         Energy energy = energyRepository.findById(energy_id).orElseThrow(() -> new RuntimeException("Energy not found"));
 
-        int newGrowth = pet.getGrowthPoints() + 5;
-        pet.setGrowthPoints(newGrowth);
-        checkGrowth(pet);
-
         int newEnergy = pet.getEnergyMeter() + 5;
         if (newEnergy >= pet.getEnergy().getMeterMax()) {
             pet.setEnergyMeter(pet.getEnergy().getMeterMax());
@@ -158,6 +152,27 @@ public class PetController {
         else {
             pet.setEnergyMeter(newEnergy);
         }
+
+        checkMeters(pet);
+
+        Pet updated = petRepository.save(pet);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/{id}/chat")
+    public ResponseEntity<?> chatPet(@PathVariable("id") int pet_id, @PathVariable("happiness_id") int happiness_id) {
+        Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
+        Happiness happy_id = happinessRepository.findById(happiness_id).orElseThrow(() -> new RuntimeException("Happiness not found"));
+
+        int newHappy = pet.getHappinessMeter() + 5;
+        if (newHappy >= pet.getHappiness().getMeterMax()) {
+            pet.setHappinessMeter(pet.getHappiness().getMeterMax());
+        }
+        else {
+            pet.setHappinessMeter(newHappy);
+        }
+
+        checkMeters(pet);
 
         Pet updated = petRepository.save(pet);
         return ResponseEntity.ok(updated);
@@ -191,5 +206,18 @@ public class PetController {
                 pet.setEnergyMeter(0);
             });
         }
+    }
+
+    private void checkMeters(Pet pet) {
+        double hungerRatio = (double) pet.getHungerMeter() / pet.getHunger().getMeterMax();
+        double happyRatio = (double) pet.getHappinessMeter() / pet.getHappiness().getMeterMax();
+        double energyRatio = (double) pet.getEnergyMeter() / pet.getEnergy().getMeterMax();
+
+        if (hungerRatio >= 0.75 && happyRatio >= 0.75 && energyRatio >= 0.75) {
+            pet.setGrowthPoints(pet.getGrowthPoints() + 5);
+            checkGrowth(pet);
+        }
+
+        Pet updated = petRepository.save(pet);
     }
 }
