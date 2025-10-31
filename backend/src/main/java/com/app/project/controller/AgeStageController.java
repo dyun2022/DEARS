@@ -19,7 +19,7 @@ public class AgeStageController {
     private AgeStageService ageStageService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> geAgeById(@PathVariable int id) {
+    public ResponseEntity<Map<String, Object>> getAgeById(@PathVariable int id) {
         AgeStage age = ageStageService.getAgeById(id);
         if (age != null) {
             Map<String, Object> ageDto = new HashMap<>();
