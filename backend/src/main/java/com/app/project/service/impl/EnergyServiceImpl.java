@@ -2,6 +2,7 @@ package com.app.project.service.impl;
 
 import com.app.project.model.AgeStage;
 import com.app.project.model.Energy;
+import com.app.project.model.Hunger;
 import com.app.project.repository.EnergyRepository;
 import com.app.project.service.AgeStageService;
 import com.app.project.service.EnergyService;
@@ -42,9 +43,13 @@ public class EnergyServiceImpl implements EnergyService {
     @PostConstruct
     public void init() {
         if (energyRepository.count() == 0) {
-            energyRepository.save(new Energy(energyRepository.findByID(1), 10));
-            energyRepository.save(new Energy(energyRepository.findByID(2), 20));
-            energyRepository.save(new Energy(energyRepository.findByID(3), 40));
+            List<AgeStage> ageStages = ageStageService.getAllAges(); // get all AgeStages
+            for (AgeStage age : ageStages) {
+                if (energyRepository.findByAge(age) == null) {
+                    Energy h = new Energy(age, age.getMeterMax());
+                    energyRepository.save(h);
+                }
+            }
         }
     }
 }

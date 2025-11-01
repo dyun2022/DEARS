@@ -14,19 +14,19 @@ public class AgeStage {
     private int age_id;
 
     @Column(name = "age_stage", nullable = false)
-    private String age_stage;
+    private String ageStage;
 
     @Column(name = "meter_max", nullable = false)
     private int meter_max;
 
-    @OneToMany(mappedBy = "age_stage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "age", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
     // empty constructor for JPA
     public AgeStage() {}
 
     public AgeStage(String age_stage, int meter_max) {
-        this.age_stage = age_stage;
+        this.ageStage = age_stage;
         this.meter_max = meter_max;
     }
 
@@ -38,10 +38,10 @@ public class AgeStage {
         this.age_id = age_id;
     }
     public String getAgeStage() {
-        return age_stage;
+        return ageStage;
     }
     public void setAgeStage(String age_stage) {
-        this.age_stage = age_stage;
+        this.ageStage = age_stage;
     }
     public int getMeterMax() {
         return meter_max;

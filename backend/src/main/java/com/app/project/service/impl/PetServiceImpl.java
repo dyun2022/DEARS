@@ -23,8 +23,8 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public Optional<Pet> getPetByUserID(int user_id) {
-        return petRepository.findByUser(user_id);
+    public Optional<Pet> getPetByUserID(int userID) {
+        return petRepository.findByUserUserID(userID);
     }
     public Pet createPet(int user_id, String type, String name, int growthPoints, int hungerMeter, int happinessMeter, int energyMeter) {
         // find user by userID

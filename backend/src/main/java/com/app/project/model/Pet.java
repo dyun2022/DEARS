@@ -140,18 +140,18 @@ public class Pet {
     }
 
     public boolean isReadyToGrow() {
-        return growth_points >= 100;
+        return growth_points >= age.getMeterMax();
     }
 
     public boolean isHappy() {
-        return happiness_meter >= 100;
+        return happiness_meter >= happiness.getMeterMax();
     }
 
     public boolean isFull() {
-        return hunger_meter >= 100;
+        return hunger_meter >= hunger.getHungerID();
     }
 
     public boolean isEnergy() {
-        return energy_meter >= 100;
+        return energy_meter >= energy.getMeterMax();
     }
 }

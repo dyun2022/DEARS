@@ -1,1 +1,9 @@
 rootProject.name = 'DEARS'
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS) // you can also use PREFER_SETTINGS
+    repositories {
+        mavenCentral()
+        maven { url 'https://my.custom.repo' }
+    }
+}
