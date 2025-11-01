@@ -34,3 +34,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+repositories {
+	mavenCentral()
+}
+

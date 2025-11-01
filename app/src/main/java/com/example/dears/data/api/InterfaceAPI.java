@@ -1,7 +1,9 @@
 package com.example.dears.data.api;
 
+import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
+import com.example.dears.data.request.createPetRequest;
 import com.example.dears.data.request.loginUserRequest;
 
 import java.util.List;
@@ -12,7 +14,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-public interface UserAPI {
+public interface InterfaceAPI {
     // *** USER RELATED REQUESTS *** //
     @POST("/users/register")
     Call<User> registerUser(@Body changeUserRequest request);
@@ -38,4 +40,8 @@ public interface UserAPI {
 
     @PUT("/users/{id}/avatar")
     Call<User> editAvatar(@Path("id") int userId);*/
+
+    // *** PET RELATED REQUESTS *** //
+    @POST("/pet/user/{id}")
+    Call<Pet> createPet(@Path("id") int userId, @Body createPetRequest createPetRequest);
 }

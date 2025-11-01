@@ -2,10 +2,12 @@ package com.example.dears.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Pet model. Should match the backend's Pet.
  */
-public class Pet {
+public class Pet implements Serializable {
         @SerializedName("pet_id")
         private int pet_id;
 
