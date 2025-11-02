@@ -186,9 +186,8 @@ public class PetController {
     }
 
     @PatchMapping("/{id}/sleep")
-    public ResponseEntity<?> sleepPet(@PathVariable("id") int pet_id, @PathVariable("energy_id") int energy_id) {
+    public ResponseEntity<?> sleepPet(@PathVariable("id") int pet_id) {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
-        Energy energy = energyRepository.findById(energy_id).orElseThrow(() -> new RuntimeException("Energy not found"));
 
         int newEnergy = pet.getEnergyMeter() + 5;
         if (newEnergy >= pet.getEnergy().getMeterMax()) {
@@ -205,9 +204,8 @@ public class PetController {
     }
 
     @PatchMapping("/{id}/chat")
-    public ResponseEntity<?> chatPet(@PathVariable("id") int pet_id, @PathVariable("happiness_id") int happiness_id) {
+    public ResponseEntity<?> chatPet(@PathVariable("id") int pet_id) {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
-        Happiness happy_id = happinessRepository.findById(happiness_id).orElseThrow(() -> new RuntimeException("Happiness not found"));
 
         int newHappy = pet.getHappinessMeter() + 5;
         if (newHappy >= pet.getHappiness().getMeterMax()) {
