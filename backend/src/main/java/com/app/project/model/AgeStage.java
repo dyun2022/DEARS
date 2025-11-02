@@ -1,5 +1,7 @@
 package com.app.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class AgeStage {
     private int meter_max;
 
     @OneToMany(mappedBy = "age", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Pet> pets = new ArrayList<>();
 
     // empty constructor for JPA
