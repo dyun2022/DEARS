@@ -19,7 +19,7 @@ public class Pet {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

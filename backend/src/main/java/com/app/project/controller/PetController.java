@@ -60,9 +60,9 @@ public class PetController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<Pet> getPetByUserID(@PathVariable("user_id") int user_id) {
-        Optional<Pet> pet = petService.getPetByUserID(user_id);
+    @GetMapping("/user/{userID}")
+    public ResponseEntity<Pet> getPetByUserID(@PathVariable("userID") int userID) {
+        Optional<Pet> pet = petService.getPetByUserID(userID);
         return pet.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -84,6 +84,13 @@ public class PetController {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "User not found with ID: " + user_id);
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        // Check if user already has a pet
+        if (owner.getPet() != null) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "User already has a pet");
+            return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
         }
 
         // create pet

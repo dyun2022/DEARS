@@ -13,7 +13,7 @@ import com.app.project.service.PetService;
 @Service
 public interface PetService {
     public Optional<Pet> getPetByID(int pet_id);
-    public Optional<Pet> getPetByUserID(int user_id);
+    public Optional<Pet> getPetByUserID(int userID);
     public Pet createPet(int user_id, AgeStage age, String type, String name, int growthPoints, Hunger hunger, int hungerMeter, Happiness happiness, int happinessMeter, Energy energy, int energyMeter);
     public Pet updatePet(int pet_id, Pet updatedPet);
 }
