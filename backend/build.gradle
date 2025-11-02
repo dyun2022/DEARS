@@ -16,8 +16,6 @@ java {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-    implementation project(':app')
-	implementation project(':app')
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
