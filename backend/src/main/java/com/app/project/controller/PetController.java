@@ -94,7 +94,28 @@ public class PetController {
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
         AgeStage age = ageStage.get();
-        Pet newPet = petService.createPet(user_id, age, type, name, 0, 0, 0, 0);
+        Optional<Hunger> hungerStage = hungerRepository.findById(1);
+        if (hungerStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Hunger not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Hunger hunger = hungerStage.get();
+        Optional<Happiness> happyStage = happinessRepository.findById(1);
+        if (happyStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Happy not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Happiness happy = happyStage.get();
+        Optional<Energy> energyStage = energyRepository.findById(1);
+        if (energyStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Energy not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Energy energy = energyStage.get();
+        Pet newPet = petService.createPet(user_id, age, type, name, 0, hunger,0, happy, 0, energy, 0);
         if (newPet == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to create pet");
