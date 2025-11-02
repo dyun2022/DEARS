@@ -87,7 +87,14 @@ public class PetController {
         }
 
         // create pet
-        Pet newPet = petService.createPet(user_id, type, name, 0, 0, 0, 0);
+        Optional<AgeStage> ageStage = ageStageRepository.findById(1);
+        if (ageStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Age not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        AgeStage age = ageStage.get();
+        Pet newPet = petService.createPet(user_id, age, type, name, 0, 0, 0, 0);
         if (newPet == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to create pet");

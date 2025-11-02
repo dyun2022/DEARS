@@ -55,8 +55,9 @@ public class Pet {
     // empty constructor for JPA
     public Pet() {}
 
-    public Pet(User user, String type, String name, int growth_points, int hunger_meter, int happiness_meter, int energy_meter) {
+    public Pet(User user, AgeStage age, String type, String name, int growth_points, int hunger_meter, int happiness_meter, int energy_meter) {
         this.user = user;
+        this.age = age;
         this.type = type;
         this.name = name;
         this.growth_points = growth_points;

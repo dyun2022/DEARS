@@ -28,8 +28,8 @@ public class User{
     private String avatar;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Pet pet = new Pet();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Pet pet;
 
     // empty constructor for JPA
     public User() {}
