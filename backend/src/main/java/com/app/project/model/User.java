@@ -13,7 +13,7 @@ public class User{
     @Id // PRIMARY KEY
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO-INCREMENT
     @Column(name = "user_id", nullable = false)
-    private int user_id;
+    private int userID;
 
     @Column(name = "username", length = 25, nullable = false, unique = true)
     private String username;
@@ -28,14 +28,14 @@ public class User{
     private String avatar;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Pet pet = new Pet();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Pet pet;
 
     // empty constructor for JPA
     public User() {}
 
     public User(int user_id, String username, String password, LocalDate birthday, String avatar) {
-        this.user_id = user_id;
+        this.userID = user_id;
         this.username = username;
         this.password = password;
         this.birthday = birthday;
@@ -51,10 +51,10 @@ public class User{
 
     // Getters and Setters
     public int getUserID() {
-        return user_id;
+        return userID;
     }
     public void setUserID(int user_id) {
-        this.user_id = user_id;
+        this.userID = user_id;
     }
     public String getUsername() {
         return username;

@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "DEARS"
-include(":app")
-include(":backend")
+include(":app", ":backend")
