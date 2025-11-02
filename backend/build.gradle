@@ -29,6 +29,8 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'com.google.mediapipe:tasks-genai:0.10.27'
 }
 
 tasks.named('test') {
