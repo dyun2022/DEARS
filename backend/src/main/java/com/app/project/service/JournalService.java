@@ -7,8 +7,10 @@ import com.app.project.model.Pet;
 import com.app.project.model.User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import com.app.project.service.PetService;
 
@@ -19,5 +21,8 @@ public interface JournalService {
     ArrayList<Entry> getAllEntries();
     Entry getEntrybyId(int entry_id);
 
-    Journal getJournalByDate(Date date);
+    List<Entry> getEntriesByDate(LocalDate date);
+    Pet getPetById(int petId);
+
+    Journal saveJournal(Journal journal);
 }

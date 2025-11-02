@@ -1,8 +1,11 @@
 package com.app.project.model;
 
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ public class Entry {
     private int entry_id;
 
     @Column(name = "date", nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "summary", nullable = false)
     private String summary;
@@ -26,20 +29,30 @@ public class Entry {
 
     @ManyToOne
     @JoinColumn(name = "pet_id", nullable = false)
+    @JsonIgnore
     private Pet pet;
+
+    @ManyToOne
+    @JoinColumn(name = "journal")
+    @JsonBackReference
+    private Journal journal;
 
     // empty constructor for JPA
     public Entry() {}
 
-    public Entry(Date date) {
+    public Entry(LocalDate date) {
         this.date = date;
     }
 
     // Getters and Setters
-    public Date getEntryDate() {
-        return date;
-    }
+    public LocalDate getEntryDate() { return date; }
     public String getSummary() { return summary; }
     public String getMood() { return mood; }
     public int getEntryId() { return entry_id; }
+    public Journal getEntryJournalId() { return journal; }
+    public Pet getPet() { return pet; }
+
+    public Integer getJournalId() {
+        return journal != null ? journal.getJournalId() : null;
+    }
 }

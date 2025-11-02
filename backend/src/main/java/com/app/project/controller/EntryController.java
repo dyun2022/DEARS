@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +38,8 @@ public class EntryController {
         }
     }
 
-    @PostMapping("/{date}")
-    public ResponseEntity<Map<String, Object>> createEntry(@PathVariable Date date, @RequestBody Map<String, String> entryData) {
+    @PostMapping("/create/{date}")
+    public ResponseEntity<Map<String, Object>> createEntry(@PathVariable LocalDate date, @RequestBody Map<String, String> entryData) {
         //  get info
         String text = entryData.get("text");
         String mood = entryData.get("mood");
