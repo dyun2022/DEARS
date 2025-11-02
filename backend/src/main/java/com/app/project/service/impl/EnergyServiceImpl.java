@@ -3,6 +3,7 @@ package com.app.project.service.impl;
 import com.app.project.model.AgeStage;
 import com.app.project.model.Energy;
 import com.app.project.model.Hunger;
+import com.app.project.model.User;
 import com.app.project.repository.EnergyRepository;
 import com.app.project.service.AgeStageService;
 import com.app.project.service.EnergyService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnergyServiceImpl implements EnergyService {
@@ -23,7 +25,8 @@ public class EnergyServiceImpl implements EnergyService {
 
     @Override
     public Energy getEnergyById(int id) {
-        return energyRepository.findById(id).orElseThrow(() -> new RuntimeException("Energy not found with id: " + id));
+        Optional<Energy> energy = energyRepository.findById(id);
+        return energy.orElse(null);
     }
 
     @Override

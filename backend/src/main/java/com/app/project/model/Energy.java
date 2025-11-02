@@ -8,7 +8,7 @@ public class Energy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "energy_id")
-    private int energy_id;
+    private int energyID;
 
     @OneToOne
     @JoinColumn(name = "age_id", nullable = false)
@@ -27,10 +27,10 @@ public class Energy {
 
     // Getters and Setters
     public int getEnergyID() {
-        return energy_id;
+        return energyID;
     }
     public void setEnergyID(int energy_id) {
-        this.energy_id = energy_id;
+        this.energyID = energy_id;
     }
     public AgeStage getAge() {
         return age;

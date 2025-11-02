@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/energy")
+@RequestMapping("/api/energy")
 public class EnergyController {
     @Autowired
     private EnergyService energyService;
