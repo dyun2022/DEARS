@@ -27,7 +27,7 @@ public class FoodController {
             foodDto.put("food_id", food.getFoodID());
             foodDto.put("food_type", food.getType());
             foodDto.put("food_points", food.getFoodPoints());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(foodDto, HttpStatus.OK);
         }
         else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

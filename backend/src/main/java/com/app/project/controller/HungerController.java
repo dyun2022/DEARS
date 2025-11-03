@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/hunger")
+@RequestMapping("/api/hunger")
 public class HungerController {
     @Autowired
     private HungerService hungerService;

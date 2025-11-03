@@ -60,9 +60,9 @@ public class PetController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<Pet> getPetByUserID(@PathVariable("user_id") int user_id) {
-        Optional<Pet> pet = petService.getPetByUserID(user_id);
+    @GetMapping("/user/{userID}")
+    public ResponseEntity<Pet> getPetByUserID(@PathVariable("userID") int userID) {
+        Optional<Pet> pet = petService.getPetByUserID(userID);
         return pet.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -86,8 +86,43 @@ public class PetController {
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
 
+        // Check if user already has a pet
+        if (owner.getPet() != null) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "User already has a pet");
+            return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        }
+
         // create pet
-        Pet newPet = petService.createPet(user_id, type, name, 0, 0, 0, 0);
+        Optional<AgeStage> ageStage = ageStageRepository.findById(1);
+        if (ageStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Age not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        AgeStage age = ageStage.get();
+        Optional<Hunger> hungerStage = hungerRepository.findById(1);
+        if (hungerStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Hunger not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Hunger hunger = hungerStage.get();
+        Optional<Happiness> happyStage = happinessRepository.findById(1);
+        if (happyStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Happy not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Happiness happy = happyStage.get();
+        Optional<Energy> energyStage = energyRepository.findById(1);
+        if (energyStage.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Energy not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        Energy energy = energyStage.get();
+        Pet newPet = petService.createPet(user_id, age, type, name, 0, hunger,0, happy, 0, energy, 0);
         if (newPet == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to create pet");
@@ -108,14 +143,24 @@ public class PetController {
                 case "name": existingPet.setName((String)value); break;
                 case "hunger": existingPet.setHunger((Hunger)value); break;
                 case "hunger_meter": existingPet.setHungerMeter((int) value); break;
-                case "happiness": existingPet.setHappiness((Happiness)value); break;
                 case "happiness_meter": existingPet.setHappinessMeter((int) value); break;
-                case "energy": existingPet.setEnergy((Energy)value); break;
                 case "energy_meter": existingPet.setEnergyMeter((int) value); break;
                 case "growthPoints": existingPet.setGrowthPoints((int) value); break;
-                case "ageStage": existingPet.setAge((AgeStage)value); break;
             }
         });
+
+        // Handle threshold checks
+        if (existingPet.isFull()) {
+            existingPet.setHungerMeter(existingPet.getHunger().getMeterMax());
+        }
+        if (existingPet.isHappy()) {
+            existingPet.setHappinessMeter(existingPet.getHappiness().getMeterMax());
+        }
+        if (existingPet.isEnergy()) {
+            existingPet.setEnergyMeter(existingPet.getEnergy().getMeterMax());
+        }
+        checkMeters(existingPet);
+        checkGrowth(existingPet);
 
         Pet updatedPet = petRepository.save(existingPet);
         return ResponseEntity.ok(updatedPet);
@@ -141,9 +186,8 @@ public class PetController {
     }
 
     @PatchMapping("/{id}/sleep")
-    public ResponseEntity<?> sleepPet(@PathVariable("id") int pet_id, @PathVariable("energy_id") int energy_id) {
+    public ResponseEntity<?> sleepPet(@PathVariable("id") int pet_id) {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
-        Energy energy = energyRepository.findById(energy_id).orElseThrow(() -> new RuntimeException("Energy not found"));
 
         int newEnergy = pet.getEnergyMeter() + 5;
         if (newEnergy >= pet.getEnergy().getMeterMax()) {
@@ -160,9 +204,8 @@ public class PetController {
     }
 
     @PatchMapping("/{id}/chat")
-    public ResponseEntity<?> chatPet(@PathVariable("id") int pet_id, @PathVariable("happiness_id") int happiness_id) {
+    public ResponseEntity<?> chatPet(@PathVariable("id") int pet_id) {
         Pet pet = petRepository.findById(pet_id).orElseThrow(() -> new RuntimeException("Pet not found"));
-        Happiness happy_id = happinessRepository.findById(happiness_id).orElseThrow(() -> new RuntimeException("Happiness not found"));
 
         int newHappy = pet.getHappinessMeter() + 5;
         if (newHappy >= pet.getHappiness().getMeterMax()) {
@@ -180,33 +223,38 @@ public class PetController {
 
     // if reached growth meter max, update all meter maxes
     private void checkGrowth(Pet pet) {
-        AgeStage currAge = pet.getAge();
-        Happiness currHappy = pet.getHappiness();
-        Hunger currHunger = pet.getHunger();
-        Energy currEnergy = pet.getEnergy();
-        if (pet.getGrowthPoints() >= pet.getAge().getMeterMax()) {
-            int nextAge = currAge.getAgeID() + 1;
-            ageStageRepository.findById(nextAge).ifPresent(nextStage -> {
-                pet.setAge(nextStage);
-                pet.setGrowthPoints(0);
-            });
-            int nextHappy = currHappy.getHappinessID() + 1;
-            happinessRepository.findById(nextHappy).ifPresent(nextHappyStage -> {
-                pet.setHappiness(nextHappyStage);
-                pet.setHappinessMeter(0);
-            });
-            int nextHunger = currHunger.getHungerID() + 1;
-            hungerRepository.findById(nextHunger).ifPresent(nextHungerStage -> {
-                pet.setHunger(nextHungerStage);
+        while (pet.getGrowthPoints() >= pet.getAge().getMeterMax()) {
+            int nextAgeID = pet.getAge().getAgeID() + 1;
+            Optional<AgeStage> nextAgeStage = ageStageRepository.findById(nextAgeID);
+            if (nextAgeStage.isPresent()) {
+                pet.setAge(nextAgeStage.get());
+            } else {
+                // Already at max age
+                break;
+            }
+
+            int nextHungerID = pet.getHunger().getHungerID() + 1;
+            hungerRepository.findById(nextHungerID).ifPresent(nextHunger -> {
+                pet.setHunger(nextHunger);
                 pet.setHungerMeter(0);
             });
-            int nextEnergy = currEnergy.getEnergyID() + 1;
-            energyRepository.findById(nextEnergy).ifPresent(nextEnergyStage -> {
-                pet.setEnergy(nextEnergyStage);
+
+            int nextHappinessID = pet.getHappiness().getHappinessID() + 1;
+            happinessRepository.findById(nextHappinessID).ifPresent(nextHappiness -> {
+                pet.setHappiness(nextHappiness);
+                pet.setHappinessMeter(0);
+            });
+
+            int nextEnergyID = pet.getEnergy().getEnergyID() + 1;
+            energyRepository.findById(nextEnergyID).ifPresent(nextEnergy -> {
+                pet.setEnergy(nextEnergy);
                 pet.setEnergyMeter(0);
             });
+
+            pet.setGrowthPoints(0);
         }
     }
+
 
     private void checkMeters(Pet pet) {
         double hungerRatio = (double) pet.getHungerMeter() / pet.getHunger().getMeterMax();
@@ -215,9 +263,8 @@ public class PetController {
 
         if (hungerRatio >= 0.75 && happyRatio >= 0.75 && energyRatio >= 0.75) {
             pet.setGrowthPoints(pet.getGrowthPoints() + 5);
-            checkGrowth(pet);
         }
 
-        Pet updated = petRepository.save(pet);
+        checkGrowth(pet);
     }
 }

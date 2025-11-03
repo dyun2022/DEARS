@@ -9,7 +9,7 @@ Change `application.properties` to match your local instance of MySQL.
 application.properties:
 
 ```
-spring.datasource.url = jdbc:mysql://localhost:{YOUR_PORT}/project201
+spring.datasource.url = jdbc:mysql://localhost:{YOUR_PORT}/dears
 spring.datasource.username = {YOUR_USERNAME}
 spring.datasource.password = {YOUR_PASSWORD}
 ```

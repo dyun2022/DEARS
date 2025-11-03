@@ -1,5 +1,7 @@
 package com.app.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class Hunger {
 
     @OneToOne
     @JoinColumn(name = "age_id", nullable = false)
+    @JsonIgnore
     private AgeStage age;
 
     @Column(name = "meter_max", nullable = false)

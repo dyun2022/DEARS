@@ -19,7 +19,7 @@ public class ChatChoicesController {
     private ChatChoicesService chatChoicesService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> geChoiceById(@PathVariable int id) {
+    public ResponseEntity<Map<String, Object>> getChoiceById(@PathVariable int id) {
         ChatChoices choice = chatChoicesService.getChoiceById(id);
         if (choice != null) {
             Map<String, Object> choiceDto = new HashMap<>();

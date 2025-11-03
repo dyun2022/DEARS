@@ -19,7 +19,7 @@ public class Pet {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -55,13 +55,17 @@ public class Pet {
     // empty constructor for JPA
     public Pet() {}
 
-    public Pet(User user, String type, String name, int growth_points, int hunger_meter, int happiness_meter, int energy_meter) {
+    public Pet(User user, AgeStage age, String type, String name, int growth_points, Hunger hunger, int hunger_meter, Happiness happiness, int happiness_meter, Energy energy, int energy_meter) {
         this.user = user;
+        this.age = age;
         this.type = type;
         this.name = name;
         this.growth_points = growth_points;
+        this.hunger = hunger;
         this.hunger_meter = hunger_meter;
+        this.happiness = happiness;
         this.happiness_meter = happiness_meter;
+        this.energy = energy;
         this.energy_meter = energy_meter;
     }
 
@@ -140,18 +144,18 @@ public class Pet {
     }
 
     public boolean isReadyToGrow() {
-        return growth_points >= 100;
+        return growth_points >= age.getMeterMax();
     }
 
     public boolean isHappy() {
-        return happiness_meter >= 100;
+        return happiness_meter >= happiness.getMeterMax();
     }
 
     public boolean isFull() {
-        return hunger_meter >= 100;
+        return hunger_meter >= hunger.getHungerID();
     }
 
     public boolean isEnergy() {
-        return energy_meter >= 100;
+        return energy_meter >= energy.getMeterMax();
     }
 }

@@ -42,9 +42,13 @@ public class HappinessServiceImpl implements HappinessService {
     @PostConstruct
     public void init() {
         if (happinessRepository.count() == 0) {
-            happinessRepository.save(new Happiness(happinessRepository.findByID(1), 10));
-            happinessRepository.save(new Happiness(happinessRepository.findByID(2), 20));
-            happinessRepository.save(new Happiness(happinessRepository.findByID(3), 40));
+            List<AgeStage> ageStages = ageStageService.getAllAges(); // get all AgeStages
+            for (AgeStage age : ageStages) {
+                if (happinessRepository.findByAge(age) == null) {
+                    Happiness h = new Happiness(age, age.getMeterMax());
+                    happinessRepository.save(h);
+                }
+            }
         }
     }
 }

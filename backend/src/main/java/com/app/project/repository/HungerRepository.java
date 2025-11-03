@@ -5,6 +5,5 @@ import com.app.project.model.AgeStage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface HungerRepository extends JpaRepository<Hunger, Integer> {
-    Hunger findByAge(AgeStage age);
-    AgeStage findByID(int id);
+    Hunger findByAge(AgeStage ageStage);
 }

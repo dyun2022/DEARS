@@ -17,10 +17,6 @@ public class Food {
     @Column(name = "food_points")
     private int food_points;
 
-    @ManyToOne
-    @JoinColumn(name = "type")
-    private Pet pet;
-
     // empty constructor for JPA
     public Food() {
     }
@@ -49,11 +45,5 @@ public class Food {
     }
     public void setFoodPoints(int food_points) {
         this.food_points = food_points;
-    }
-    public Pet getPet() {
-        return pet;
-    }
-    public void setPet(Pet pet) {
-        this.pet = pet;
     }
 }

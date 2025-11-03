@@ -22,7 +22,7 @@
         android:layout_width="120dp"
         android:layout_marginBottom="200dp"
         android:backgroundTint="@color/black"
-        android:text="tester"
+        android:text="click to generate"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

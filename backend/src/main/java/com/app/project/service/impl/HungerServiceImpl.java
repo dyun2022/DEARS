@@ -1,6 +1,7 @@
 package com.app.project.service.impl;
 
 import com.app.project.model.AgeStage;
+import com.app.project.model.Happiness;
 import com.app.project.model.Hunger;
 import com.app.project.repository.HungerRepository;
 import com.app.project.service.AgeStageService;
@@ -42,9 +43,13 @@ public class HungerServiceImpl implements HungerService {
     @PostConstruct
     public void init() {
         if (hungerRepository.count() == 0) {
-            hungerRepository.save(new Hunger(hungerRepository.findByID(1), 10));
-            hungerRepository.save(new Hunger(hungerRepository.findByID(2), 20));
-            hungerRepository.save(new Hunger(hungerRepository.findByID(3), 40));
+            List<AgeStage> ageStages = ageStageService.getAllAges(); // get all AgeStages
+            for (AgeStage age : ageStages) {
+                if (hungerRepository.findByAge(age) == null) {
+                    Hunger h = new Hunger(age, age.getMeterMax());
+                    hungerRepository.save(h);
+                }
+            }
         }
     }
 }
