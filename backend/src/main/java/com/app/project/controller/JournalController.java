@@ -87,7 +87,7 @@ public class JournalController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createEntry(@RequestBody Map<String, Object> journalData) {
+    public ResponseEntity<Map<String, Object>> createJournal(@RequestBody Map<String, Object> journalData) {
         try {
             Journal journal = new Journal();
 

@@ -34,8 +34,11 @@ public class Entry {
 
     @ManyToOne
     @JoinColumn(name = "journal")
-    @JsonBackReference
+    @JsonIgnore
     private Journal journal;
+
+    @Column(name = "journal_id")
+    private int journalId;
 
     // empty constructor for JPA
     public Entry() {}
@@ -55,4 +58,14 @@ public class Entry {
     public Integer getJournalId() {
         return journal != null ? journal.getJournalId() : null;
     }
+
+    public void setEntryDate(LocalDate date) { this.date = date; }
+    public void setSummary(String summary) { this.summary = summary; }
+    public void setMood(String mood) { this.mood = mood; }
+
+    public void setPet(Pet pet) { this.pet = pet; }
+
+    public void setJournal(Journal journal) { this.journal = journal; }
+    public void setJournalId(int journalId) { this.journalId = journalId; }
+
 }

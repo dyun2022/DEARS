@@ -82,8 +82,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
                     }
                 }
 

@@ -1,3 +1,4 @@
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.6'
@@ -31,6 +32,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'com.google.mediapipe:tasks-genai:0.10.27'
+
+	implementation 'org.apache.commons:commons-compress:1.27.1'
 }
 
 tasks.named('test') {

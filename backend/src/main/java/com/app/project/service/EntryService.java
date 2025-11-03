@@ -11,4 +11,6 @@ import com.app.project.service.PetService;
 @Service
 public interface EntryService {
     Entry getEntryById(int id);
+    Entry saveEntry(Entry entry);
+    Pet getPetById(int petId);
 }
