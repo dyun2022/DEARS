@@ -20,3 +20,8 @@ To start SpringBoot:
 cd backend
 ./gradleW bootRun
 ```
+
+## to set up llm on your local emulator -- use Pixel 8
+follow: https://github.com/briankim113/ChatPet/blob/main/app/README.md
+
+download link for ```gemma3-1b-it-int4.task```: https://huggingface.co/litert-community/Gemma3-1B-IT#:~:text=Download%20and%20install%20the%20apk.
