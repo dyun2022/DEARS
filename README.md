@@ -1,4 +1,4 @@
-### Backend
+## Backend
 
 Navigate to `src.main.resources`
 
@@ -21,7 +21,8 @@ cd backend
 ./gradleW bootRun
 ```
 
-## to set up llm on your local emulator -- use Pixel 8
-follow: https://github.com/briankim113/ChatPet/blob/main/app/README.md
-
-download link for ```gemma3-1b-it-int4.task```: https://huggingface.co/litert-community/Gemma3-1B-IT#:~:text=Download%20and%20install%20the%20apk.
+## Emulator -- use Pixel 8
+To run on emulator:
+* go to Device Manager > three dots next to Pixel 8 > Additional Settings
+* increase internal storage to 16 gb and expanded storage to 2 gb
+* increase to 8 cores in CPU
