@@ -41,55 +41,68 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    public void updateTextView(){
+    public void updateTextView() {
         TextView textView = findViewById(R.id.LLMResults);
-        // create new llminference object, to be able to connect w/ LLM
         LLMInference llm = new LLMInference(this);
 
-        // send prompt + display results
-        // FOR FRONTEND: call generateJournalEntry() to generate journal entry and respondToChat() for chatting
-        // just add the chat prompt as the last paramater for respondToChat()
-        llm.generateJournalEntry("young", "cat", 80, 60, 70,
-            new LLMInference.LLMCallback() {
-                @Override
-                public void onComplete(String llmResult) {
-                    // Step 2: Parse the LLM result
-                    try {
-                        JSONObject json = new JSONObject(llmResult);
-                        String mood = json.getString("mood");
-                        String summary = json.getString("summary");
-                        String entryText = json.getString("summary"); // or get from user input
+        // put the llm call on a thread so it doesn't hog all of the resources
+        new Thread(() -> {
+            try {
+                llm.generateJournalEntry("young", "cat", 80, 60, 70, new LLMInference.LLMCallback() {
+                    @Override
+                    public void onComplete(String llmResult) {
+                        runOnUiThread(() -> {
+                            try {
+                                String processedResult = llmResult.substring(7, llmResult.length() - 4);
+                                JSONObject json = new JSONObject(processedResult);
+                                String mood = json.getString("mood");
+                                String summary = json.getString("summary");
+                                String entryText = json.getString("summary");
 
-                        // Step 3: Send to backend
-                        llm.sendToBackend(new Date(), entryText, mood, summary,
-                                new LLMInference.CreateEntryCallback() {
-                                    @Override
-                                    public void onSuccess(JSONObject response) {
-                                        runOnUiThread(() -> {
-                                            Toast.makeText(getApplicationContext(),
-                                                    "Saved", Toast.LENGTH_SHORT).show();
-                                        });
-                                    }
+                                textView.setText(processedResult);
 
-                                    @Override
-                                    public void onError(Exception e) {
-                                        runOnUiThread(() -> {
-                                            Toast.makeText(getApplicationContext(),
-                                                    "Failed to save", Toast.LENGTH_SHORT).show();
-                                        });
-                                    }
-                                });
+                                // Send to backend on background thread
+                                new Thread(() -> {
+                                    llm.sendToBackend(new Date(), entryText, mood, summary,
+                                        new LLMInference.CreateEntryCallback() {
+                                            @Override
+                                            public void onSuccess(JSONObject response) {
+                                                runOnUiThread(() ->
+                                                    Toast.makeText(getApplicationContext(),"Saved", Toast.LENGTH_SHORT).show()
+                                                );
+                                            }
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                                            @Override
+                                            public void onError(Exception e) {
+                                                runOnUiThread(() ->
+                                                    Toast.makeText(getApplicationContext(),"Failed to save", Toast.LENGTH_SHORT).show()
+                                                );
+                                            }
+                                    });
+                                }).start();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(getApplicationContext(),"Error parsing LLM output", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                }
 
-                @Override
-                public void onError(Exception e) {
-                    System.out.println("Error generating response");
-                }
-            });
+                    @Override
+                    public void onError(Exception e) {
+                        runOnUiThread(() ->
+                            Toast.makeText(getApplicationContext(),"Error generating response", Toast.LENGTH_SHORT).show()
+                        );
+                    }
+                });
 
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() ->
+                    Toast.makeText(getApplicationContext(), "Error running inference", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
     }
+
 }

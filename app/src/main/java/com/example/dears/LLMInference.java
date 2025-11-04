@@ -1,6 +1,7 @@
 package com.example.dears;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.mediapipe.tasks.genai.llminference.*;
 
@@ -8,7 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -24,6 +28,8 @@ public class LLMInference {
 
     public LLMInference(Context context) {
         this.context = context;
+        ensureModelCopied();
+        this.modelPath = new File(context.getFilesDir(), "llm/gemma3-1b-it-int4.task").getAbsolutePath();
     }
 
     public void callLLM(String prompt, LLMCallback callback) {
@@ -127,5 +133,23 @@ public class LLMInference {
     public interface LLMCallback {
         void onComplete(String result);
         void onError(Exception e);
+    }
+
+    private void ensureModelCopied() {
+        File llmDir = new File(context.getFilesDir(), "llm");
+        if (!llmDir.exists()) llmDir.mkdirs();
+
+        File modelFile = new File(llmDir, "gemma3-1b-it-int4.task");
+        if (modelFile.exists()) return;
+
+        try (InputStream in = context.getAssets().open("llm/gemma3-1b-it-int4.task");
+             OutputStream out = new FileOutputStream(modelFile)) {
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+            Log.d("LLMInference", "Model copied to " + modelFile.getAbsolutePath());
+        } catch (IOException e) {
+            Log.e("LLMInference", "Failed to copy model", e);
+        }
     }
 }
