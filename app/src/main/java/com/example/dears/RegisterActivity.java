@@ -17,11 +17,23 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.dears.data.api.APIClient;
+import com.example.dears.data.api.InterfaceAPI;
+import com.example.dears.data.model.Pet;
+import com.example.dears.data.model.User;
+import com.example.dears.data.request.changeUserRequest;
+import com.example.dears.data.request.createPetRequest;
 import com.google.android.material.button.MaterialButton;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -30,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageView avatarBox;  // clickable avatar placeholder
 
     private String selectedPet = null;
+    InterfaceAPI interfaceAPI;
     private int selectedAvatarResId = 0;
 
     // Colors
@@ -42,6 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
         // Inputs
         etUsername = findViewById(R.id.etUsername);
@@ -98,17 +112,61 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            // TODO: /api/users/register call here if desired.
+            // Correct date format
+            LocalDate birthdate;
+            try {
+                birthdate = LocalDate.parse(birthday);
+            } catch (DateTimeParseException e) {
+                Toast.makeText(this, "Please write birthday as YYYY-MM-DD!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // TODO: Validate and send to backend /api/users/register
+            // TODO: allow avatar to be chosen
+            changeUserRequest req1 = new changeUserRequest(username, password, birthdate, Integer.toString(selectedAvatarResId));
+            final int[] userId = new int[1];
 
-            Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
-            intent.putExtra("username", username);
-            intent.putExtra("pet", selectedPet);     // "Deer" or "Bear"
-            intent.putExtra("petName", petName);
-            intent.putExtra("birthday", birthday);
-            intent.putExtra("avatarResId", selectedAvatarResId);
-            startActivity(intent);
+            Call<User> callRegister = interfaceAPI.registerUser(req1);
+            callRegister.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        userId[0] = response.body().getUserID();
+                    }
+                    else if (response.code() == 409) {
+                        Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    createPetRequest req2 = new createPetRequest(petName, selectedPet);
+                    Call<Pet> callPetCreation = interfaceAPI.createPet(userId[0], req2);
+
+                    callPetCreation.enqueue(new Callback<Pet>() {
+                        @Override
+                        public void onResponse(Call<Pet> call, Response<Pet> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                Toast.makeText(RegisterActivity.this, "Registered as " + username + " with a " + selectedPet + "!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
+                                intent.putExtra("pet", response.body());
+                                intent.putExtra("userId", userId[0]);
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Pet> call, Throwable t) {
+                            Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                 @Override
+                 public void onFailure(Call<User> call, Throwable t) {
+                     Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                 }
+            });
         });
     }
+
 
     // Make MaterialButton show a huge full-color icon that takes most of the button.
     private void setPetButtonAsLargeIcon(MaterialButton b, int iconRes, String label) {
