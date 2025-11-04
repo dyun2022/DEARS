@@ -37,7 +37,3 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-repositories {
-	mavenCentral()
-}
-

@@ -2,13 +2,14 @@ package com.example.dears.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Happiness AgeStage. Should match the backend's AgeStage.
  */
-public class AgeStage {
+public class AgeStage implements Serializable {
     @SerializedName("age_id")
     private int age_id;
 

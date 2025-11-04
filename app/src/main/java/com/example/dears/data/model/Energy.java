@@ -2,7 +2,9 @@ package com.example.dears.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Energy {
+import java.io.Serializable;
+
+public class Energy implements Serializable {
     @SerializedName("energy_id")
     private int energy_id;
 

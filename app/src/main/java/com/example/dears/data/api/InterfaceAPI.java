@@ -16,19 +16,19 @@ import retrofit2.http.Path;
 
 public interface InterfaceAPI {
     // *** USER RELATED REQUESTS *** //
-    @POST("/users/register")
+    @POST("users/register")
     Call<User> registerUser(@Body changeUserRequest request);
 
-    @POST("/users/login")
+    @POST("users/login")
     Call<User> loginUser(@Body loginUserRequest request);
 
-    @POST("/users")
+    @POST("users")
     Call<List<User>> saveUser(@Body changeUserRequest request);
 
-    @GET("/users")
+    @GET("users")
     Call<User> getAllUsers();
 
-    @GET("/users/{id}")
+    @GET("users/{id}")
     Call<User> getUserById(@Path("id") int userId);
 
     // TO-DO finish edit routes
@@ -42,6 +42,9 @@ public interface InterfaceAPI {
     Call<User> editAvatar(@Path("id") int userId);*/
 
     // *** PET RELATED REQUESTS *** //
-    @POST("/pet/user/{id}")
+    @GET("pet/user/{id}")
+    Call<Pet> getPetById(@Path("id") int userId);
+
+    @POST("pet/user/{id}")
     Call<Pet> createPet(@Path("id") int userId, @Body createPetRequest createPetRequest);
 }

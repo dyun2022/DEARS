@@ -99,32 +99,34 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                     else if (response.code() == 409) {
                         Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+
+                    createPetRequest req2 = new createPetRequest(petName, selectedPet);
+                    Call<Pet> callPetCreation = interfaceAPI.createPet(userId[0], req2);
+
+                    callPetCreation.enqueue(new Callback<Pet>() {
+                        @Override
+                        public void onResponse(Call<Pet> call, Response<Pet> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                Toast.makeText(RegisterActivity.this, "Registered as " + username + " with a " + selectedPet + "!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                intent.putExtra("pet", response.body());
+                                intent.putExtra("userId", userId[0]);
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Pet> call, Throwable t) {
+                            Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
-                    Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            createPetRequest req2 = new createPetRequest(selectedPet, petName);
-            Call<Pet> callPetCreation = interfaceAPI.createPet(userId[0], req2);
-
-            callPetCreation.enqueue(new Callback<Pet>() {
-                @Override
-                public void onResponse(Call<Pet> call, Response<Pet> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        Toast.makeText(RegisterActivity.this, "Registered as " + username + " with a " + selectedPet + "!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                        intent.putExtra("pet", response.body());
-                        intent.putExtra("userId", userId);
-                        startActivity(intent);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Pet> call, Throwable t) {
                     Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                 }
             });

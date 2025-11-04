@@ -7,13 +7,13 @@ import java.time.LocalDate;
 public class changeUserRequest {
     private String username;
     private String password;
-    private LocalDate date;
+    private LocalDate birthday;
     private String avatar;
 
-    public changeUserRequest(String u, String p, LocalDate d, String a) {
+    public changeUserRequest(String u, String p, LocalDate b, String a) {
         username = u;
         password = p;
-        date = d;
+        birthday = b;
         avatar = a;
     }
 }
