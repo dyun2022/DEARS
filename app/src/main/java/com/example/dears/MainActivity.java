@@ -16,6 +16,10 @@ import com.example.dears.data.model.Pet;
 public class MainActivity extends AppCompatActivity {
     Pet pet;
     int userId;
+    int timesChatted = 0;
+    int timesFed = 0;
+    int timesSleep = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,17 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, ChatActivity.class));
+            }
+        });
+
+        final Button jButton = findViewById(R.id.toJournal);
+        jButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent jIntent = new Intent(MainActivity.this, JournalActivity.class);
+                jIntent.putExtra("timesChatted", timesChatted);
+                jIntent.putExtra("timesFed", timesFed);
+                jIntent.putExtra("timesSleep", timesSleep);
+                startActivity(jIntent);
             }
         });
     }
