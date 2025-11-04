@@ -80,7 +80,7 @@
             android:id="@+id/tvAvatarLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="select\nyour\navatar!"
+            android:text="Select\nyour\navatar!"
             android:textAlignment="center"
             app:layout_constraintTop_toBottomOf="@id/tilBirthday"
             app:layout_constraintStart_toStartOf="parent"
