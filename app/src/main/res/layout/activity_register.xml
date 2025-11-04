@@ -86,7 +86,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp" />
 
-        <View
+        <ImageView
             android:id="@+id/avatarBox"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -105,32 +105,39 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="24dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDeer"
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="140dp"
             android:text="Deer"
-            android:textColor="#000000"
-            android:backgroundTint="#D9D9D9"
+            app:backgroundTint="#D9D9D9"
+            app:icon="@drawable/baby_deer_default"
+            app:iconGravity="textTop"
+            app:iconSize="96dp"
+            app:iconPadding="6dp"
             app:layout_constraintTop_toBottomOf="@id/tvPickPet"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnBear"
             app:layout_constraintHorizontal_chainStyle="spread"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBear"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="140dp"
             android:text="Bear"
-            android:textColor="#000000"
-            android:backgroundTint="#D9D9D9"
+            app:backgroundTint="#D9D9D9"
+            app:icon="@drawable/baby_bear_default"
+            app:iconGravity="textTop"
+            app:iconSize="96dp"
+            app:iconPadding="6dp"
             app:layout_constraintTop_toTopOf="@id/btnDeer"
             app:layout_constraintBottom_toBottomOf="@id/btnDeer"
             app:layout_constraintStart_toEndOf="@id/btnDeer"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp" />
+
 
 
 

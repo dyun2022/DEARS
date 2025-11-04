@@ -26,6 +26,7 @@
         <activity android:name=".ChatActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".JournalActivity" android:exported="true"/>
+        <activity android:name=".PetHomeActivity" android:exported="true"/>
     </application>
 
 </manifest>
