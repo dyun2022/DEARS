@@ -1,3 +1,20 @@
+## Frontend
+
+Need git-lfs
+
+On macOS:
+To install brew: 
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+Run:
+```
+brew install git-lfs
+git lfs install
+```
+
 ## Backend
 
 Navigate to `src.main.resources`
