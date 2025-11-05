@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DEARS</string>
+    <string name="chat1">Hello!</string>
+    <string name="chat2">Tell me a joke!</string>
+    <string name="chat3">How are you?</string>
+    <string name="prompt">What do you want to say to your pet?</string>
 </resources>

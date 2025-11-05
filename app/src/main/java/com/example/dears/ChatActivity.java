@@ -33,53 +33,53 @@ public class ChatActivity extends AppCompatActivity {
             return insets;
         });
 
-        final Button button = findViewById(R.id.Generate);
-        button.setOnClickListener(new View.OnClickListener() {
+//        final Button button = findViewById(R.id.Generate);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                updateTextView();
+//            }
+//        });
+
+        final Button button1 = findViewById(R.id.button1);
+        button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                updateTextView();
+                updateTextView(button1.getText().toString());
+            }
+        });
+
+        final Button button2 = findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                updateTextView(button2.getText().toString());
+            }
+        });
+
+        final Button button3 = findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                updateTextView(button3.getText().toString());
             }
         });
     }
 
-    public void updateTextView() {
+    public void updateTextView(String prompt) {
         TextView textView = findViewById(R.id.LLMResults);
         LLMInference llm = new LLMInference(this);
 
         // put the llm call on a thread so it doesn't hog all of the resources
         new Thread(() -> {
             try {
-                llm.generateJournalEntry("young", "cat", 80, 60, 70, new LLMInference.LLMCallback() {
+                llm.respondToChat("baby", "deer", 80, 60, 70, prompt, new LLMInference.LLMCallback() {
                     @Override
                     public void onComplete(String llmResult) {
+                        System.out.println(llmResult);
                         runOnUiThread(() -> {
                             try {
-                                String processedResult = llmResult.substring(7, llmResult.length() - 4);
+                                String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
                                 JSONObject json = new JSONObject(processedResult);
-                                String mood = json.getString("mood");
-                                String summary = json.getString("summary");
-                                String entryText = json.getString("summary");
+                                String response = json.getString("response");
 
                                 textView.setText(processedResult);
-
-                                // Send to backend on background thread
-                                new Thread(() -> {
-                                    llm.sendToBackend(new Date(), entryText, mood, summary,
-                                        new LLMInference.CreateEntryCallback() {
-                                            @Override
-                                            public void onSuccess(JSONObject response) {
-                                                runOnUiThread(() ->
-                                                    Toast.makeText(getApplicationContext(),"Saved", Toast.LENGTH_SHORT).show()
-                                                );
-                                            }
-
-                                            @Override
-                                            public void onError(Exception e) {
-                                                runOnUiThread(() ->
-                                                    Toast.makeText(getApplicationContext(),"Failed to save", Toast.LENGTH_SHORT).show()
-                                                );
-                                            }
-                                    });
-                                }).start();
 
                             } catch (Exception e) {
                                 e.printStackTrace();

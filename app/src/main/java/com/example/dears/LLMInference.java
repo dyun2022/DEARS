@@ -59,7 +59,7 @@ public class LLMInference {
 
 
     public void generateJournalEntry(String age, String type, int happiness, int hunger, int sleep, LLMCallback callback) {
-        String prompt = "In JSON format with the fields \"date\", \"mood\", and \"summary\"," +
+        String prompt = "In strict JSON format with the fields \"date\", \"mood\", and \"summary\"," +
                 "where date is MM-DD-YYYY format and mood is an integer out of 100, " +
                 "generate a journal entry in the voice of a " + age + " " + type +
                 " with happiness level: " + happiness + ", hunger satisfaction level: " + hunger + ", and amount of sleep gotten " + sleep +
@@ -70,8 +70,9 @@ public class LLMInference {
     }
 
     public void respondToChat(String age, String type, int happiness, int hunger, int sleep, String input, LLMCallback callback) {
-        String prompt = "In JSON format with the field \"response\", " +
-                "generate a response to the input, " + input +  " in the voice of a " + age + " " + type +
+        String prompt = "Respond ONLY in strict JSON format with only the field \"response\" where the response is a String." +
+                "Do not include any text before or after the JSON. Keep the response short (less than 25 words). " +
+                "Generate a response to the input, " + input +  " in the voice of a " + age + " " + type +
                 " with happiness level: " + happiness + ", hunger satisfaction level: " + hunger + ", and amount of sleep gotten " + sleep +
                 ". If hunger, sleep, or happiness levels are low, make it sound angrier. If happiness is high, make it sound cheerful.";
 
