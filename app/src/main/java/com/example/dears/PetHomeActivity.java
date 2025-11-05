@@ -3,7 +3,6 @@ package com.example.dears;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
-import com.example.dears.data.model.AgeStage;
 import com.example.dears.data.model.Pet;
+import com.example.dears.data.request.updatePetRequest;
 
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import retrofit2.Response;
 
 public class PetHomeActivity extends AppCompatActivity {
     Pet pet;
+    int ageId;
     int userId;
     int clock;
     // The width of the status bars *IN DP*
@@ -37,6 +37,13 @@ public class PetHomeActivity extends AppCompatActivity {
     boolean isHappy = false;
     InterfaceAPI interfaceAPI;
 
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        // Save pet object
+        savedInstanceState.putSerializable("pet", pet);
+        savedInstanceState.putInt("userId", userId);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +51,17 @@ public class PetHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pet_home);
         interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
+
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
 
+        if (savedInstanceState != null) {
+            pet = (Pet) savedInstanceState.getSerializable("pet");
+            userId = savedInstanceState.getInt("userId");
+        }
+
+        ageId = pet.getAge().getAgeID();
 
         // Buttons & Views
         Button btnSleep = findViewById(R.id.btnSleep);
@@ -65,9 +79,7 @@ public class PetHomeActivity extends AppCompatActivity {
         ivPetOval.bringToFront();
 
         setPetImage("default");
-        updateEnergyBar();
-        updateHungerBar();
-        updateHappinessBar();
+        updateBars();
 
         // Initialize foods.
         if (pet.getType().equals("Deer")) {
@@ -137,6 +149,8 @@ public class PetHomeActivity extends AppCompatActivity {
             public void run() {
                 clock++;
                 if (isSleeping) petSleep();
+                // TO-DO: Implement non-buggy status decay while sleeping
+                else statusDecay();
                 handler.postDelayed(this, 1000);
             }
         });
@@ -175,6 +189,15 @@ public class PetHomeActivity extends AppCompatActivity {
 
         Integer img = petImages.get(key);
         if (img != null) ivPetOval.setImageResource(img);
+
+        int newAgeId = pet.getAge().getAgeID();
+        // Pet grew up!
+        if (ageId != newAgeId) {
+            isSleeping = false;
+            ageId = newAgeId;
+            happyReaction();
+            Toast.makeText(PetHomeActivity.this, "Your pet grew!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void happyReaction() {
@@ -196,9 +219,7 @@ public class PetHomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Pet> call, Throwable t) {
-                Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
-            }
+            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
         });
     }
 
@@ -226,6 +247,7 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
+                    setPetImage("default");
                     updateHungerBar();
                     btnFeed.setVisibility(View.VISIBLE);
                     btnChat.setVisibility(View.VISIBLE);
@@ -238,9 +260,7 @@ public class PetHomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Pet> call, Throwable t) {
-                Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
-            }
+            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
         });
     }
     private void updateEnergyBar() {
@@ -274,5 +294,38 @@ public class PetHomeActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
         params.width = updatedWidth;
         barHappiness.setLayoutParams(params);
+    }
+
+    private void statusDecay() {
+        int decay = 1;
+        int energyDecay = Math.max(pet.getEnergyMeter() - decay, 0);
+        int hungerDecay = Math.max(pet.getHungerMeter() - decay, 0);
+        int happinessDecay = Math.max(pet.getHappinessMeter() - decay, 0);
+        updatePetRequest upr = new updatePetRequest(hungerDecay, happinessDecay, energyDecay);
+        Call<Pet> updatePet = interfaceAPI.updatePet(pet.getPetID(), upr);
+
+        updatePet.enqueue(new Callback<Pet>() {
+            @Override
+            public void onResponse(Call<Pet> call, Response<Pet> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    pet = response.body();
+                    setPetImage("default");
+                    updateBars();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
+        });
+    }
+
+    private void fail() {
+        Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateBars() {
+        updateEnergyBar();
+        updateHappinessBar();
+        updateHungerBar();
     }
 }

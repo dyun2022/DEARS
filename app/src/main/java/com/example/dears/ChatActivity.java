@@ -104,5 +104,4 @@ public class ChatActivity extends AppCompatActivity {
             }
         }).start();
     }
-
 }

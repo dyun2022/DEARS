@@ -6,6 +6,7 @@ import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
 import com.example.dears.data.request.createPetRequest;
 import com.example.dears.data.request.loginUserRequest;
+import com.example.dears.data.request.updatePetRequest;
 
 import java.util.List;
 
@@ -50,6 +51,8 @@ public interface InterfaceAPI {
     @POST("pet/user/{id}")
     Call<Pet> createPet(@Path("id") int userId, @Body createPetRequest createPetRequest);
 
+    @PATCH("pet/{id}")
+    Call<Pet> updatePet(@Path("id") int petId, @Body updatePetRequest updatePetRequest);
     @PATCH("pet/{id}/sleep")
     Call<Pet> sleepPet(@Path("id") int petId);
 
