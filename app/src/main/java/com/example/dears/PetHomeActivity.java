@@ -121,6 +121,16 @@ public class PetHomeActivity extends AppCompatActivity {
             });
         });
 
+        btnJournal.setOnClickListener( v -> {
+            Intent i = new Intent(PetHomeActivity.this, JournalActivity.class);
+            i.putExtra("userId", userId);
+            i.putExtra("pet", pet);
+            i.putExtra("timesChatted", timesChatted);
+            i.putExtra("timesFed", timesFed);
+            i.putExtra("timesChatted", timesChatted);
+            startActivity(i);
+        });
+
         // Quick pet view init
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
         ivPetOval.setVisibility(View.VISIBLE);
@@ -142,6 +152,7 @@ public class PetHomeActivity extends AppCompatActivity {
 
         // Sleep logic
         btnSleep.setOnClickListener(v -> {
+            timesSleep += 1;
             // * TO-DO * Make pet not sleep if happiness is at max
             if (!isSleeping) {
                 btnFeed.setVisibility(View.GONE);
@@ -164,6 +175,7 @@ public class PetHomeActivity extends AppCompatActivity {
 
         // Food logic
         btnFeed.setOnClickListener( v -> {
+            timesFed += 1;
             btnFeed.setVisibility(View.GONE);
             btnChat.setVisibility(View.GONE);
             btnSleep.setVisibility(View.GONE);
@@ -198,7 +210,15 @@ public class PetHomeActivity extends AppCompatActivity {
                 clock++;
                 if (isSleeping) petSleep();
                 // TO-DO: Implement non-buggy status decay while sleeping
-                //eelse statusDecay();
+                else statusDecay();
+
+                // New "day" every 5 minutes
+                if (clock % 300 == 0) {
+                    clock = 0;
+                    timesChatted = 0;
+                    timesFed = 0;
+                    timesSleep = 0;
+                }
                 handler.postDelayed(this, 1000);
             }
         });
