@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">DEARS</string>
+    <string name="huggingface_path">/data/local/tmp/llm/gemma3-1b-it-int4.task</string>
     <string name="chat1">Hello!</string>
     <string name="chat2">Tell me a joke!</string>
     <string name="chat3">How are you?</string>
