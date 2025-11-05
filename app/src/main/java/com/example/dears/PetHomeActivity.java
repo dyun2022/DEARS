@@ -168,13 +168,7 @@ public class PetHomeActivity extends AppCompatActivity {
                 setPetImage("sleep");
                 isSleeping = true;
             } else {
-                btnFeed.setVisibility(View.VISIBLE);
-                btnChat.setVisibility(View.VISIBLE);
-                btnJournal.setVisibility(View.VISIBLE);
-                btnSettings.setVisibility(View.VISIBLE);
-                btnSleep.setText("Sleepy time!");
-                setPetImage("default");
-                isSleeping = false;
+                wakeUp();
             }
         });
 
@@ -212,7 +206,10 @@ public class PetHomeActivity extends AppCompatActivity {
             public void run() {
                 // TO-DO: The clock still runs when navigating to other pages...
                 clock++;
-                if (isSleeping) petSleep();
+                if (isSleeping) {
+                    if (pet.getEnergyMeter() == pet.getEnergy().getMeterMax()) wakeUp();
+                    else petSleep();
+                }
                 // TO-DO: Implement non-buggy status decay while sleeping
                 else statusDecay();
 
@@ -262,6 +259,22 @@ public class PetHomeActivity extends AppCompatActivity {
         timesSleep = prefs.getInt("timesSleep", 0);
 
         runClock(); // restart clock when resuming
+    }
+
+    private void wakeUp() {
+        Button btnSleep = findViewById(R.id.btnSleep);
+        Button btnFeed = findViewById(R.id.btnFeed);
+        Button btnChat = findViewById(R.id.btnChat);
+        ImageButton btnJournal = findViewById(R.id.btnJournal);
+        ImageButton btnSettings = findViewById(R.id.btnSettings);
+
+        btnFeed.setVisibility(View.VISIBLE);
+        btnChat.setVisibility(View.VISIBLE);
+        btnJournal.setVisibility(View.VISIBLE);
+        btnSettings.setVisibility(View.VISIBLE);
+        btnSleep.setText("Sleepy time!");
+        setPetImage("default");
+        isSleeping = false;
     }
 
     // Action: happy, sleep, or default
