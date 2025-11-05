@@ -1,13 +1,17 @@
 package com.example.dears.data.api;
 
 import com.example.dears.data.model.Food;
+import com.example.dears.data.model.Journal;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
+import com.example.dears.data.request.createEntryRequest;
+import com.example.dears.data.request.createJournalRequest;
 import com.example.dears.data.request.createPetRequest;
 import com.example.dears.data.request.loginUserRequest;
 import com.example.dears.data.request.updatePetRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -63,4 +67,15 @@ public interface InterfaceAPI {
     // *** FOOD RELATED REQUESTS *** //
     @GET("food")
     Call<Food[]> getFoods();
+
+    // ** JOURNAL RELATED REQUESTS ** //
+    @POST("journal/create")
+    Call<Object> createJournalForUser(@Body createJournalRequest createJournalRequest);
+
+    @GET("journal")
+    Call<Journal[]> getAllJournals();
+
+    // ** ENTRY RELATED REQUESTS ** //
+    @POST("create/{date}")
+    Call<Object> createEntry(@Path("date") String localDate, @Body createEntryRequest createEntryRequest);
 }

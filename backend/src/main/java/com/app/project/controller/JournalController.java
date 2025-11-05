@@ -60,6 +60,8 @@ public class JournalController {
                 .map(entry -> {
                     Map<String, Object> dto = new HashMap<>();
                     dto.put("entry_id", entry.getEntryId());
+                    dto.put("pet_id", entry.getPet().getPetID());
+                    dto.put("journal_id", entry.getJournalId());
                     dto.put("date", entry.getEntryDate());
                     dto.put("summary", entry.getSummary());
                     return dto;
