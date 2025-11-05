@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void onResponse(Call<Pet> call, Response<Pet> response) {
                             if (response.isSuccessful() && response.body() != null) {
                                 Toast.makeText(LoginActivity.this, "Logged in successfully!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, PetHomeActivity.class);
                                 intent.putExtra("pet", response.body());
                                 intent.putExtra("userId", userId[0]);
                                 startActivity(intent);

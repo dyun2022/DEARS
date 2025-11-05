@@ -1,15 +1,15 @@
 package com.example.dears.data.model;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 
 /**
  * Pet model. Should match the backend's Pet.
  */
 public class Pet implements Serializable {
-        @SerializedName("pet_id")
-        private int pet_id;
+
+        @SerializedName("petID")
+        private int petID;
 
         @SerializedName("name")
         private String name;
@@ -23,63 +23,94 @@ public class Pet implements Serializable {
         @SerializedName("age")
         private AgeStage age;
 
-        @SerializedName("growth_points")
-        private int growth_points;
+        @SerializedName("growthPoints")
+        private int growthPoints;
 
         @SerializedName("hunger")
         private Hunger hunger;
 
-        @SerializedName("hunger_meter")
-        private int hunger_meter;
+        @SerializedName("hungerMeter")
+        private int hungerMeter;
 
         @SerializedName("happiness")
         private Happiness happiness;
 
-        @SerializedName("happiness_meter")
-        private int happiness_meter;
+        @SerializedName("happinessMeter")
+        private int happinessMeter;
 
         @SerializedName("energy")
         private Energy energy;
 
-        @SerializedName("energy_meter")
-        private int energy_meter;
+        @SerializedName("energyMeter")
+        private int energyMeter;
 
+        @SerializedName("full")
+        private boolean full;
 
-        public int getPet_id() {
-                return pet_id;
+        @SerializedName("happy")
+        private boolean happy;
+
+        @SerializedName("readyToGrow")
+        private boolean readyToGrow;
+
+        // --- Getters ---
+        public int getPetID() {
+                return petID;
         }
+
         public String getName() {
                 return name;
         }
+
         public String getType() {
                 return type;
         }
+
         public User getUser() {
                 return user;
         }
+
         public AgeStage getAge() {
                 return age;
         }
-        public int getGrowth_points() {
-                return growth_points;
+
+        public int getGrowthPoints() {
+                return growthPoints;
         }
+
         public Hunger getHunger() {
                 return hunger;
         }
-        public int getHunger_meter() {
-                return hunger_meter;
+
+        public int getHungerMeter() {
+                return hungerMeter;
         }
+
         public Happiness getHappiness() {
                 return happiness;
         }
-        public int getHappiness_meter() {
-                return happiness_meter;
+
+        public int getHappinessMeter() {
+                return happinessMeter;
         }
+
         public Energy getEnergy() {
                 return energy;
         }
-        public int getEnergy_meter() {
-                return energy_meter;
+
+        public int getEnergyMeter() {
+                return energyMeter;
+        }
+
+        public boolean isFull() {
+                return full;
+        }
+
+        public boolean isHappy() {
+                return happy;
+        }
+
+        public boolean isReadyToGrow() {
+                return readyToGrow;
         }
 }
-

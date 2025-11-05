@@ -10,24 +10,31 @@ import java.util.List;
  * Happiness AgeStage. Should match the backend's AgeStage.
  */
 public class AgeStage implements Serializable {
-    @SerializedName("age_id")
-    private int age_id;
+    @SerializedName("ageID")
+    private int ageID;
 
-    @SerializedName("age_stage")
-    private String age_stage;
+    @SerializedName("ageStage")
+    private String ageStage;
 
-    @SerializedName("meter_max")
-    private int meter_max;
+    @SerializedName("meterMax")
+    private int meterMax;
 
     @SerializedName("pets")
     private List<Pet> pets = new ArrayList<>();
 
-
-    public String getAge_stage() {
-            return age_stage;
+    public int getAgeID() {
+        return ageID;
     }
 
-    public int getMeter_max() {
-        return meter_max;
+    public String getAgeStage() {
+        return ageStage;
+    }
+
+    public int getMeterMax() {
+        return meterMax;
+    }
+
+    public List<Pet> getPets() {
+        return pets;
     }
 }

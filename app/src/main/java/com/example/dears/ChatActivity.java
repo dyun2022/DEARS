@@ -36,8 +36,8 @@ import retrofit2.Response;
 public class ChatActivity extends AppCompatActivity {
     private String age;
     private String petType = null;
-    private int petID = -1;
-    private int userId;
+    private int petId = -1;
+    private int userId = 0;
     private Pet pet;
     private int hunger;
     private int energy;
@@ -61,6 +61,7 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         Intent intent = getIntent();
+        userId = intent.getIntExtra("userId", 0); // fallback to 0 if not passed
 
         Call<Pet> call = interfaceAPI.getPetById(userId);
         call.enqueue(new Callback<Pet>() {
@@ -71,15 +72,38 @@ public class ChatActivity extends AppCompatActivity {
 
                  //get pet attributes
                     name = pet.getName();
+                    petId = pet.getPetID();
                     petType = pet.getType();
-                    hunger = pet.getHunger_meter();
-                    energy = pet.getEnergy_meter();
-                    happiness = pet.getHappiness_meter();
-                    growth = pet.getGrowth_points();
+                    hunger = pet.getHungerMeter();
+                    energy = pet.getEnergyMeter();
+                    happiness = pet.getHappinessMeter();
+                    growth = pet.getGrowthPoints();
 
                     // get age/meters
-                    age = pet.getAge().getAge_stage();
-                    meterMax = pet.getAge().getMeter_max();
+                    age = pet.getAge().getAgeStage();
+                    meterMax = pet.getAge().getMeterMax();
+
+                    ImageView petPicture = findViewById(R.id.petPicture);
+
+                    //check pet type
+                    if (petType.equalsIgnoreCase("bear")) {
+                        //check age stage
+                        if (age.equalsIgnoreCase("baby")){
+                            petPicture.setImageResource(R.drawable.baby_bear_default);
+                        } else if (age.equalsIgnoreCase("teen")){
+                            petPicture.setImageResource(R.drawable.teen_bear_default);
+                        } else {
+                            petPicture.setImageResource(R.drawable.adult_bear_default);
+                        }
+                    } else {
+                        if (age.equalsIgnoreCase("baby")){
+                            petPicture.setImageResource(R.drawable.baby_deer_default);
+                        } else if (age.equalsIgnoreCase("teen")){
+                            petPicture.setImageResource(R.drawable.teen_deer_default);
+                        } else {
+                            petPicture.setImageResource(R.drawable.adult_deer_default);
+                        }
+                    }
 
                     Toast.makeText(getApplicationContext(),
                             "Pet: " + name + " (" + petType + "), Stage: " + age,
@@ -94,29 +118,6 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
-        ImageView petPicture = findViewById(R.id.petPicture);
-
-        //check pet type
-        if (petType.equalsIgnoreCase("bear")) {
-            //check age stage
-            if (age.equalsIgnoreCase("baby")){
-                petPicture.setImageResource(R.drawable.baby_bear_default);
-            } else if (age.equalsIgnoreCase("teen")){
-                petPicture.setImageResource(R.drawable.teen_bear_default);
-            } else {
-                petPicture.setImageResource(R.drawable.adult_bear_default);
-            }
-        } else {
-            if (age.equalsIgnoreCase("baby")){
-                petPicture.setImageResource(R.drawable.baby_deer_default);
-            } else if (age.equalsIgnoreCase("teen")){
-                petPicture.setImageResource(R.drawable.teen_deer_default);
-            } else {
-                petPicture.setImageResource(R.drawable.adult_deer_default);
-            }
-        }
 
         TextView textView = findViewById(R.id.LLMResults);
 
@@ -149,6 +150,14 @@ public class ChatActivity extends AppCompatActivity {
                 textView.setText("Loading...");
                 updateTextView(jokeButton.getText().toString());
             }
+        });
+
+        final Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener( v -> {
+            Intent mainIntent = new Intent(ChatActivity.this, PetHomeActivity.class);
+            mainIntent.putExtra("pet", pet);
+            mainIntent.putExtra("userId", userId);
+            startActivity(mainIntent);
         });
     }
 
