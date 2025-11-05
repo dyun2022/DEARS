@@ -22,4 +22,12 @@ public class AgeStage implements Serializable {
     @SerializedName("pets")
     private List<Pet> pets = new ArrayList<>();
 
+
+    public String getAge_stage() {
+            return age_stage;
+    }
+
+    public int getMeter_max() {
+        return meter_max;
+    }
 }
