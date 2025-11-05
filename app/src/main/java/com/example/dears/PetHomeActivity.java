@@ -11,9 +11,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
+import com.example.dears.data.model.MainViewModel;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.request.updatePetRequest;
 
@@ -24,6 +26,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PetHomeActivity extends AppCompatActivity {
+    // private MainViewModel mainViewModel;
+
     Pet pet;
     int ageId;
     int userId;
@@ -50,16 +54,28 @@ public class PetHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pet_home);
         interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
-
+        // Persist data
+        // mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
 
-        if (savedInstanceState != null) {
-            pet = (Pet) savedInstanceState.getSerializable("pet");
-            userId = savedInstanceState.getInt("userId");
+        // Smarter way to persist data; right now, going to rely on intents
+        /*if (pet != null) { mann idk
+            mainViewModel.setPet(pet);
+            mainViewModel.setUserId(userId);
         }
+        else {
+            mainViewModel.getPet().observe(this, p -> {
+                if (p != null) {
+                    pet = p;
+                    updateBars();
+                }
+            });
+
+            mainViewModel.getUserId().observe(this, id -> userId = id);
+        }*/
 
         ageId = pet.getAge().getAgeID();
 
@@ -72,6 +88,15 @@ public class PetHomeActivity extends AppCompatActivity {
         ImageView lowFood = findViewById(R.id.lowFood);
         ImageView midFood = findViewById(R.id.midFood);
         ImageView highFood = findViewById(R.id.highFood);
+
+        btnChat.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(PetHomeActivity.this, ChatActivity.class);
+                intent.putExtra("pet", pet);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+            }
+        });
 
         // Quick pet view init
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
@@ -214,6 +239,7 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
+                    // mainViewModel.setPet(pet);
                     updateEnergyBar();
                 }
             }
@@ -247,6 +273,7 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
+                    // mainViewModel.setPet(pet);
                     setPetImage("default");
                     updateHungerBar();
                     btnFeed.setVisibility(View.VISIBLE);
@@ -309,6 +336,7 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
+                    // mainViewModel.setPet(pet);
                     setPetImage("default");
                     updateBars();
                 }
