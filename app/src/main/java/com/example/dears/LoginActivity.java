@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.View.OnHoverListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +19,9 @@ import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
+import com.example.dears.data.request.changeUserRequest;
+import com.example.dears.data.request.createPetRequest;
 import com.example.dears.data.request.loginUserRequest;
-
-import java.lang.reflect.Field;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,11 +34,11 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvSignup;
     InterfaceAPI interfaceAPI;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
         etUsername = findViewById(R.id.etUsername);
@@ -54,51 +55,41 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            loginUserRequest req = new loginUserRequest(u, p);
+            loginUserRequest req1 = new loginUserRequest(u, p);
             final int[] userId = new int[1];
 
-            interfaceAPI.loginUser(req).enqueue(new Callback<User>() {
+            Call<User> callRegister = interfaceAPI.loginUser(req1);
+            callRegister.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
-                    if (!response.isSuccessful() || response.body() == null) {
-                        if (response.code() == 401) {
-                            Toast.makeText(LoginActivity.this, "Username or password is invalid", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
-                        }
+                    if (response.isSuccessful() && response.body() != null) {
+                        userId[0] = response.body().getUserID();
+                    }
+                    else if (response.code() == 401) {
+                        Toast.makeText(LoginActivity.this, "Username or password is invalid", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    userId[0] = response.body().getUserID();
+                    Call<Pet> getPet = interfaceAPI.getPetById(userId[0]);
 
-                    // Fetch pet so we can forward the chosen type to PetHomeActivity
-                    interfaceAPI.getPetById(userId[0]).enqueue(new Callback<Pet>() {
+                    getPet.enqueue(new Callback<Pet>() {
                         @Override
-                        public void onResponse(Call<Pet> call, Response<Pet> petResp) {
-                            Intent intent = new Intent(LoginActivity.this, PetHomeActivity.class);
-                            intent.putExtra("userId", userId[0]);
-                            if (petResp.isSuccessful() && petResp.body() != null) {
-                                try {
-                                    Field f = petResp.body().getClass().getDeclaredField("type");
-                                    f.setAccessible(true);
-                                    Object val = f.get(petResp.body());
-                                    if (val != null) {
-                                        intent.putExtra("pet", val.toString());
-                                    }
-                                } catch (Exception ignored) {
-                                }
+                        public void onResponse(Call<Pet> call, Response<Pet> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                Toast.makeText(LoginActivity.this, "Logged in successfully!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(LoginActivity.this, PetHomeActivity.class);
+                                intent.putExtra("pet", response.body());
+                                intent.putExtra("userId", userId[0]);
+                                startActivity(intent);
                             }
-
-                            startActivity(intent);
                         }
 
                         @Override
                         public void onFailure(Call<Pet> call, Throwable t) {
-                            Intent intent = new Intent(LoginActivity.this, PetHomeActivity.class);
-                            intent.putExtra("userId", userId[0]);
-                            startActivity(intent);
+                            Toast.makeText(LoginActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                         }
                     });
+
                 }
 
                 @Override
@@ -112,6 +103,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             tvSignup.setOnHoverListener(underlineOnHover());

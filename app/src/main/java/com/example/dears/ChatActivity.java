@@ -99,6 +99,14 @@ public class ChatActivity extends AppCompatActivity {
                 updateTextView(jokeButton.getText().toString());
             }
         });
+
+        final Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener( v -> {
+            Intent mainIntent = new Intent(ChatActivity.this, PetHomeActivity.class);
+            mainIntent.putExtra("pet", pet);
+            mainIntent.putExtra("userId", userId);
+            startActivity(mainIntent);
+        });
     }
 
     public void updateTextView(String prompt) {

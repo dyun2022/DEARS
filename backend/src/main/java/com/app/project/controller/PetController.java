@@ -150,7 +150,7 @@ public class PetController {
         });
 
         // Handle threshold checks
-        if (existingPet.isFull()) {
+        /*if (existingPet.isFull()) {
             existingPet.setHungerMeter(existingPet.getHunger().getMeterMax());
         }
         if (existingPet.isHappy()) {
@@ -158,7 +158,7 @@ public class PetController {
         }
         if (existingPet.isEnergy()) {
             existingPet.setEnergyMeter(existingPet.getEnergy().getMeterMax());
-        }
+        }*/
         checkMeters(existingPet);
         checkGrowth(existingPet);
 
