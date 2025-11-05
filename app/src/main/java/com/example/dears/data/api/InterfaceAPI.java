@@ -17,6 +17,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface InterfaceAPI {
+    // ***** USER AUTH / CRUD *****
     @POST("users/register")
     Call<User> registerUser(@Body changeUserRequest request);
 
@@ -24,7 +25,7 @@ public interface InterfaceAPI {
     Call<User> loginUser(@Body loginUserRequest request);
 
     @POST("users")
-    Call<User> saveUser(@Body changeUserRequest request);
+    Call<List<User>> saveUser(@Body changeUserRequest request);
 
     @GET("users")
     Call<User> getAllUsers();
@@ -32,15 +33,24 @@ public interface InterfaceAPI {
     @GET("users/{id}")
     Call<User> getUserById(@Path("id") int userId);
 
+    // ***** USER FIELD UPDATES (match backend @RequestMapping("/api/users")) *****
+    // PUT /api/users/{id}/username
+    @PUT("users/{id}/username")
+    Call<User> updateUsername(@Path("id") int userId, @Body Map<String, String> body);
+
+    // PUT /api/users/{id}/password
     @PUT("users/{id}/password")
     Call<User> updatePassword(@Path("id") int userId, @Body Map<String, String> body);
 
+    // PUT /api/users/{id}/birthday
     @PUT("users/{id}/birthday")
-    Call<User> updateBirthday(@Path("id") int userId, @Body Map<String, String> body);
+    Call<User> updateBirthday(@Path("id") int userId, @Body Map<String, Object> body);
 
+    // PUT /api/users/{id}/avatar
     @PUT("users/{id}/avatar")
     Call<User> updateAvatar(@Path("id") int userId, @Body Map<String, String> body);
 
+    // ***** PET *****
     @GET("pet/user/{id}")
     Call<Pet> getPetById(@Path("id") int userId);
 

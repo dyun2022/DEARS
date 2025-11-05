@@ -1,7 +1,6 @@
 package com.example.dears;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class PetHomeActivity extends AppCompatActivity {
 
     private ImageView ivPetOval;
-    private int resolvedUserId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +19,11 @@ public class PetHomeActivity extends AppCompatActivity {
         ivPetOval = findViewById(R.id.ivPetOval);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
 
-        int intentUserId = getIntent().getIntExtra("userId", -1);
-        if (intentUserId > 0) {
-            resolvedUserId = intentUserId;
-        } else {
-            SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
-            resolvedUserId = sp.getInt("userId", -1);
-        }
+        // Always read the id that Register/Login placed here:
+        final int currentUserId = getIntent().getIntExtra("userId", -1);
+        String pet = getIntent().getStringExtra("pet"); // "Deer" or "Bear"
 
-        String pet = getIntent().getStringExtra("pet");
+        // Show correct pet chosen at registration
         if ("Deer".equalsIgnoreCase(pet)) {
             ivPetOval.setImageResource(R.drawable.baby_deer_default);
         } else {
@@ -38,11 +32,11 @@ public class PetHomeActivity extends AppCompatActivity {
 
         btnSettings.setOnClickListener(v -> {
             Intent i = new Intent(PetHomeActivity.this, SettingsActivity.class);
-            i.putExtra("userId", resolvedUserId);
+            // CRITICAL: forward the same id so Settings updates the right user
+            i.putExtra("userId", currentUserId);
             i.putExtra("username", getIntent().getStringExtra("username"));
             i.putExtra("birthday", getIntent().getStringExtra("birthday"));
             i.putExtra("avatarName", getIntent().getStringExtra("avatarName"));
-
             startActivity(i);
         });
     }

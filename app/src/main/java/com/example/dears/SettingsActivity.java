@@ -1,15 +1,11 @@
 package com.example.dears;
 
 import android.app.AlertDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,15 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.User;
-import com.example.dears.data.request.changeUserRequest;
-import com.google.android.material.button.MaterialButton;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,16 +31,18 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText etUsername, etPassword, etBirthday;
     private ImageView avatarBox;
     private ImageButton btnBack;
-    private MaterialButton btnSave;
+    private android.widget.Button btnSave;
 
-    private InterfaceAPI api;
     private int userId = -1;
+    private String initialUsername;
+    private String initialBirthday;
+    private String initialAvatarName;
 
-    private String initialUsername, initialAvatarName, initialBirthday;
-    private String serverPasswordShadow;
     private int selectedAvatarResId = 0;
 
     private final AlertDialog[] avatarDialog = new AlertDialog[1];
+
+    private InterfaceAPI api;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,93 +58,39 @@ public class SettingsActivity extends AppCompatActivity {
         etBirthday = findViewById(R.id.etBirthday);
         avatarBox  = findViewById(R.id.avatarBox);
 
-        userId = getIntent().getIntExtra("userId", -1);
-        if (userId <= 0) {
-            SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
-            userId = sp.getInt("userId", -1);
-        }
+        // Read latest values from PetHomeActivity
+        userId            = getIntent().getIntExtra("userId", getIntent().getIntExtra("userID", -1));
+        initialUsername   = getIntent().getStringExtra("username");
+        initialBirthday   = getIntent().getStringExtra("birthday");
+        initialAvatarName = getIntent().getStringExtra("avatarName");
 
-        fastPrefillFromIntentOrPrefs();
-
-        if (userId > 0) {
-            fetchAndPrefillFromServer(userId);
+        if (initialUsername != null) etUsername.setText(initialUsername);
+        if (initialBirthday != null) etBirthday.setText(initialBirthday);
+        if (initialAvatarName != null) {
+            int res = getResources().getIdentifier(initialAvatarName, "drawable", getPackageName());
+            if (res != 0) {
+                selectedAvatarResId = res;
+                avatarBox.setImageResource(res);
+            }
         }
 
         btnBack.setOnClickListener(v -> onBackPressed());
-        avatarBox.setOnClickListener(v -> showAvatarPickerDialog());
-        btnSave.setOnClickListener(v -> saveChanges());
+        avatarBox.setOnClickListener(v -> showAvatarPicker());
+
+        btnSave.setOnClickListener(v -> onSave());
     }
 
-    private void fastPrefillFromIntentOrPrefs() {
-        String u = getIntent().getStringExtra("username");
-        String b = getIntent().getStringExtra("birthday");
-        String avatarName = getIntent().getStringExtra("avatarName");
-
-        SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
-        if (TextUtils.isEmpty(u)) u = sp.getString("username", null);
-        if (TextUtils.isEmpty(b)) b = sp.getString("birthday", null);
-        if (TextUtils.isEmpty(avatarName)) avatarName = sp.getString("avatarName", null);
-
-        if (!TextUtils.isEmpty(u)) etUsername.setText(u);
-        if (!TextUtils.isEmpty(b)) etBirthday.setText(b);
-        if (!TextUtils.isEmpty(avatarName)) {
-            int id = getResources().getIdentifier(avatarName, "drawable", getPackageName());
-            if (id != 0) {
-                selectedAvatarResId = id;
-                avatarBox.setImageResource(id);
-            }
-        }
-    }
-
-    private void fetchAndPrefillFromServer(int uid) {
-        api.getUserById(uid).enqueue(new Callback<User>() {
-            @Override public void onResponse(Call<User> call, Response<User> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) return;
-                User u = resp.body();
-
-                if (!TextUtils.isEmpty(u.getUsername())) {
-                    etUsername.setText(u.getUsername());
-                    initialUsername = u.getUsername();
-                }
-                if (u.getBirthday() != null) {
-                    etBirthday.setText(u.getBirthday().toString());
-                    initialBirthday = u.getBirthday().toString();
-                }
-                serverPasswordShadow = u.getPassword();
-
-                String avatarEntry = u.getAvatar();
-                if (!TextUtils.isEmpty(avatarEntry)) {
-                    int id = getResources().getIdentifier(avatarEntry, "drawable", getPackageName());
-                    if (id != 0) {
-                        selectedAvatarResId = id;
-                        avatarBox.setImageResource(id);
-                        initialAvatarName = avatarEntry;
-                    }
-                }
-
-                SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
-                sp.edit()
-                        .putString("username", u.getUsername())
-                        .putString("birthday", (u.getBirthday() != null ? u.getBirthday().toString() : null))
-                        .putString("avatarName", u.getAvatar())
-                        .apply();
-            }
-            @Override public void onFailure(Call<User> call, Throwable t) {}
-        });
-    }
-
-    private void saveChanges() {
+    private void onSave() {
         if (userId <= 0) {
-            Toast.makeText(this, "Missing user ID", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Missing user ID. Cannot save.", Toast.LENGTH_LONG).show();
             return;
         }
-
         String newUsername = etUsername.getText().toString().trim();
         String newPassword = etPassword.getText().toString().trim();
         String newBirthday = etBirthday.getText().toString().trim();
         String newAvatarName = (selectedAvatarResId != 0)
                 ? getResources().getResourceEntryName(selectedAvatarResId)
-                : initialAvatarName;
+                : null;
 
         if (TextUtils.isEmpty(newUsername)) {
             Toast.makeText(this, "Username cannot be empty", Toast.LENGTH_SHORT).show();
@@ -158,124 +101,155 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        final int[] pending = {0};
-        final int[] done    = {0};
-        final boolean[] failed = {false};
-        Runnable maybeFinish = () -> {
-            if (done[0] == pending[0] && pending[0] > 0 && !failed[0]) {
-                etPassword.setText("");
-                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+        AtomicInteger pending = new AtomicInteger(0);
+        AtomicInteger done = new AtomicInteger(0);
+        AtomicBoolean failed = new AtomicBoolean(false);
+
+        Runnable tryFinish = () -> {
+            if (done.get() == pending.get() && pending.get() > 0 && !failed.get()) {
+                Toast.makeText(SettingsActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 finish();
             }
         };
 
-        // password
+        // 1) Username (hit /api/users/{id}/username)
+        if (initialUsername == null || !initialUsername.equals(newUsername)) {
+            pending.incrementAndGet();
+            Map<String, String> body = new HashMap<>();
+            body.put("username", newUsername);
+            api.updateUsername(userId, body).enqueue(new Callback<User>() {
+                @Override public void onResponse(Call<User> call, Response<User> response) {
+                    if (!response.isSuccessful()) {
+                        failed.set(true);
+                        Toast.makeText(SettingsActivity.this,
+                                "Username update failed (HTTP " + response.code() + ")",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        initialUsername = newUsername; // keep local state in sync
+                    }
+                    done.incrementAndGet();
+                    tryFinish.run();
+                }
+                @Override public void onFailure(Call<User> call, Throwable t) {
+                    failed.set(true);
+                    Toast.makeText(SettingsActivity.this,
+                            "Username update failed: " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                    done.incrementAndGet();
+                    tryFinish.run();
+                }
+            });
+        }
+
+        // 2) Password (only if provided)
         if (!TextUtils.isEmpty(newPassword)) {
-            pending[0]++;
+            pending.incrementAndGet();
             Map<String, String> body = new HashMap<>();
             body.put("password", newPassword);
             api.updatePassword(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) failed[0] = true;
-                    done[0]++; maybeFinish.run();
+                @Override public void onResponse(Call<User> call, Response<User> response) {
+                    if (!response.isSuccessful()) {
+                        failed.set(true);
+                        Toast.makeText(SettingsActivity.this,
+                                "Password update failed (HTTP " + response.code() + ")",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
                 @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
+                    failed.set(true);
+                    Toast.makeText(SettingsActivity.this,
+                            "Password update failed: " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
             });
         }
 
-        // birthday
+        // 3) Birthday (if changed)
         if (initialBirthday == null || !initialBirthday.equals(newBirthday)) {
-            pending[0]++;
-            Map<String, String> body = new HashMap<>();
-            body.put("birthday", newBirthday);
+            pending.incrementAndGet();
+            Map<String, Object> body = new HashMap<>();
+            body.put("birthday", newBirthday); // ISO yyyy-MM-dd; backend maps to LocalDate
             api.updateBirthday(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) { failed[0] = true; }
-                    else { initialBirthday = newBirthday; }
-                    done[0]++; maybeFinish.run();
+                @Override public void onResponse(Call<User> call, Response<User> response) {
+                    if (!response.isSuccessful()) {
+                        failed.set(true);
+                        Toast.makeText(SettingsActivity.this,
+                                "Birthday update failed (HTTP " + response.code() + ")",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        initialBirthday = newBirthday;
+                    }
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
                 @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
+                    failed.set(true);
+                    Toast.makeText(SettingsActivity.this,
+                            "Birthday update failed: " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
             });
         }
 
-        // avatar
+        // 4) Avatar (if changed)
         if (newAvatarName != null && (initialAvatarName == null || !initialAvatarName.equals(newAvatarName))) {
-            pending[0]++;
+            pending.incrementAndGet();
             Map<String, String> body = new HashMap<>();
             body.put("avatar", newAvatarName);
             api.updateAvatar(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) { failed[0] = true; }
-                    else { initialAvatarName = newAvatarName; }
-                    done[0]++; maybeFinish.run();
+                @Override public void onResponse(Call<User> call, Response<User> response) {
+                    if (!response.isSuccessful()) {
+                        failed.set(true);
+                        Toast.makeText(SettingsActivity.this,
+                                "Avatar update failed (HTTP " + response.code() + ")",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        initialAvatarName = newAvatarName;
+                    }
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
                 @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
+                    failed.set(true);
+                    Toast.makeText(SettingsActivity.this,
+                            "Avatar update failed: " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                    done.incrementAndGet();
+                    tryFinish.run();
                 }
             });
         }
 
-        // username
-        if (initialUsername == null || !initialUsername.equals(newUsername)) {
-            String passwordToSend = !TextUtils.isEmpty(newPassword) ? newPassword : serverPasswordShadow;
-            if (TextUtils.isEmpty(passwordToSend)) {
-                Toast.makeText(this, "Enter your password to change username.", Toast.LENGTH_SHORT).show();
-            } else {
-                pending[0]++;
-                LocalDate bd = LocalDate.parse(newBirthday);
-                changeUserRequest body = new changeUserRequest(
-                        userId, newUsername, passwordToSend, bd,
-                        (newAvatarName != null ? newAvatarName : initialAvatarName)
-                );
-                api.saveUser(body).enqueue(new Callback<User>() {
-                    @Override public void onResponse(Call<User> call, Response<User> resp) {
-                        if (!resp.isSuccessful() || resp.body() == null) {
-                            failed[0] = true;
-                        } else {
-                            User u = resp.body();
-                            initialUsername = u.getUsername();
-
-                            getSharedPreferences("auth", MODE_PRIVATE).edit()
-                                    .putString("username", u.getUsername())
-                                    .apply();
-                        }
-                        done[0]++; maybeFinish.run();
-                    }
-                    @Override public void onFailure(Call<User> call, Throwable t) {
-                        failed[0] = true; done[0]++; maybeFinish.run();
-                    }
-                });
-            }
-        }
-
-        if (pending[0] == 0) {
+        if (pending.get() == 0) {
             Toast.makeText(this, "No changes to save.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showAvatarPickerDialog() {
-        List<Integer> drawables = getAllCandidateDrawables();
-        if (drawables.isEmpty()) {
+    /* ---------- Avatar picker ---------- */
+    private void showAvatarPicker() {
+        List<Integer> ids = listContentDrawables();
+        if (ids.isEmpty()) {
             Toast.makeText(this, "No PNGs found in drawable/", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        ScrollView scroll = new ScrollView(this);
-        GridLayout grid = new GridLayout(this);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.GridLayout grid = new android.widget.GridLayout(this);
         grid.setColumnCount(3);
         int pad = dp(12);
         grid.setPadding(pad, pad, pad, pad);
         grid.setUseDefaultMargins(true);
 
-        for (int resId : drawables) {
+        for (int resId : ids) {
             ImageView iv = new ImageView(this);
             iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
             iv.setImageResource(resId);
-            GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
+            android.widget.GridLayout.LayoutParams lp = new android.widget.GridLayout.LayoutParams();
             lp.width = dp(90);
             lp.height = dp(90);
             iv.setLayoutParams(lp);
@@ -286,19 +260,19 @@ public class SettingsActivity extends AppCompatActivity {
             });
             grid.addView(iv);
         }
-        scroll.addView(grid, new ScrollView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        scroll.addView(grid, new android.widget.ScrollView.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        AlertDialog.Builder b = new AlertDialog.Builder(this)
                 .setTitle("Choose your avatar")
                 .setView(scroll)
                 .setNegativeButton("Cancel", (d, w) -> d.dismiss());
-
-        avatarDialog[0] = builder.create();
+        avatarDialog[0] = b.create();
         avatarDialog[0].show();
     }
 
-    private List<Integer> getAllCandidateDrawables() {
+    private List<Integer> listContentDrawables() {
         List<Integer> ids = new ArrayList<>();
         Field[] fields = R.drawable.class.getDeclaredFields();
         for (Field f : fields) {
@@ -308,7 +282,6 @@ public class SettingsActivity extends AppCompatActivity {
                 int resId = f.getInt(null);
                 String type = getResources().getResourceTypeName(resId);
                 if (!"drawable".equals(type)) continue;
-
                 if (name.endsWith("_default") || name.endsWith("_happy") || name.endsWith("_sleep")
                         || name.contains("bear") || name.contains("deer")
                         || name.equals("berries") || name.equals("honey") || name.equals("salmon")

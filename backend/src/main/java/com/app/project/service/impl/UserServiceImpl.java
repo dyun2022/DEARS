@@ -61,4 +61,12 @@ public class UserServiceImpl implements UserService {
         user.setAvatar(avatar);
         return userRepository.save(user);
     }
+
+    @Override
+    public User updateUsername(int userID, String username) {
+        User u = getUserById(userID);
+        if (u == null) return null;
+        u.setUsername(username);
+        return userRepository.save(u);
+    }
 }

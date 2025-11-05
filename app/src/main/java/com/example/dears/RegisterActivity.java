@@ -2,14 +2,10 @@ package com.example.dears;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -17,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -30,10 +24,8 @@ import com.example.dears.data.request.changeUserRequest;
 import com.example.dears.data.request.createPetRequest;
 import com.google.android.material.button.MaterialButton;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +42,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private String selectedPet = null;
     private int selectedAvatarResId = 0;
+    private String selectedAvatarName = null;
+
     private final AlertDialog[] alert = new AlertDialog[1];
 
     private static final int COLOR_GRAY  = Color.parseColor("#D9D9D9");
@@ -60,25 +54,22 @@ public class RegisterActivity extends AppCompatActivity {
     private InterfaceAPI api;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
         api = APIClient.getClient().create(InterfaceAPI.class);
 
-        // Inputs
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etBirthday = findViewById(R.id.etBirthday);
         etPetName  = findViewById(R.id.etPetName);
 
-        // Buttons & views
         btnDeer     = findViewById(R.id.btnDeer);
         btnBear     = findViewById(R.id.btnBear);
         btnRegister = findViewById(R.id.btnRegister);
         avatarBox   = findViewById(R.id.avatarBox);
 
-        // Make Deer/Bear buttons show large icons
         setPetButtonAsLargeIcon(btnDeer, R.drawable.baby_deer_default, "Deer");
         setPetButtonAsLargeIcon(btnBear, R.drawable.baby_bear_default, "Bear");
         setPetButtonUnselected(btnDeer);
@@ -89,7 +80,6 @@ public class RegisterActivity extends AppCompatActivity {
             setPetButtonSelected(btnDeer);
             setPetButtonUnselected(btnBear);
         });
-
         btnBear.setOnClickListener(v -> {
             selectedPet = "Bear";
             setPetButtonSelected(btnBear);
@@ -107,8 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
         String birthdayStr = etBirthday.getText().toString().trim();
         String petName  = etPetName.getText().toString().trim();
 
-        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password) ||
-                TextUtils.isEmpty(birthdayStr) || TextUtils.isEmpty(petName)) {
+        if (username.isEmpty() || password.isEmpty() || birthdayStr.isEmpty() || petName.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -121,84 +110,58 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        LocalDate birthday = parseBirthdayFlexible(birthdayStr);
-        if (birthday == null) {
-            Toast.makeText(this, "Birthday format must be YYYY-MM-DD or MM/DD/YYYY", Toast.LENGTH_LONG).show();
+        // birthday to LocalDate
+        final LocalDate birthday;
+        try {
+            birthday = LocalDate.parse(birthdayStr); // expects yyyy-MM-dd
+        } catch (DateTimeParseException e) {
+            Toast.makeText(this, "Birthday must be yyyy-MM-dd", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String avatarEntryName = safeEntryName(selectedAvatarResId);
-        if (avatarEntryName == null) {
-            Toast.makeText(this, "Invalid avatar image", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // resource entry name for backend avatar field
+        selectedAvatarName = getResources().getResourceEntryName(selectedAvatarResId);
 
-        changeUserRequest registerReq = new changeUserRequest(username, password, birthday, avatarEntryName);
-
-        api.registerUser(registerReq).enqueue(new Callback<User>() {
-            @Override public void onResponse(Call<User> call, Response<User> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    String msg = extractError(response);
-                    Toast.makeText(RegisterActivity.this, "Register failed: " + msg, Toast.LENGTH_LONG).show();
+        // Call backend register (your InterfaceAPI has users/register that returns User)
+        changeUserRequest req = new changeUserRequest(username, password, birthday, selectedAvatarName);
+        api.registerUser(req).enqueue(new Callback<User>() {
+            @Override public void onResponse(Call<User> call, Response<User> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    Toast.makeText(RegisterActivity.this, "Register failed", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                User created = resp.body();
+                int userId = created.getUserID();
 
-                User created = response.body();
-                int newUserId = created.getUserID();
-
-                SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
-                sp.edit().putInt("userId", newUserId).apply();
-
-                createPetRequest petReq = new createPetRequest(petName, selectedPet);
-                api.createPet(newUserId, petReq).enqueue(new Callback<Pet>() {
+                // (Optional) ensure pet exists for this user
+                createPetRequest petReq = new createPetRequest(selectedPet, petName);
+                api.createPet(userId, petReq).enqueue(new Callback<Pet>() {
                     @Override public void onResponse(Call<Pet> call2, Response<Pet> resp2) {
-                        if (!resp2.isSuccessful() || resp2.body() == null) {
-                            String msg = extractError(resp2);
-                            Toast.makeText(RegisterActivity.this, "Pet create failed: " + msg, Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
-                        intent.putExtra("userId", newUserId);
-                        intent.putExtra("username", username);
-                        intent.putExtra("birthday", birthday.toString());
-                        intent.putExtra("avatarName", avatarEntryName);
-                        intent.putExtra("pet", selectedPet);
-                        startActivity(intent);
+                        // Even if pet creation fails, still proceed to PetHome with the correct userId.
+                        goToPetHome(userId, username, birthdayStr, selectedAvatarName, selectedPet);
                     }
-
                     @Override public void onFailure(Call<Pet> call2, Throwable t2) {
-                        Toast.makeText(RegisterActivity.this, "Pet create failed: " + t2.getMessage(), Toast.LENGTH_LONG).show();
+                        goToPetHome(userId, username, birthdayStr, selectedAvatarName, selectedPet);
                     }
                 });
             }
-
             @Override public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(RegisterActivity.this, "Register failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(RegisterActivity.this, "Register failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private String extractError(Response<?> response) {
-        try {
-            if (response.errorBody() != null) {
-                return response.errorBody().string();
-            }
-        } catch (IOException ignored) {}
-        return "HTTP " + response.code();
-    }
-
-    @Nullable
-    private LocalDate parseBirthdayFlexible(String s) {
-        try {
-            return LocalDate.parse(s, DateTimeFormatter.ISO_LOCAL_DATE); // yyyy-MM-dd
-        } catch (DateTimeParseException ignored) {}
-        try {
-            return LocalDate.parse(s, DateTimeFormatter.ofPattern("M/d/yyyy"));
-        } catch (DateTimeParseException ignored) {}
-        try {
-            return LocalDate.parse(s, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-        } catch (DateTimeParseException ignored) {}
-        return null;
+    private void goToPetHome(int userId, String username, String birthday, String avatarName, String petType) {
+        Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
+        // CRITICAL: carry userId forward so Settings can update correctly
+        intent.putExtra("userId", userId);
+        intent.putExtra("username", username);
+        intent.putExtra("birthday", birthday);
+        intent.putExtra("avatarName", avatarName);
+        intent.putExtra("pet", petType); // "Deer" or "Bear" to show the right oval art
+        startActivity(intent);
+        // Optionally finish register so back doesn’t return here
+        // finish();
     }
 
     private void setPetButtonAsLargeIcon(MaterialButton b, int iconRes, String label) {
@@ -236,7 +199,6 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "No PNGs found in drawable/", Toast.LENGTH_SHORT).show();
             return;
         }
-
         ScrollView scroll = new ScrollView(this);
         GridLayout grid = new GridLayout(this);
         grid.setColumnCount(3);
@@ -254,7 +216,7 @@ public class RegisterActivity extends AppCompatActivity {
             iv.setOnClickListener(v -> {
                 selectedAvatarResId = resId;
                 avatarBox.setImageResource(resId);
-                if (alert[0] != null) alert[0].dismiss();
+                alert[0].dismiss();
             });
             grid.addView(iv);
         }
@@ -280,7 +242,6 @@ public class RegisterActivity extends AppCompatActivity {
                 int resId = f.getInt(null);
                 String type = getResources().getResourceTypeName(resId);
                 if (!"drawable".equals(type)) continue;
-
                 if (name.endsWith("_default") || name.endsWith("_happy") || name.endsWith("_sleep")
                         || name.contains("bear") || name.contains("deer")
                         || name.equals("berries") || name.equals("honey") || name.equals("salmon")
@@ -290,13 +251,5 @@ public class RegisterActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
         return ids;
-    }
-
-    private String safeEntryName(int resId) {
-        try {
-            return getResources().getResourceEntryName(resId);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }
