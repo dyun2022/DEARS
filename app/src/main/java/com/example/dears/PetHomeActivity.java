@@ -34,7 +34,9 @@ public class PetHomeActivity extends AppCompatActivity {
     int timesFed = 0;
     int timesSleep = 0;
     boolean isSleeping = false;
+    boolean isHappy = false;
     InterfaceAPI interfaceAPI;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +48,39 @@ public class PetHomeActivity extends AppCompatActivity {
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
 
-        // Buttons
+
+        // Buttons & Views
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
         ImageButton btnJournal = findViewById(R.id.btnJournal);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
+        ImageView lowFood = findViewById(R.id.lowFood);
+        ImageView midFood = findViewById(R.id.midFood);
+        ImageView highFood = findViewById(R.id.highFood);
+
+        // Quick pet view init
+        ImageView ivPetOval = findViewById(R.id.ivPetOval);
+        ivPetOval.setVisibility(View.VISIBLE);
+        ivPetOval.bringToFront();
 
         setPetImage("default");
         updateEnergyBar();
         updateHungerBar();
         updateHappinessBar();
 
+        // Initialize foods.
+        if (pet.getType().equals("Deer")) {
+            lowFood.setImageResource(R.drawable.bark);
+            midFood.setImageResource(R.drawable.berries);
+            highFood.setImageResource(R.drawable.mushroom);
+        } else {
+            lowFood.setImageResource(R.drawable.honey);
+            midFood.setImageResource(R.drawable.berries);
+            highFood.setImageResource(R.drawable.salmon);
+        }
+
+        // Sleep logic
         btnSleep.setOnClickListener(v -> {
             // * TO-DO * Make pet not sleep if happiness is at max
             if (!isSleeping) {
@@ -77,12 +100,33 @@ public class PetHomeActivity extends AppCompatActivity {
                 setPetImage("default");
                 isSleeping = false;
             }
+        });
 
+        // Food logic
+        btnFeed.setOnClickListener( v -> {
+            btnFeed.setVisibility(View.GONE);
+            btnChat.setVisibility(View.GONE);
+            btnSleep.setVisibility(View.GONE);
+            lowFood.setVisibility(View.VISIBLE);
+            midFood.setVisibility(View.VISIBLE);
+            highFood.setVisibility(View.VISIBLE);
+        });
+
+        lowFood.setOnClickListener(v -> {
+            String food = pet.getType().equals("Deer") ? "bark" : "honey";
+            petFeed(food);
+        });
+
+        midFood.setOnClickListener(v -> {
+            petFeed("berries");
+        });
+
+        highFood.setOnClickListener(v -> {
+            String food = pet.getType().equals("Deer") ? "mushroom" : "salmon";
+            petFeed(food);
         });
 
         runClock();
-
-
     }
 
     private void runClock() {
@@ -93,7 +137,6 @@ public class PetHomeActivity extends AppCompatActivity {
             public void run() {
                 clock++;
                 if (isSleeping) petSleep();
-
                 handler.postDelayed(this, 1000);
             }
         });
@@ -134,11 +177,16 @@ public class PetHomeActivity extends AppCompatActivity {
         if (img != null) ivPetOval.setImageResource(img);
     }
 
-
+    private void happyReaction() {
+        setPetImage("happy");
+        new Handler().postDelayed(() -> {
+            setPetImage("default");
+        }, 500);
+    }
     private void petSleep() {
-        Call<Pet> callPetCreation = interfaceAPI.sleepPet(pet.getPetID());
+        Call<Pet> petSleep = interfaceAPI.sleepPet(pet.getPetID());
 
-        callPetCreation.enqueue(new Callback<Pet>() {
+        petSleep.enqueue(new Callback<Pet>() {
             @Override
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -154,6 +202,47 @@ public class PetHomeActivity extends AppCompatActivity {
         });
     }
 
+    private void petFeed(String food) {
+        // This is admittedly bad coding practice
+        // Might make more robust in a later version
+        Map<String, Integer> foodToId = Map.of(
+                "bark", 1,
+                "berries", 2,
+                "mushroom", 3,
+                "honey", 4,
+                "salmon", 5
+        );
+        ImageView lowFood = findViewById(R.id.lowFood);
+        ImageView midFood = findViewById(R.id.midFood);
+        ImageView highFood = findViewById(R.id.highFood);
+        Button btnSleep = findViewById(R.id.btnSleep);
+        Button btnFeed = findViewById(R.id.btnFeed);
+        Button btnChat = findViewById(R.id.btnChat);
+
+        Call<Pet> petFeed = interfaceAPI.feedPet(pet.getPetID(), foodToId.get(food));
+
+        petFeed.enqueue(new Callback<Pet>() {
+            @Override
+            public void onResponse(Call<Pet> call, Response<Pet> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    pet = response.body();
+                    updateHungerBar();
+                    btnFeed.setVisibility(View.VISIBLE);
+                    btnChat.setVisibility(View.VISIBLE);
+                    btnSleep.setVisibility(View.VISIBLE);
+                    lowFood.setVisibility(View.GONE);
+                    midFood.setVisibility(View.GONE);
+                    highFood.setVisibility(View.GONE);
+                    happyReaction();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Pet> call, Throwable t) {
+                Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void updateEnergyBar() {
         View barEnergy = findViewById(R.id.barEnergy);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);

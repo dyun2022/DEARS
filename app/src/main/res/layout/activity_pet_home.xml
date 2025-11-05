@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E8F3FF">
@@ -141,6 +142,17 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 
+    <ImageView
+        android:id="@+id/ivPetOval2"
+        android:layout_width="260dp"
+        android:layout_height="360dp"
+        android:layout_marginBottom="-60dp"
+        android:background="@drawable/bg_oval_light"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toTopOf="@id/ground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnFeed"
         android:layout_width="220dp"
@@ -182,5 +194,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="20dp" />
+
+    <ImageView
+        android:id="@+id/lowFood"
+        android:background="@drawable/food_option"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@drawable/mushroom"
+        app:layout_constraintBottom_toBottomOf="@id/ground"
+        app:layout_constraintTop_toTopOf="@id/ground"
+        app:layout_constraintEnd_toStartOf="@id/midFood"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <ImageView
+        android:id="@+id/midFood"
+        android:background="@drawable/food_option"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@drawable/berries"
+        app:layout_constraintBottom_toBottomOf="@id/ground"
+        app:layout_constraintTop_toTopOf="@id/ground"
+        app:layout_constraintStart_toEndOf="@id/lowFood"
+        app:layout_constraintEnd_toStartOf="@id/highFood"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <ImageView
+        android:id="@+id/highFood"
+        android:background="@drawable/food_option"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@drawable/salmon"
+        app:layout_constraintBottom_toBottomOf="@id/ground"
+        app:layout_constraintTop_toTopOf="@id/ground"
+        app:layout_constraintStart_toEndOf="@id/midFood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

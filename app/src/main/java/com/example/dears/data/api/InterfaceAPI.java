@@ -1,5 +1,6 @@
 package com.example.dears.data.api;
 
+import com.example.dears.data.model.Food;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
@@ -51,4 +52,11 @@ public interface InterfaceAPI {
 
     @PATCH("pet/{id}/sleep")
     Call<Pet> sleepPet(@Path("id") int petId);
+
+    @PATCH("pet/{id}/feed/{foodId}")
+    Call<Pet> feedPet(@Path("id") int petId, @Path("foodId") int foodId);
+
+    // *** FOOD RELATED REQUESTS *** //
+    @GET("food")
+    Call<Food[]> getFoods();
 }
