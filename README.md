@@ -1,6 +1,6 @@
 ## Frontend
 
-Need git-lfs
+git-lfs is required
 
 On macOS:
 To install brew: 
@@ -12,6 +12,14 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 Run:
 ```
 brew install git-lfs
+git lfs install
+```
+
+OR:
+Install from here: https://git-lfs.com/
+
+Run (either macOS or Windows):
+```
 git lfs install
 ```
 
