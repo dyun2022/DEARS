@@ -11,6 +11,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -47,4 +48,7 @@ public interface InterfaceAPI {
 
     @POST("pet/user/{id}")
     Call<Pet> createPet(@Path("id") int userId, @Body createPetRequest createPetRequest);
+
+    @PATCH("pet/{id}/sleep")
+    Call<Pet> sleepPet(@Path("id") int petId);
 }

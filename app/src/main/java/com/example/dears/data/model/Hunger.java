@@ -8,12 +8,24 @@ import java.io.Serializable;
  * Hunger model. Should match the backend's Hunger.
  */
 public class Hunger implements Serializable {
-    @SerializedName("happiness_id")
-    private int happiness_id;
+    @SerializedName("hungerID")
+    private int hungerID;
 
     @SerializedName("age")
     private AgeStage age;
 
-    @SerializedName("meter_max")
-    private int meter_max;
+    @SerializedName("meterMax")
+    private int meterMax;
+
+    public int getHungerID() {
+        return hungerID;
+    }
+
+    public AgeStage getAge() {
+        return age;
+    }
+
+    public int getMeterMax() {
+        return meterMax;
+    }
 }

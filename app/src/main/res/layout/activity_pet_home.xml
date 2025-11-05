@@ -17,14 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/barEnergy"
+    <FrameLayout
+        android:id="@+id/barEnergyGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#9AD24D"
+        android:background="#DDDDDD"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvEnergy"
-        app:layout_constraintTop_toBottomOf="@id/tvEnergy" />
+        app:layout_constraintTop_toBottomOf="@id/tvEnergy">
+
+        <View
+            android:id="@+id/barEnergy"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#9AD24D" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvHunger"
@@ -34,36 +41,49 @@
         android:textColor="#6B3A2E"
         android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="@id/tvEnergy"
-        app:layout_constraintTop_toBottomOf="@id/barEnergy" />
+        app:layout_constraintTop_toBottomOf="@id/barEnergyGray" />
 
-    <View
-        android:id="@+id/barHunger"
+    <FrameLayout
+        android:id="@+id/barHungerGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#E48F47"
+        android:background="#DDDDDD"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvHunger"
-        app:layout_constraintTop_toBottomOf="@id/tvHunger" />
+        app:layout_constraintTop_toBottomOf="@id/tvHunger">
+
+        <View
+            android:id="@+id/barHunger"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E48F47" />
+    </FrameLayout>
 
     <TextView
-        android:id="@+id/tvFriendship"
+        android:id="@+id/tvHappiness"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="friendship"
+        android:text="happiness"
         android:textColor="#6B3A2E"
         android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="@id/tvHunger"
-        app:layout_constraintTop_toBottomOf="@id/barHunger" />
+        app:layout_constraintTop_toBottomOf="@id/barHungerGray" />
 
-    <View
-        android:id="@+id/barFriendship"
+    <FrameLayout
+        android:id="@+id/barHappinessGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#F4F665"
+        android:background="#DDDDDD"
         android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="@id/tvFriendship"
-        app:layout_constraintTop_toBottomOf="@id/tvFriendship" />
+        app:layout_constraintStart_toStartOf="@id/tvHappiness"
+        app:layout_constraintTop_toBottomOf="@id/tvHappiness">
 
+        <View
+            android:id="@+id/barHappiness"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F4F665" />
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/btnSettings"
