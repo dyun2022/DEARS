@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.Journal;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
+import com.example.dears.data.request.createEntryRequest;
 
 import org.json.JSONObject;
 
@@ -56,6 +59,9 @@ public class JournalActivity extends AppCompatActivity {
 
         setPetImage();
 
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> onBackPressed());
+
         LinearLayout entries = findViewById(R.id.entriesContainer);
 
         Call<Journal[]> jReq = interfaceAPI.getAllJournals();
@@ -72,14 +78,32 @@ public class JournalActivity extends AppCompatActivity {
                     for (Journal j : response.body()) {
                         if (j.getPetId() == pet.getPetID()) {
                             entries.addView(createEntryView(j.getSummary()));
+                            Log.d("JOURNALLOG", j.getDate().toString() + " vs " + defaultDate.plusDays(day));
+
                             if (j.getDate().equals(defaultDate.plusDays(day))) needCreateJournal = false;
                         }
                     }
 
                     if (needCreateJournal) {
-                        createEntryObj(0);
+                        Call<Journal> cjReq = interfaceAPI.getJournalByPetID(pet.getPetID());
+
+                        cjReq.enqueue(new Callback<Journal>() {
+                            @Override
+                            public void onResponse(Call<Journal> call, Response<Journal> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    createEntryObj(response.body().getJournalId());
+                                } else {
+                                    fail();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Journal> call, Throwable t) {
+                                fail();
+                            }
+                        });
                     }
-                }
+                } else { fail(); }
             }
 
             @Override
@@ -113,6 +137,7 @@ public class JournalActivity extends AppCompatActivity {
                                 JSONObject json = new JSONObject(processedResult);
                                 String response = "Day " + day + "\n";
                                 String summary = json.getString("summary");
+                                int mood = json.getInt("mood");
                                 response += summary;
                                 if (timesChatted != 0) response += " You chatted with me " + timesChatted + " time" + ((timesChatted == 1) ? "!" : "s!");
                                 if (timesFed != 0) response += " You fed me " + timesFed + " time" + ((timesChatted == 1) ? "!" : "s!") ;
@@ -121,6 +146,23 @@ public class JournalActivity extends AppCompatActivity {
                                 Log.d("JOURNALLOG", response);
                                 LinearLayout entries = findViewById(R.id.entriesContainer);
                                 entries.addView(createEntryView(response));
+
+                                createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
+                                Call<Object> creRes = interfaceAPI.createEntry(defaultDate.plusDays(1).toString(), creReq);
+                                creRes.enqueue(new Callback<Object>() {
+                                    @Override
+                                    public void onResponse(Call<Object> call, Response<Object> response) {
+                                        if (response.isSuccessful() && response.body() != null) {
+                                        } else {
+                                            fail();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Object> call, Throwable t) {
+                                        fail();
+                                    }
+                                });
                             } catch (Exception e) {
                                 Log.d("JOURNALLOG", "exception");
                                 e.printStackTrace();

@@ -72,10 +72,13 @@ public interface InterfaceAPI {
     @POST("journal/create")
     Call<Object> createJournalForUser(@Body createJournalRequest createJournalRequest);
 
+    @GET("journal/pet/{id}")
+    Call<Journal> getJournalByPetID(@Path("id") int petId);
+
     @GET("journal")
     Call<Journal[]> getAllJournals();
 
     // ** ENTRY RELATED REQUESTS ** //
-    @POST("create/{date}")
+    @POST("entry/create/{date}")
     Call<Object> createEntry(@Path("date") String localDate, @Body createEntryRequest createEntryRequest);
 }
