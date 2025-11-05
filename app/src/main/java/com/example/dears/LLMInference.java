@@ -65,13 +65,13 @@ public class LLMInference {
                 " with happiness level percent: " + happiness + ", hunger satisfaction level percent: " + hunger + ", and energy level percent: " + sleep +
                 " If hunger and sleep levels are < 0.5, make it sound angrier."
                 + " If happiness > 0.5, make it sound cheerful." +
-                " Keep summary at ONE to TWO sentences." +
                 " You are to output ONLY valid JSON (no explanations, no markdown). " +
+                "Summary must be ONE sentence and no more than 20 words." +
                 "\nUse the following fields exactly:\n" +
                 "{\n" +
                 "  \"date\": \"MM-DD-YYYY\",\n" +
                 "  \"mood\": <integer from 0 to 100>,\n" +
-                "  \"summary\": \"<string of 1-2 sentences>\"\n" +
+                "  \"summary\": \"<string>\"\n" +
                 "}\n";
 
         // send prompt to LLM

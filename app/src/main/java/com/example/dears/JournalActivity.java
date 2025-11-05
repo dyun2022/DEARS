@@ -140,15 +140,15 @@ public class JournalActivity extends AppCompatActivity {
                                 int mood = json.getInt("mood");
                                 response += summary;
                                 if (timesChatted != 0) response += " You chatted with me " + timesChatted + " time" + ((timesChatted == 1) ? "!" : "s!");
-                                if (timesFed != 0) response += " You fed me " + timesFed + " time" + ((timesChatted == 1) ? "!" : "s!") ;
-                                if (timesSleep != 0) response += " I napped " + timesSleep + " time" + ((timesChatted == 1) ? "!" : "s!") ;
+                                if (timesFed != 0) response += " You fed me " + timesFed + " time" + ((timesFed == 1) ? "!" : "s!") ;
+                                if (timesSleep != 0) response += " I napped " + timesSleep + " time" + ((timesSleep == 1) ? "!" : "s!") ;
 
                                 Log.d("JOURNALLOG", response);
                                 LinearLayout entries = findViewById(R.id.entriesContainer);
                                 entries.addView(createEntryView(response));
 
                                 createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
-                                Call<Object> creRes = interfaceAPI.createEntry(defaultDate.plusDays(1).toString(), creReq);
+                                Call<Object> creRes = interfaceAPI.createEntry(defaultDate.plusDays(day).toString(), creReq);
                                 creRes.enqueue(new Callback<Object>() {
                                     @Override
                                     public void onResponse(Call<Object> call, Response<Object> response) {
