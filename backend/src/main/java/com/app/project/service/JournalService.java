@@ -24,5 +24,6 @@ public interface JournalService {
     List<Entry> getEntriesByDate(LocalDate date);
     Pet getPetById(int petId);
 
+    Journal getJournalByPetId(int petId);
     Journal saveJournal(Journal journal);
 }
