@@ -159,10 +159,7 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                         Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
                         intent.putExtra("userId", newUserId);
-                        intent.putExtra("username", username);
-                        intent.putExtra("birthday", birthday.toString());
-                        intent.putExtra("avatarName", avatarEntryName);
-                        intent.putExtra("pet", selectedPet);
+                        intent.putExtra("pet", resp2.body());
                         startActivity(intent);
                     }
 

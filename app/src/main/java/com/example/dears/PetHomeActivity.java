@@ -17,6 +17,7 @@ import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.MainViewModel;
 import com.example.dears.data.model.Pet;
+import com.example.dears.data.model.User;
 import com.example.dears.data.request.updatePetRequest;
 
 import java.util.Map;
@@ -98,6 +99,28 @@ public class PetHomeActivity extends AppCompatActivity {
             }
         });
 
+        btnSettings.setOnClickListener(v -> {
+            Call<User> getUser = interfaceAPI.getUserById(userId);
+
+            getUser.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Intent i = new Intent(PetHomeActivity.this, SettingsActivity.class);
+                        i.putExtra("userId", userId);
+                        i.putExtra("pet", pet);
+                        i.putExtra("username", response.body().getUsername());
+                        i.putExtra("birthday", response.body().getBirthday());
+                        i.putExtra("avatarName", response.body().getAvatar());
+                        startActivity(i);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) { fail(); }
+            });
+        });
+
         // Quick pet view init
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
         ivPetOval.setVisibility(View.VISIBLE);
@@ -175,7 +198,7 @@ public class PetHomeActivity extends AppCompatActivity {
                 clock++;
                 if (isSleeping) petSleep();
                 // TO-DO: Implement non-buggy status decay while sleeping
-                else statusDecay();
+                //eelse statusDecay();
                 handler.postDelayed(this, 1000);
             }
         });
