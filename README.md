@@ -43,3 +43,5 @@ To run on emulator:
 * go to Device Manager > three dots next to Pixel 8 > Additional Settings
 * increase internal storage to 16 gb and expanded storage to 2 gb
 * increase to 8 cores in CPU
+
+You may have to run ```adb shell pm clear com.example.dears``` to clear the cache
