@@ -214,7 +214,7 @@ public class PetHomeActivity extends AppCompatActivity {
                 clock++;
                 if (isSleeping) petSleep();
                 // TO-DO: Implement non-buggy status decay while sleeping
-                //else statusDecay();
+                else statusDecay();
 
                 // New "day" every 5 minutes
                 if (clock % 300 == 0) {
