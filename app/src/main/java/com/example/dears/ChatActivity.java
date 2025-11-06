@@ -15,6 +15,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.dears.data.model.Pet;
+
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.Pet;
@@ -27,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+//import com.example.dears.data.model.Pet;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,8 +39,8 @@ import retrofit2.Response;
 public class ChatActivity extends AppCompatActivity {
     private String age;
     private String petType = null;
-    private int petId = -1;
-    private int userId = 0;
+    private int petID = -1;
+    private int userId;
     private Pet pet;
     private int hunger;
     private int energy;
@@ -45,6 +48,7 @@ public class ChatActivity extends AppCompatActivity {
     private int growth;
     private int meterMax;
     private String name;
+    /// should be able to do pet.name after and just use dot operator for all the values
 
     /// should be able to do pet.name after and just use dot operator for all the values
 
@@ -72,7 +76,7 @@ public class ChatActivity extends AppCompatActivity {
 
                  //get pet attributes
                     name = pet.getName();
-                    petId = pet.getPetID();
+                    petID = pet.getPetID();
                     petType = pet.getType();
                     hunger = pet.getHungerMeter();
                     energy = pet.getEnergyMeter();
