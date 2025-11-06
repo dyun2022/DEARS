@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DEARS</string>
+    <string name="huggingface_path">/data/local/tmp/llm/gemma3-1b-it-int4.task</string>
 </resources>

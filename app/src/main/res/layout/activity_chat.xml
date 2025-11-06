@@ -5,27 +5,93 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/notepaper"
     tools:context=".ChatActivity">
 
     <TextView
         android:id="@+id/LLMResults"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="4dp"
+        android:layout_height="15dp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/my_custom_orange"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.447"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.664" />
 
     <Button
         android:id="@+id/Generate"
-        android:layout_height="60dp"
         android:layout_width="120dp"
-        android:layout_marginBottom="200dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="72dp"
         android:backgroundTint="@color/black"
         android:text="click to generate"
         android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/petPicture"
+        android:layout_width="203dp"
+        android:layout_height="224dp"
+        app:srcCompat="@drawable/honey"
+        tools:layout_editor_absoluteX="104dp"
+        tools:layout_editor_absoluteY="104dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2"/>
+
+    <Button
+        android:id="@+id/chatGreeting"
+        android:layout_width="81dp"
+        android:layout_height="95dp"
+        android:text="How are you?"
+        android:backgroundTint="@color/my_custom_orange"
+        tools:layout_editor_absoluteX="165dp"
+        tools:layout_editor_absoluteY="354dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54"/>
+
+    <Button
+        android:id="@+id/chatHello"
+        android:layout_width="81dp"
+        android:layout_height="95dp"
+        android:text="Hello!"
+        android:textSize="12sp"
+        android:backgroundTint="@color/my_custom_orange"
+        tools:layout_editor_absoluteX="72dp"
+        tools:layout_editor_absoluteY="354dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54"/>
+
+    <Button
+        android:id="@+id/chatJoke"
+        android:layout_width="81dp"
+        android:layout_height="95dp"
+        android:text="Tell me a joke!"
+        tools:layout_editor_absoluteX="259dp"
+        android:backgroundTint="@color/my_custom_orange"
+        tools:layout_editor_absoluteY="354dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
