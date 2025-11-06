@@ -17,4 +17,5 @@ public interface UserService {
     User updateBirthday(int userId, LocalDate birthday);
     User updatePassword(int userId, String password);
     User updateAvatar(int userId, String avatar);
+    User updateUsername(int userId, String username);
 }

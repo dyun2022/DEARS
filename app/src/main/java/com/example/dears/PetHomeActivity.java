@@ -1,6 +1,7 @@
 package com.example.dears;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -38,9 +39,12 @@ public class PetHomeActivity extends AppCompatActivity {
     int timesChatted = 0;
     int timesFed = 0;
     int timesSleep = 0;
+    int day = 1;
     boolean isSleeping = false;
     boolean isHappy = false;
     InterfaceAPI interfaceAPI;
+    private Handler handler = new Handler();
+    private Runnable clockRunnable;
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -125,9 +129,10 @@ public class PetHomeActivity extends AppCompatActivity {
             Intent i = new Intent(PetHomeActivity.this, JournalActivity.class);
             i.putExtra("userId", userId);
             i.putExtra("pet", pet);
-            i.putExtra("timesChatted", timesChatted);
+            i.putExtra("timesSleep", timesSleep);
             i.putExtra("timesFed", timesFed);
             i.putExtra("timesChatted", timesChatted);
+            i.putExtra("day", day);
             startActivity(i);
         });
 
@@ -153,7 +158,7 @@ public class PetHomeActivity extends AppCompatActivity {
         // Sleep logic
         btnSleep.setOnClickListener(v -> {
             timesSleep += 1;
-            // * TO-DO * Make pet not sleep if happiness is at max
+            // TO-DO Make pet not sleep if energy is at max
             if (!isSleeping) {
                 btnFeed.setVisibility(View.GONE);
                 btnChat.setVisibility(View.GONE);
@@ -163,13 +168,7 @@ public class PetHomeActivity extends AppCompatActivity {
                 setPetImage("sleep");
                 isSleeping = true;
             } else {
-                btnFeed.setVisibility(View.VISIBLE);
-                btnChat.setVisibility(View.VISIBLE);
-                btnJournal.setVisibility(View.VISIBLE);
-                btnSettings.setVisibility(View.VISIBLE);
-                btnSleep.setText("Sleepy time!");
-                setPetImage("default");
-                isSleeping = false;
+                wakeUp();
             }
         });
 
@@ -202,13 +201,15 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     private void runClock() {
-        final Handler handler = new Handler();
-
-        handler.post(new Runnable() {
+        clockRunnable = new Runnable() {
             @Override
             public void run() {
+                // TO-DO: The clock still runs when navigating to other pages...
                 clock++;
-                if (isSleeping) petSleep();
+                if (isSleeping) {
+                    if (pet.getEnergyMeter() == pet.getEnergy().getMeterMax()) wakeUp();
+                    else petSleep();
+                }
                 // TO-DO: Implement non-buggy status decay while sleeping
                 else statusDecay();
 
@@ -218,10 +219,62 @@ public class PetHomeActivity extends AppCompatActivity {
                     timesChatted = 0;
                     timesFed = 0;
                     timesSleep = 0;
+                    day += 1;
                 }
                 handler.postDelayed(this, 1000);
             }
-        });
+        };
+
+        handler.post(clockRunnable);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(clockRunnable);
+        SharedPreferences prefs = getSharedPreferences("PetPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("clock", clock);
+        editor.putInt("day", day);
+        editor.putInt("timesFed", timesFed);
+        editor.putInt("timesChatted", timesChatted);
+        editor.putInt("timesSleep", timesSleep);
+        editor.apply();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(clockRunnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("PetPrefs", MODE_PRIVATE);
+        clock = prefs.getInt("clock", 0);
+        day = prefs.getInt("day", 1);
+        timesFed = prefs.getInt("timesFed", 0);
+        timesChatted = prefs.getInt("timesChatted", 0);
+        timesSleep = prefs.getInt("timesSleep", 0);
+
+        runClock(); // restart clock when resuming
+    }
+
+    private void wakeUp() {
+        Button btnSleep = findViewById(R.id.btnSleep);
+        Button btnFeed = findViewById(R.id.btnFeed);
+        Button btnChat = findViewById(R.id.btnChat);
+        ImageButton btnJournal = findViewById(R.id.btnJournal);
+        ImageButton btnSettings = findViewById(R.id.btnSettings);
+
+        btnFeed.setVisibility(View.VISIBLE);
+        btnChat.setVisibility(View.VISIBLE);
+        btnJournal.setVisibility(View.VISIBLE);
+        btnSettings.setVisibility(View.VISIBLE);
+        btnSleep.setText("Sleepy time!");
+        setPetImage("default");
+        isSleeping = false;
     }
 
     // Action: happy, sleep, or default

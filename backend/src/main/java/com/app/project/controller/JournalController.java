@@ -52,6 +52,30 @@ public class JournalController {
         }
     }
 
+    @GetMapping("/pet/{pet_id}")
+    public ResponseEntity<Map<String, Object>> getJournalByPetId(@PathVariable int pet_id) {
+        Journal journal = journalService.getJournalByPetId(pet_id);
+        if (journal != null) {
+            Map<String, Object> journalDto = new HashMap<>();
+            journalDto.put("journal_id", journal.getJournalId());
+
+            List<Map<String, Object>> entriesDtos = journal.getEntries().stream()
+                    .map(entry -> {
+                        Map<String, Object> dto = new HashMap<>();
+                        dto.put("entry_id", entry.getEntryId());
+                        dto.put("date", entry.getEntryDate());
+                        dto.put("summary", entry.getSummary());
+                        return dto;
+                    })
+                    .toList();
+
+            journalDto.put("entries", entriesDtos);
+            return new ResponseEntity<>(journalDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllEntries() {
         List<Entry> entries = journalService.getAllEntries();
@@ -60,6 +84,8 @@ public class JournalController {
                 .map(entry -> {
                     Map<String, Object> dto = new HashMap<>();
                     dto.put("entry_id", entry.getEntryId());
+                    dto.put("pet_id", entry.getPet().getPetID());
+                    dto.put("journal_id", entry.getJournalId());
                     dto.put("date", entry.getEntryDate());
                     dto.put("summary", entry.getSummary());
                     return dto;

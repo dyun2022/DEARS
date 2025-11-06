@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface JournalRepository extends JpaRepository<Journal, Integer> {
     Optional<Journal> findById(int journal_id);
     Optional<Journal> findByPet(Pet pet_id);
+    Optional<Journal> findByPet_petId(int pet_id);
 }

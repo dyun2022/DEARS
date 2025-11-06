@@ -62,6 +62,13 @@ public class JournalServiceImpl implements JournalService {
         return entries;
     }
 
+    public Journal getJournalByPetId(int petId) {
+        // Pet p = this.getPetById(petId);
+        return journalRepository.findByPet_petId(petId).orElse(null);
+    }
+
+
+
     public Pet getPetById(int petId) {
         return petService.getPetByID(petId).orElse(null);
     }

@@ -51,12 +51,6 @@
             android:paddingStart="28dp"
             android:paddingEnd="28dp"
             >
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/journal_entry"/>
         </LinearLayout>
     </ScrollView>
 

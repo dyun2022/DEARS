@@ -27,6 +27,7 @@ import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
+import com.example.dears.data.request.createJournalRequest;
 import com.example.dears.data.request.createPetRequest;
 import com.google.android.material.button.MaterialButton;
 
@@ -157,10 +158,29 @@ public class RegisterActivity extends AppCompatActivity {
                             Toast.makeText(RegisterActivity.this, "Pet create failed: " + msg, Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
-                        intent.putExtra("userId", newUserId);
-                        intent.putExtra("pet", resp2.body());
-                        startActivity(intent);
+
+                        Pet myPet = resp2.body();
+
+                        createJournalRequest journalReq = new createJournalRequest(resp2.body().getPetID());
+                        api.createJournalForUser(journalReq).enqueue(new Callback<Object>() {
+                            @Override public void onResponse(Call<Object> call2, Response<Object> resp2) {
+                                if (!resp2.isSuccessful() || resp2.body() == null) {
+                                    String msg = extractError(resp2);
+                                    Toast.makeText(RegisterActivity.this, "Pet create failed: " + msg, Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                Intent intent = new Intent(RegisterActivity.this, PetHomeActivity.class);
+                                intent.putExtra("userId", newUserId);
+                                intent.putExtra("pet", myPet);
+                                startActivity(intent);
+                            }
+                            @Override
+                            public void onFailure(Call<Object> call2, Throwable t2) {
+                                Toast.makeText(RegisterActivity.this, "Pet create failed: " + t2.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+
                     }
 
                     @Override public void onFailure(Call<Pet> call2, Throwable t2) {
