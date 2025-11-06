@@ -16,16 +16,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // save user in database
+    @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    // get all users in database
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Override
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
@@ -59,6 +60,13 @@ public class UserServiceImpl implements UserService {
     public User updateAvatar(int userId, String avatar) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.setAvatar(avatar);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUsername(int userId, String username) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(username);
         return userRepository.save(user);
     }
 }

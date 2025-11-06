@@ -58,12 +58,21 @@ public class LLMInference {
     }
 
 
-    public void generateJournalEntry(String age, String type, int happiness, int hunger, int sleep, LLMCallback callback) {
+    public void generateJournalEntry(String age, String type, double happiness, double hunger, double sleep, LLMCallback callback) {
         String prompt = "In strict JSON format with the fields \"date\", \"mood\", and \"summary\"," +
                 "where date is MM-DD-YYYY format and mood is an integer out of 100, " +
                 "generate a journal entry in the voice of a " + age + " " + type +
-                " with happiness level: " + happiness + ", hunger satisfaction level: " + hunger + ", and amount of sleep gotten " + sleep +
-                ". If hunger and sleep levels are low, make it sound angrier. If happiness is high, make it sound cheerful.";
+                " with happiness level percent: " + happiness + ", hunger satisfaction level percent: " + hunger + ", and energy level percent: " + sleep +
+                " If hunger and sleep levels are < 0.5, make it sound angrier."
+                + " If happiness > 0.5, make it sound cheerful." +
+                " You are to output ONLY valid JSON (no explanations, no markdown). " +
+                "Summary must be ONE sentence and no more than 20 words." +
+                "\nUse the following fields exactly:\n" +
+                "{\n" +
+                "  \"date\": \"MM-DD-YYYY\",\n" +
+                "  \"mood\": <integer from 0 to 100>,\n" +
+                "  \"summary\": \"<string>\"\n" +
+                "}\n";
 
         // send prompt to LLM
         callLLM(prompt, callback);
