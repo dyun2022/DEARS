@@ -5,14 +5,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,7 +21,9 @@ import com.example.dears.data.model.User;
 import com.google.android.material.button.MaterialButton;
 
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,8 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText etUsername, etPassword, etBirthday;
     private ImageView avatarBox;
     private ImageButton btnBack;
-    private MaterialButton btnSave, btnLogout;
+    private MaterialButton btnSave;
+    private MaterialButton btnLogout; // ensure this exists in your XML
 
     private InterfaceAPI api;
     private int userId = -1;
@@ -56,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         btnBack    = findViewById(R.id.btnBack);
         btnSave    = findViewById(R.id.btnSave);
-        btnLogout  = findViewById(R.id.btnLogout);
+        btnLogout  = findViewById(R.id.btnLogout); // add this to XML under Save
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etBirthday = findViewById(R.id.etBirthday);
@@ -78,15 +80,18 @@ public class SettingsActivity extends AppCompatActivity {
         avatarBox.setOnClickListener(v -> showAvatarPickerDialog());
         btnSave.setOnClickListener(v -> saveChanges());
 
-        btnLogout.setOnClickListener(v -> {
-            getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
-            getSharedPreferences("PetPrefs", MODE_PRIVATE).edit().clear().apply();
-
-            Intent i = new Intent(SettingsActivity.this, LoginActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            finishAffinity();
-        });
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                // clear session + pet UI state and go to Login
+                getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
+                getSharedPreferences("PetPrefs", MODE_PRIVATE).edit().clear().apply();
+                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, LoginActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                finishAffinity();
+            });
+        }
     }
 
     private void fastPrefillFromIntentOrPrefs() {
@@ -153,10 +158,10 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        String newUsername   = etUsername.getText().toString().trim();
-        String newPassword   = etPassword.getText().toString().trim();
-        String newBirthday   = etBirthday.getText().toString().trim();
-        String newAvatarName = (selectedAvatarResId != 0)
+        final String newUsername   = etUsername.getText().toString().trim();
+        final String newPassword   = etPassword.getText().toString().trim();
+        final String newBirthday   = etBirthday.getText().toString().trim();
+        final String newAvatarName = (selectedAvatarResId != 0)
                 ? getResources().getResourceEntryName(selectedAvatarResId)
                 : initialAvatarName;
 
@@ -169,106 +174,117 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        final int[] pending = {0};
-        final int[] done    = {0};
-        final boolean[] failed = {false};
+        final boolean changePassword = !TextUtils.isEmpty(newPassword);
+        final boolean changeBirthday = (initialBirthday == null) || !newBirthday.equals(initialBirthday);
+        final boolean changeAvatar   = (newAvatarName != null) &&
+                ((initialAvatarName == null) || !newAvatarName.equals(initialAvatarName));
+        final boolean changeUsername = (initialUsername == null) || !newUsername.equals(initialUsername);
 
-        Runnable maybeFinish = () -> {
-            if (done[0] == pending[0] && pending[0] > 0 && !failed[0]) {
+        if (!changePassword && !changeBirthday && !changeAvatar && !changeUsername) {
+            Toast.makeText(this, "No changes to save.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Build a sequential chain of updates to avoid concurrent lost updates.
+        final Deque<Runnable> chain = new ArrayDeque<>();
+
+        if (changePassword) {
+            chain.add(() -> doUpdatePassword(newPassword, succeed(chain)));
+        }
+        if (changeBirthday) {
+            chain.add(() -> doUpdateBirthday(newBirthday, succeed(chain)));
+        }
+        if (changeAvatar) {
+            chain.add(() -> doUpdateAvatar(newAvatarName, succeed(chain)));
+        }
+        if (changeUsername) {
+            chain.add(() -> doUpdateUsername(newUsername, succeed(chain)));
+        }
+
+        // start chain
+        chain.poll().run();
+    }
+
+    /** Returns a continuation that runs the next step or finishes on success. */
+    private Runnable succeed(Deque<Runnable> chain) {
+        return () -> {
+            Runnable next = chain.poll();
+            if (next != null) {
+                next.run();
+            } else {
                 etPassword.setText("");
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
                 finish();
             }
         };
+    }
 
-        // password
-        if (!TextUtils.isEmpty(newPassword)) {
-            pending[0]++;
-            Map<String, String> body = new HashMap<>();
-            body.put("password", newPassword);
-            api.updatePassword(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) failed[0] = true;
-                    done[0]++; maybeFinish.run();
+    private void doUpdatePassword(String newPassword, Runnable onSuccess) {
+        Map<String, String> body = new HashMap<>();
+        body.put("password", newPassword);
+        api.updatePassword(userId, body).enqueue(new Callback<User>() {
+            @Override public void onResponse(Call<User> call, Response<User> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showFail("Password");
+                    return;
                 }
-                @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
+                serverPasswordShadow = newPassword;
+                onSuccess.run();
+            }
+            @Override public void onFailure(Call<User> call, Throwable t) { showFail("Password"); }
+        });
+    }
+
+    private void doUpdateBirthday(String newBirthday, Runnable onSuccess) {
+        Map<String, String> body = new HashMap<>();
+        body.put("birthday", newBirthday); // ISO-8601 string expected by server
+        api.updateBirthday(userId, body).enqueue(new Callback<User>() {
+            @Override public void onResponse(Call<User> call, Response<User> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showFail("Birthday");
+                    return;
                 }
-            });
-        }
+                initialBirthday = newBirthday;
+                onSuccess.run();
+            }
+            @Override public void onFailure(Call<User> call, Throwable t) { showFail("Birthday"); }
+        });
+    }
 
-        if (initialBirthday == null || !initialBirthday.equals(newBirthday)) {
-            pending[0]++;
-            Map<String, String> body = new HashMap<>();
-            body.put("birthday", newBirthday);
-            api.updateBirthday(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) { failed[0] = true; }
-                    else { initialBirthday = newBirthday; }
-                    done[0]++; maybeFinish.run();
+    private void doUpdateAvatar(String newAvatarName, Runnable onSuccess) {
+        Map<String, String> body = new HashMap<>();
+        body.put("avatar", newAvatarName);
+        api.updateAvatar(userId, body).enqueue(new Callback<User>() {
+            @Override public void onResponse(Call<User> call, Response<User> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showFail("Avatar");
+                    return;
                 }
-                @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
+                initialAvatarName = newAvatarName;
+                onSuccess.run();
+            }
+            @Override public void onFailure(Call<User> call, Throwable t) { showFail("Avatar"); }
+        });
+    }
+
+    private void doUpdateUsername(String newUsername, Runnable onSuccess) {
+        Map<String, String> body = new HashMap<>();
+        body.put("username", newUsername);
+        // Requires InterfaceAPI to have: @PUT("users/{id}/username") Call<User> updateUsername(@Path("id") int userId, @Body Map<String, String> body);
+        api.updateUsername(userId, body).enqueue(new Callback<User>() {
+            @Override public void onResponse(Call<User> call, Response<User> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showFail("Username");
+                    return;
                 }
-            });
-        }
-
-        // avatar
-        if (newAvatarName != null && (initialAvatarName == null || !initialAvatarName.equals(newAvatarName))) {
-            pending[0]++;
-            Map<String, String> body = new HashMap<>();
-            body.put("avatar", newAvatarName);
-            api.updateAvatar(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful()) { failed[0] = true; }
-                    else { initialAvatarName = newAvatarName; }
-                    done[0]++; maybeFinish.run();
-                }
-                @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true; done[0]++; maybeFinish.run();
-                }
-            });
-        }
-
-        if (initialUsername == null || !initialUsername.equals(newUsername)) {
-            pending[0]++;
-
-            Map<String, String> body = new HashMap<>();
-            body.put("username", newUsername);
-
-            Log.d("Settings", "Calling updateUsername for userId=" + userId + " -> " + newUsername);
-
-            api.updateUsername(userId, body).enqueue(new Callback<User>() {
-                @Override public void onResponse(Call<User> call, Response<User> resp) {
-                    if (!resp.isSuccessful() || resp.body() == null) {
-                        failed[0] = true;
-                        String msg = "Username update failed (HTTP " + resp.code() + ")";
-                        if (resp.code() == 404) msg = "Username update failed: user not found (check userId)";
-                        if (resp.code() == 409) msg = "Username update failed: that username is already taken";
-                        Toast.makeText(SettingsActivity.this, msg, Toast.LENGTH_LONG).show();
-                    } else {
-                        User u = resp.body();
-                        initialUsername = u.getUsername();
-                        etUsername.setText(u.getUsername());
-                        getSharedPreferences("auth", MODE_PRIVATE)
-                                .edit()
-                                .putString("username", u.getUsername())
-                                .apply();
-                    }
-                    done[0]++; maybeFinish.run();
-                }
-
-                @Override public void onFailure(Call<User> call, Throwable t) {
-                    failed[0] = true;
-                    Toast.makeText(SettingsActivity.this, "Username update failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    done[0]++; maybeFinish.run();
-                }
-            });
-        }
-
-        if (pending[0] == 0) {
-            Toast.makeText(this, "No changes to save.", Toast.LENGTH_SHORT).show();
-        }
+                initialUsername = resp.body().getUsername();
+                getSharedPreferences("auth", MODE_PRIVATE).edit()
+                        .putString("username", initialUsername)
+                        .apply();
+                onSuccess.run();
+            }
+            @Override public void onFailure(Call<User> call, Throwable t) { showFail("Username"); }
+        });
     }
 
     private void showAvatarPickerDialog() {
@@ -337,5 +353,9 @@ public class SettingsActivity extends AppCompatActivity {
     private int dp(int value) {
         float d = getResources().getDisplayMetrics().density;
         return Math.round(value * d);
+    }
+
+    private void showFail(String which) {
+        Toast.makeText(this, which + " update failed", Toast.LENGTH_LONG).show();
     }
 }
