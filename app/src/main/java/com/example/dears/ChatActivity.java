@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 //import com.example.dears.data.model.Pet;
 
 import retrofit2.Call;
@@ -65,14 +66,9 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         Intent intent = getIntent();
-        userId = intent.getIntExtra("userId", 0); // fallback to 0 if not passed
+        pet = (Pet) intent.getSerializableExtra("pet");
+        userId = intent.getIntExtra("userId", -1);
 
-        Call<Pet> call = interfaceAPI.getPetById(userId);
-        call.enqueue(new Callback<Pet>() {
-            @Override
-            public void onResponse(Call<Pet> call, Response<Pet> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    pet = response.body();
 
                  //get pet attributes
                     name = pet.getName();
@@ -87,41 +83,15 @@ public class ChatActivity extends AppCompatActivity {
                     age = pet.getAge().getAgeStage();
                     meterMax = pet.getAge().getMeterMax();
 
-                    ImageView petPicture = findViewById(R.id.petPicture);
+        setPetImage();
 
-                    //check pet type
-                    if (petType.equalsIgnoreCase("bear")) {
-                        //check age stage
-                        if (age.equalsIgnoreCase("baby")){
-                            petPicture.setImageResource(R.drawable.baby_bear_default);
-                        } else if (age.equalsIgnoreCase("teen")){
-                            petPicture.setImageResource(R.drawable.teen_bear_default);
-                        } else {
-                            petPicture.setImageResource(R.drawable.adult_bear_default);
-                        }
-                    } else {
-                        if (age.equalsIgnoreCase("baby")){
-                            petPicture.setImageResource(R.drawable.baby_deer_default);
-                        } else if (age.equalsIgnoreCase("teen")){
-                            petPicture.setImageResource(R.drawable.teen_deer_default);
-                        } else {
-                            petPicture.setImageResource(R.drawable.adult_deer_default);
-                        }
-                    }
-
-                    Toast.makeText(getApplicationContext(),
-                            "Pet: " + name + " (" + petType + "), Stage: " + age,
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Pet not found", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Pet> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        //check pet type
+//        if (petType.equalsIgnoreCase("bear")) {
+//            //check age stage
+//            if ()
+//        } else {
+//
+//        }
 
         TextView textView = findViewById(R.id.LLMResults);
 
@@ -157,7 +127,12 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         final Button backButton = findViewById(R.id.backButton);
-
+        backButton.setOnClickListener( v -> {
+            Intent mainIntent = new Intent(ChatActivity.this, PetHomeActivity.class);
+            mainIntent.putExtra("pet", pet);
+            mainIntent.putExtra("userId", userId);
+            startActivity(mainIntent);
+        });
     }
 
     public void updateTextView(String prompt) {
@@ -203,6 +178,26 @@ public class ChatActivity extends AppCompatActivity {
             }
         }).start();
     }
+    private void setPetImage() {
+        ImageView petImage = findViewById(R.id.petPicture);
 
+        // Dictionary to make grabbing the image easier
+        Map<String, Integer> petImages = Map.ofEntries(
+                Map.entry("adult_bear_default", R.drawable.adult_bear_default),
+                Map.entry("teen_bear_default", R.drawable.teen_bear_default),
+                Map.entry("baby_bear_default", R.drawable.baby_bear_default),
+                Map.entry("adult_deer_default", R.drawable.adult_deer_default),
+                Map.entry("teen_deer_default", R.drawable.teen_deer_default),
+                Map.entry("baby_deer_default", R.drawable.baby_deer_default)
+        );
+
+        String key = "";
+        key += pet.getAge().getAgeStage() + "_";
+        key += pet.getType().toLowerCase() + "_";
+        key += "default";
+
+        Integer img = petImages.get(key);
+        if (img != null) petImage.setImageResource(img);
+    }
 }
 
