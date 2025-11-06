@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 //import com.example.dears.data.model.Pet;
 
 public class ChatActivity extends AppCompatActivity {
@@ -57,7 +58,7 @@ public class ChatActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
         }
 
-        ImageView petPicture = findViewById(R.id.petPicture);
+        setPetImage();
 
         //check pet type
 //        if (petType.equalsIgnoreCase("bear")) {
@@ -116,7 +117,13 @@ public class ChatActivity extends AppCompatActivity {
         // put the llm call on a thread so it doesn't hog all of the resources
         new Thread(() -> {
             try {
-                llm.respondToChat("baby", "deer", 80, 60, 70, prompt, new LLMInference.LLMCallback() {
+                llm.respondToChat(
+                        pet.getAge().getAgeStage(),
+                        pet.getType(),
+                        ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
+                        ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
+                        ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
+                        prompt, new LLMInference.LLMCallback() {
                     @Override
                     public void onComplete(String llmResult) {
                         System.out.println(llmResult);
@@ -152,6 +159,26 @@ public class ChatActivity extends AppCompatActivity {
             }
         }).start();
     }
+    private void setPetImage() {
+        ImageView petImage = findViewById(R.id.petPicture);
 
+        // Dictionary to make grabbing the image easier
+        Map<String, Integer> petImages = Map.ofEntries(
+                Map.entry("adult_bear_default", R.drawable.adult_bear_default),
+                Map.entry("teen_bear_default", R.drawable.teen_bear_default),
+                Map.entry("baby_bear_default", R.drawable.baby_bear_default),
+                Map.entry("adult_deer_default", R.drawable.adult_deer_default),
+                Map.entry("teen_deer_default", R.drawable.teen_deer_default),
+                Map.entry("baby_deer_default", R.drawable.baby_deer_default)
+        );
+
+        String key = "";
+        key += pet.getAge().getAgeStage() + "_";
+        key += pet.getType().toLowerCase() + "_";
+        key += "default";
+
+        Integer img = petImages.get(key);
+        if (img != null) petImage.setImageResource(img);
+    }
 }
 
