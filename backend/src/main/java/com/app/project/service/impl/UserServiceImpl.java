@@ -63,7 +63,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // NEW
     @Override
     public User updateUsername(int userId, String username) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));

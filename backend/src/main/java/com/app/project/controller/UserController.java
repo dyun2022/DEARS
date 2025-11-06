@@ -145,7 +145,6 @@ public class UserController {
         }
     }
 
-    // NEW: update username
     @PutMapping("/{id}/username")
     public ResponseEntity<?> editUsername(@PathVariable("id") int userID,
                                           @RequestBody Map<String, String> request) {

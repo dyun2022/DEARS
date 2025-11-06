@@ -47,7 +47,6 @@ public interface InterfaceAPI {
     @PUT("users/{id}/avatar")
     Call<User> updateAvatar(@Path("id") int userId, @Body Map<String, String> body);
 
-    // ✅ NEW: update username (matches your backend route)
     @PUT("users/{id}/username")
     Call<User> updateUsername(@Path("id") int userId, @Body Map<String, String> body);
 

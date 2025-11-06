@@ -1,6 +1,7 @@
 package com.example.dears;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,13 +36,13 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText etUsername, etPassword, etBirthday;
     private ImageView avatarBox;
     private ImageButton btnBack;
-    private MaterialButton btnSave;
+    private MaterialButton btnSave, btnLogout;
 
     private InterfaceAPI api;
     private int userId = -1;
 
     private String initialUsername, initialAvatarName, initialBirthday;
-    private String serverPasswordShadow; // we keep it if you ever want to require pwd confirmation
+    private String serverPasswordShadow;
     private int selectedAvatarResId = 0;
 
     private final AlertDialog[] avatarDialog = new AlertDialog[1];
@@ -55,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         btnBack    = findViewById(R.id.btnBack);
         btnSave    = findViewById(R.id.btnSave);
+        btnLogout  = findViewById(R.id.btnLogout);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etBirthday = findViewById(R.id.etBirthday);
@@ -75,6 +77,16 @@ public class SettingsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> onBackPressed());
         avatarBox.setOnClickListener(v -> showAvatarPickerDialog());
         btnSave.setOnClickListener(v -> saveChanges());
+
+        btnLogout.setOnClickListener(v -> {
+            getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
+            getSharedPreferences("PetPrefs", MODE_PRIVATE).edit().clear().apply();
+
+            Intent i = new Intent(SettingsActivity.this, LoginActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finishAffinity();
+        });
     }
 
     private void fastPrefillFromIntentOrPrefs() {
@@ -185,7 +197,6 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
-        // birthday
         if (initialBirthday == null || !initialBirthday.equals(newBirthday)) {
             pending[0]++;
             Map<String, String> body = new HashMap<>();
@@ -219,7 +230,6 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
-        // username (✅ uses PUT /users/{id}/username)
         if (initialUsername == null || !initialUsername.equals(newUsername)) {
             pending[0]++;
 
