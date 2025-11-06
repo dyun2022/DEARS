@@ -78,12 +78,17 @@ public class LLMInference {
         callLLM(prompt, callback);
     }
 
-    public void respondToChat(String age, String type, int happiness, int hunger, int sleep, String input, LLMCallback callback) {
+    public void respondToChat(String age, String type, double happiness, double hunger, double sleep, String input, LLMCallback callback) {
         String prompt = "Respond ONLY in strict JSON format with only the field \"response\" where the response is a String." +
                 "Do not include any text before or after the JSON. Keep the response short (less than 25 words). " +
                 "Generate a response to the input, " + input +  " in the voice of a " + age + " " + type +
                 " with happiness level: " + happiness + ", hunger satisfaction level: " + hunger + ", and amount of sleep gotten " + sleep +
-                ". If hunger, sleep, or happiness levels are low, make it sound angrier. If happiness is high, make it sound cheerful.";
+                ". If hunger, sleep, or happiness levels are low, make it sound angrier. If happiness is high, make it sound cheerful."
+        + " You are to output ONLY valid JSON (no explanations, no markdown)." +
+                "\nUse the following fields exactly:\n" +
+                "{\n" +
+                "  \"response\": \"<string>\"\n" +
+                "}\n";
 
         // send prompt to LLM
         callLLM(prompt, callback);
