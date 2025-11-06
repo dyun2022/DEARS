@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -17,11 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.User;
-import com.example.dears.data.request.changeUserRequest;
 import com.google.android.material.button.MaterialButton;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
     private int userId = -1;
 
     private String initialUsername, initialAvatarName, initialBirthday;
-    private String serverPasswordShadow;
+    private String serverPasswordShadow; // we keep it if you ever want to require pwd confirmation
     private int selectedAvatarResId = 0;
 
     private final AlertDialog[] avatarDialog = new AlertDialog[1];
@@ -142,9 +141,9 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        String newUsername = etUsername.getText().toString().trim();
-        String newPassword = etPassword.getText().toString().trim();
-        String newBirthday = etBirthday.getText().toString().trim();
+        String newUsername   = etUsername.getText().toString().trim();
+        String newPassword   = etPassword.getText().toString().trim();
+        String newBirthday   = etBirthday.getText().toString().trim();
         String newAvatarName = (selectedAvatarResId != 0)
                 ? getResources().getResourceEntryName(selectedAvatarResId)
                 : initialAvatarName;
@@ -161,6 +160,7 @@ public class SettingsActivity extends AppCompatActivity {
         final int[] pending = {0};
         final int[] done    = {0};
         final boolean[] failed = {false};
+
         Runnable maybeFinish = () -> {
             if (done[0] == pending[0] && pending[0] > 0 && !failed[0]) {
                 etPassword.setText("");
@@ -219,37 +219,41 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
-        // username
+        // username (✅ uses PUT /users/{id}/username)
         if (initialUsername == null || !initialUsername.equals(newUsername)) {
-            String passwordToSend = !TextUtils.isEmpty(newPassword) ? newPassword : serverPasswordShadow;
-            if (TextUtils.isEmpty(passwordToSend)) {
-                Toast.makeText(this, "Enter your password to change username.", Toast.LENGTH_SHORT).show();
-            } else {
-                pending[0]++;
-                LocalDate bd = LocalDate.parse(newBirthday);
-                changeUserRequest body = new changeUserRequest(
-                        userId, newUsername, passwordToSend, bd,
-                        (newAvatarName != null ? newAvatarName : initialAvatarName)
-                );
-                api.saveUser(body).enqueue(new Callback<User>() {
-                    @Override public void onResponse(Call<User> call, Response<User> resp) {
-                        if (!resp.isSuccessful() || resp.body() == null) {
-                            failed[0] = true;
-                        } else {
-                            User u = resp.body();
-                            initialUsername = u.getUsername();
+            pending[0]++;
 
-                            getSharedPreferences("auth", MODE_PRIVATE).edit()
-                                    .putString("username", u.getUsername())
-                                    .apply();
-                        }
-                        done[0]++; maybeFinish.run();
+            Map<String, String> body = new HashMap<>();
+            body.put("username", newUsername);
+
+            Log.d("Settings", "Calling updateUsername for userId=" + userId + " -> " + newUsername);
+
+            api.updateUsername(userId, body).enqueue(new Callback<User>() {
+                @Override public void onResponse(Call<User> call, Response<User> resp) {
+                    if (!resp.isSuccessful() || resp.body() == null) {
+                        failed[0] = true;
+                        String msg = "Username update failed (HTTP " + resp.code() + ")";
+                        if (resp.code() == 404) msg = "Username update failed: user not found (check userId)";
+                        if (resp.code() == 409) msg = "Username update failed: that username is already taken";
+                        Toast.makeText(SettingsActivity.this, msg, Toast.LENGTH_LONG).show();
+                    } else {
+                        User u = resp.body();
+                        initialUsername = u.getUsername();
+                        etUsername.setText(u.getUsername());
+                        getSharedPreferences("auth", MODE_PRIVATE)
+                                .edit()
+                                .putString("username", u.getUsername())
+                                .apply();
                     }
-                    @Override public void onFailure(Call<User> call, Throwable t) {
-                        failed[0] = true; done[0]++; maybeFinish.run();
-                    }
-                });
-            }
+                    done[0]++; maybeFinish.run();
+                }
+
+                @Override public void onFailure(Call<User> call, Throwable t) {
+                    failed[0] = true;
+                    Toast.makeText(SettingsActivity.this, "Username update failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    done[0]++; maybeFinish.run();
+                }
+            });
         }
 
         if (pending[0] == 0) {
