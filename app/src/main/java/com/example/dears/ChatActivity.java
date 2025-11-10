@@ -102,12 +102,17 @@ public class ChatActivity extends AppCompatActivity {
             updateTextView(jokeButton.getText().toString());
         });
 
+        if (savedInstanceState != null) {
+            timesChatted = savedInstanceState.getInt("timesChatted", 0);
+        }
+
         final ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("pet", pet);
             resultIntent.putExtra("userId", userId);
             resultIntent.putExtra("updateHappiness", true);
+            resultIntent.putExtra("timesChatted", timesChatted);
             setResult(RESULT_OK, resultIntent);
             finish();
         });
@@ -163,6 +168,8 @@ public class ChatActivity extends AppCompatActivity {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("pet", pet);
                         resultIntent.putExtra("userId", userId);
+                        resultIntent.putExtra("timesChatted", timesChatted);
+                        resultIntent.putExtra("updateHappiness", false);
                         setResult(RESULT_OK, resultIntent);
                     });
                 } else {
@@ -209,6 +216,7 @@ public class ChatActivity extends AppCompatActivity {
                 );
             }
         }).start();
+
     }
 
     private void setPetImage(String action) {
@@ -244,4 +252,11 @@ public class ChatActivity extends AppCompatActivity {
     private void fail() {
         Toast.makeText(ChatActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("timesChatted", timesChatted);
+    }
 }
+
