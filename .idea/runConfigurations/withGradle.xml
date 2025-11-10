@@ -1,7 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="withGradle" type="CompoundRunConfigurationType">
-    <toRun name="app" type="AndroidRunConfigurationType" />
-    <toRun name="DEARS:backend [bootRun]" type="GradleRunConfiguration" />
     <method v="2" />
   </configuration>
 </component>
