@@ -83,4 +83,8 @@ public interface InterfaceAPI {
     // ENTRY
     @POST("entry/create/{date}")
     Call<Object> createEntry(@Path("date") String localDate, @Body createEntryRequest createEntryRequest);
+
+
+    @PATCH("pet/{id}/feed")
+    Call<Pet> chatPet(@Path("id") int petId);
 }

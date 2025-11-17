@@ -3,8 +3,11 @@ package com.example.dears.data.model;
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
+/**
+ * Pet model. Should match the backend's Pet.
+ */
 public class Pet implements Serializable {
-
+        private static final long serialVersionUID = 1L;
         @SerializedName("petID")
         private int petID;
 

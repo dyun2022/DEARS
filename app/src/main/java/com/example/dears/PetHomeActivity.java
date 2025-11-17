@@ -11,6 +11,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -45,6 +48,9 @@ public class PetHomeActivity extends AppCompatActivity {
     InterfaceAPI interfaceAPI;
     private Handler handler = new Handler();
     private Runnable clockRunnable;
+    private static final int REQUEST_CHAT = 1001;
+
+    private ActivityResultLauncher<Intent> chatLauncher;
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -62,9 +68,29 @@ public class PetHomeActivity extends AppCompatActivity {
         // Persist data
         // mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        chatLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                (ActivityResult result) -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        Pet updated = (Pet) data.getSerializableExtra("pet");
+                        if (data != null && data.hasExtra("pet")) {
+                            pet = updated;
+                           runOnUiThread(()-> {;
+                               updateBars();
+                               setPetImage("default");
+                           });
+                        }
+                    }
+                }
+        );
+
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
+        if(intent.getBooleanExtra("updateHappiness", false)){
+            updateHappinessBar();
+        }
 
         // Smarter way to persist data; right now, going to rely on intents
         /*if (pet != null) { mann idk
@@ -96,10 +122,10 @@ public class PetHomeActivity extends AppCompatActivity {
 
         btnChat.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(PetHomeActivity.this, ChatActivity.class);
-                intent.putExtra("pet", pet);
-                intent.putExtra("userId", userId);
-                startActivity(intent);
+                Intent chatIntent = new Intent(PetHomeActivity.this, ChatActivity.class);
+                chatIntent.putExtra("pet", pet);
+                chatIntent.putExtra("userId", userId);
+                chatLauncher.launch(chatIntent);
             }
         });
 
@@ -410,12 +436,22 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     private void updateHappinessBar() {
-        View barHappiness = findViewById(R.id.barHappiness);
-        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
 
-        ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
-        params.width = getUpdatedWidth(pet.getHappinessMeter(), pet.getHappiness().getMeterMax(), barMax);
-        barHappiness.setLayoutParams(params);
+//        View barHappiness = findViewById(R.id.barHappiness);
+//        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
+//        double barPercent = ((double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax();
+//        int updatedWidth = (int) (barMax * barPercent);
+//
+//        ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
+//        params.width = updatedWidth;
+//        barHappiness.setLayoutParams(params);
+
+        View barHappiness = findViewById(R.id.barHappiness);
+        if (barHappiness == null || pet == null || pet.getAge() == null) {
+            return;
+        }
+        int meterMax = pet.getAge().getMeterMax();
+        PetUIHelper.updateHappinessBar(barHappiness, pet, this, meterMax);
     }
 
     public int getUpdatedWidth(int value, int max, int width) {
@@ -428,8 +464,7 @@ public class PetHomeActivity extends AppCompatActivity {
         int decay = 1;
         int energyDecay = Math.max(pet.getEnergyMeter() - decay, 0);
         int hungerDecay = Math.max(pet.getHungerMeter() - decay, 0);
-        //int happinessDecay = Math.max(pet.getHappinessMeter() - decay, 0);
-        int happinessDecay = (int) (pet.getHappiness().getMeterMax() * 0.9);
+        int happinessDecay = Math.max(pet.getHappinessMeter() - decay, 0);
         updatePetRequest upr = new updatePetRequest(hungerDecay, happinessDecay, energyDecay);
         Call<Pet> updatePet = interfaceAPI.updatePet(pet.getPetID(), upr);
 

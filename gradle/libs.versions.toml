@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 uiGraphics = "1.9.4"
 uiGraphicsAndroid = "1.9.4"
 
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
