@@ -11,6 +11,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -45,6 +48,9 @@ public class PetHomeActivity extends AppCompatActivity {
     InterfaceAPI interfaceAPI;
     private Handler handler = new Handler();
     private Runnable clockRunnable;
+    private static final int REQUEST_CHAT = 1001;
+
+    private ActivityResultLauncher<Intent> chatLauncher;
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -62,9 +68,29 @@ public class PetHomeActivity extends AppCompatActivity {
         // Persist data
         // mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        chatLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                (ActivityResult result) -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        Pet updated = (Pet) data.getSerializableExtra("pet");
+                        if (data != null && data.hasExtra("pet")) {
+                            pet = updated;
+                           runOnUiThread(()-> {;
+                               updateBars();
+                               setPetImage("default");
+                           });
+                        }
+                    }
+                }
+        );
+
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
+        if(intent.getBooleanExtra("updateHappiness", false)){
+            updateHappinessBar();
+        }
 
         // Smarter way to persist data; right now, going to rely on intents
         /*if (pet != null) { mann idk
@@ -96,10 +122,10 @@ public class PetHomeActivity extends AppCompatActivity {
 
         btnChat.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(PetHomeActivity.this, ChatActivity.class);
-                intent.putExtra("pet", pet);
-                intent.putExtra("userId", userId);
-                startActivity(intent);
+                Intent chatIntent = new Intent(PetHomeActivity.this, ChatActivity.class);
+                chatIntent.putExtra("pet", pet);
+                chatIntent.putExtra("userId", userId);
+                chatLauncher.launch(chatIntent);
             }
         });
 
@@ -261,7 +287,7 @@ public class PetHomeActivity extends AppCompatActivity {
         runClock(); // restart clock when resuming
     }
 
-    private void wakeUp() {
+    public void wakeUp() {
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
@@ -278,7 +304,7 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     // Action: happy, sleep, or default
-    private void setPetImage(String action) {
+    public void setPetImage(String action) {
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
 
         // Dictionary to make grabbing the image easier
@@ -321,13 +347,13 @@ public class PetHomeActivity extends AppCompatActivity {
         }
     }
 
-    private void happyReaction() {
+    public void happyReaction() {
         setPetImage("happy");
         new Handler().postDelayed(() -> {
             setPetImage("default");
         }, 500);
     }
-    private void petSleep() {
+    public void petSleep() {
         Call<Pet> petSleep = interfaceAPI.sleepPet(pet.getPetID());
 
         petSleep.enqueue(new Callback<Pet>() {
@@ -345,7 +371,11 @@ public class PetHomeActivity extends AppCompatActivity {
         });
     }
 
-    private void petFeed(String food) {
+    public void petFeed(String food) {
+        if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
+            showToast("Pet is too full to eat!");
+            return;
+        }
         // This is admittedly bad coding practice
         // Might make more robust in a later version
         Map<String, Integer> foodToId = Map.of(
@@ -386,37 +416,48 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onFailure(Call<Pet> call, Throwable t) { fail(); }
         });
     }
-    private void updateEnergyBar() {
+
+    public void updateEnergyBar() {
         View barEnergy = findViewById(R.id.barEnergy);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
         ViewGroup.LayoutParams params = barEnergy.getLayoutParams();
-        params.width = updatedWidth;
+        params.width = getUpdatedWidth(pet.getEnergyMeter(), pet.getEnergy().getMeterMax(), barMax);
         barEnergy.setLayoutParams(params);
     }
 
-    private void updateHungerBar() {
+    public void updateHungerBar() {
         View barHunger = findViewById(R.id.barHunger);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getHungerMeter()) / pet.getHunger().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
         ViewGroup.LayoutParams params = barHunger.getLayoutParams();
-        params.width = updatedWidth;
+        params.width = getUpdatedWidth(pet.getHungerMeter(), pet.getHunger().getMeterMax(), barMax);
         barHunger.setLayoutParams(params);
     }
 
     private void updateHappinessBar() {
-        View barHappiness = findViewById(R.id.barHappiness);
-        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
-        ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
-        params.width = updatedWidth;
-        barHappiness.setLayoutParams(params);
+//        View barHappiness = findViewById(R.id.barHappiness);
+//        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
+//        double barPercent = ((double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax();
+//        int updatedWidth = (int) (barMax * barPercent);
+//
+//        ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
+//        params.width = updatedWidth;
+//        barHappiness.setLayoutParams(params);
+
+        View barHappiness = findViewById(R.id.barHappiness);
+        if (barHappiness == null || pet == null || pet.getAge() == null) {
+            return;
+        }
+        int meterMax = pet.getAge().getMeterMax();
+        PetUIHelper.updateHappinessBar(barHappiness, pet, this, meterMax);
+    }
+
+    public int getUpdatedWidth(int value, int max, int width) {
+
+        double percent = ((double) value) / max;
+        return (int) (width * percent);
     }
 
     private void statusDecay() {
@@ -443,11 +484,15 @@ public class PetHomeActivity extends AppCompatActivity {
         });
     }
 
-    private void fail() {
-        Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+    public void fail() {
+        showToast("Something went wrong, please try again");
     }
 
-    private void updateBars() {
+    public void showToast(String message) {
+        Toast.makeText(PetHomeActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void updateBars() {
         updateEnergyBar();
         updateHappinessBar();
         updateHungerBar();

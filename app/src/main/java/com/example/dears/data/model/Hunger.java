@@ -28,4 +28,8 @@ public class Hunger implements Serializable {
     public int getMeterMax() {
         return meterMax;
     }
+
+    public void setMeterMax(int mm) {
+        meterMax = mm;
+    }
 }

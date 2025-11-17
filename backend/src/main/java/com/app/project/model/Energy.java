@@ -44,6 +44,9 @@ public class Energy {
     public int getMeterMax() {
         return meter_max;
     }
+    public void setMeterMax(int meter_max) {
+        this.meter_max = meter_max;
+    }
     public void setEnergyPoints(int meter_max) {
         this.meter_max = meter_max;
     }
