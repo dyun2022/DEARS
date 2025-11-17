@@ -103,6 +103,7 @@ CREATE TABLE ChatChoices(
     chat_id INT AUTO_INCREMENT PRIMARY KEY,
     choice VARCHAR(150) NOT NULL
 );
+
 INSERT INTO ChatChoices(choice) VALUE
     ('Hello'),
     ('How are you?'),

@@ -70,6 +70,7 @@ public class Pet implements Serializable {
         public AgeStage getAge() {
                 return age;
         }
+        public void setAge(AgeStage newAge) {this.age = newAge;}
 
         public int getGrowthPoints() {
                 return growthPoints;
@@ -82,6 +83,7 @@ public class Pet implements Serializable {
         public int getHungerMeter() {
                 return hungerMeter;
         }
+        public void setHungerMeter(int newHunger) {this.hungerMeter = newHunger;}
 
         public Happiness getHappiness() {
                 return happiness;
@@ -90,6 +92,7 @@ public class Pet implements Serializable {
         public int getHappinessMeter() {
                 return happinessMeter;
         }
+        public void setHappinessMeter(int newHappy) {this.happinessMeter = newHappy;}
 
         public Energy getEnergy() {
                 return energy;
@@ -97,6 +100,35 @@ public class Pet implements Serializable {
 
         public int getEnergyMeter() {
                 return energyMeter;
+        }
+        public void setEnergyMeter(int newEnergy) {this.energyMeter = newEnergy;}
+
+        public void setMeters(int hunger, int happiness, int energy) {
+                this.hungerMeter = hunger;
+                this.happinessMeter = happiness;
+                this.energyMeter = energy;
+        }
+
+        public void checkMeters() {
+                if (hungerMeter >= 75 && happinessMeter >= 75 && energyMeter >= 75) {
+                        growthPoints += 5;
+                }
+
+                int nextAgeID = age.getAgeID() + 1;
+
+                // check if pet needs to evolve
+                checkGrowth();
+        }
+
+        private void checkGrowth() {
+                while (growthPoints >= age.getMeterMax() && age.getAgeID() < 3) {
+                        growthPoints -= age.getMeterMax();
+
+                        // reset meters after evolution
+                        hungerMeter = 0;
+                        happinessMeter = 0;
+                        energyMeter = 0;
+                }
         }
 
         public boolean isFull() {
