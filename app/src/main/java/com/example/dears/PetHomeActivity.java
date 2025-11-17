@@ -278,7 +278,7 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     // Action: happy, sleep, or default
-    private void setPetImage(String action) {
+    public void setPetImage(String action) {
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
 
         // Dictionary to make grabbing the image easier
@@ -321,7 +321,7 @@ public class PetHomeActivity extends AppCompatActivity {
         }
     }
 
-    private void happyReaction() {
+    public void happyReaction() {
         setPetImage("happy");
         new Handler().postDelayed(() -> {
             setPetImage("default");
@@ -346,6 +346,10 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public void petFeed(String food) {
+        if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
+            showToast("Pet is too full to eat!");
+            return;
+        }
         // This is admittedly bad coding practice
         // Might make more robust in a later version
         Map<String, Integer> foodToId = Map.of(
@@ -386,37 +390,38 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onFailure(Call<Pet> call, Throwable t) { fail(); }
         });
     }
+
     public void updateEnergyBar() {
         View barEnergy = findViewById(R.id.barEnergy);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
         ViewGroup.LayoutParams params = barEnergy.getLayoutParams();
-        params.width = updatedWidth;
+        params.width = getUpdatedWidth(pet.getEnergyMeter(), pet.getEnergy().getMeterMax(), barMax);
         barEnergy.setLayoutParams(params);
     }
 
     public void updateHungerBar() {
         View barHunger = findViewById(R.id.barHunger);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getHungerMeter()) / pet.getHunger().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
         ViewGroup.LayoutParams params = barHunger.getLayoutParams();
-        params.width = updatedWidth;
+        params.width = getUpdatedWidth(pet.getHungerMeter(), pet.getHunger().getMeterMax(), barMax);
         barHunger.setLayoutParams(params);
     }
 
     private void updateHappinessBar() {
         View barHappiness = findViewById(R.id.barHappiness);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-        double barPercent = ((double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax();
-        int updatedWidth = (int) (barMax * barPercent);
 
         ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
-        params.width = updatedWidth;
+        params.width = getUpdatedWidth(pet.getHappinessMeter(), pet.getHappiness().getMeterMax(), barMax);
         barHappiness.setLayoutParams(params);
+    }
+
+    public int getUpdatedWidth(int value, int max, int width) {
+
+        double percent = ((double) value) / max;
+        return (int) (width * percent);
     }
 
     private void statusDecay() {
@@ -445,7 +450,11 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public void fail() {
-        Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+        showToast("Something went wrong, please try again");
+    }
+
+    public void showToast(String message) {
+        Toast.makeText(PetHomeActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     public void updateBars() {
