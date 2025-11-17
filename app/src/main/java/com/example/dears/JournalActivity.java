@@ -23,6 +23,7 @@ import com.example.dears.data.request.createEntryRequest;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -35,13 +36,15 @@ public class JournalActivity extends AppCompatActivity {
     int timesChatted;
     int timesFed;
     int timesSleep;
-    int day;
+    String day;
 
     InterfaceAPI interfaceAPI;
 
 
     // In order to make demo easier
     final LocalDate defaultDate = LocalDate.of(2025, 11, 5);
+    private LocalDate today = LocalDate.now();
+    DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,7 @@ public class JournalActivity extends AppCompatActivity {
         timesChatted = intent.getIntExtra("timesChatted", 0);
         timesFed = intent.getIntExtra("timesFed", 0);
         timesSleep = intent.getIntExtra("timesSleep", 0);
-        day = intent.getIntExtra("day", 0);
+        day = dateformatter.format(today);
 
         setPetImage();
 
@@ -78,9 +81,9 @@ public class JournalActivity extends AppCompatActivity {
                     for (Journal j : response.body()) {
                         if (j.getPetId() == pet.getPetID()) {
                             entries.addView(createEntryView(j.getSummary()));
-                            Log.d("JOURNALLOG", j.getDate().toString() + " vs " + defaultDate.plusDays(day));
+                            Log.d("JOURNALLOG", j.getDate().toString() + " vs " + day);
 
-                            if (j.getDate().equals(defaultDate.plusDays(day))) needCreateJournal = false;
+                            if (j.getDate().equals(day)) needCreateJournal = false;
                         }
                     }
 
@@ -135,7 +138,7 @@ public class JournalActivity extends AppCompatActivity {
                                 String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
                                 Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
                                 JSONObject json = new JSONObject(processedResult);
-                                String response = "Day " + day + "\n";
+                                String response = day + "\n";
                                 String summary = json.getString("summary");
                                 int mood = json.getInt("mood");
                                 response += summary;
@@ -148,7 +151,7 @@ public class JournalActivity extends AppCompatActivity {
                                 entries.addView(createEntryView(response));
 
                                 createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
-                                Call<Object> creRes = interfaceAPI.createEntry(defaultDate.plusDays(day).toString(), creReq);
+                                Call<Object> creRes = interfaceAPI.createEntry(day, creReq);
                                 creRes.enqueue(new Callback<Object>() {
                                     @Override
                                     public void onResponse(Call<Object> call, Response<Object> response) {
