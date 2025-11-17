@@ -22,6 +22,13 @@ public class AgeStage implements Serializable {
     @SerializedName("pets")
     private List<Pet> pets = new ArrayList<>();
 
+    public AgeStage() {};
+
+    public AgeStage(int aid, String as, int mm) {
+        ageID = aid;
+        ageStage = as;
+        meterMax = mm;
+    }
     public int getAgeID() {
         return ageID;
     }

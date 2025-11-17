@@ -45,6 +45,9 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.ui.graphics)
     implementation(libs.ui.graphics.android)
+    implementation(libs.ext.junit)
+    implementation(libs.runner)
+    implementation(libs.espresso.core)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter)
@@ -62,4 +65,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.6.1")
 }

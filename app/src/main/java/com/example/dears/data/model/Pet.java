@@ -53,7 +53,33 @@ public class Pet implements Serializable {
         @SerializedName("readyToGrow")
         private boolean readyToGrow;
 
-        // --- Getters ---
+        public Pet() {};
+
+        public Pet(int petID,
+                   String name,
+                   String type,
+                   AgeStage age,
+                   int growthPoints,
+                   Hunger hunger,
+                   int hungerMeter,
+                   Happiness happiness,
+                   int happinessMeter,
+                   Energy energy,
+                   int energyMeter) {
+
+                this.petID = petID;
+                this.name = name;
+                this.type = type;
+                this.age = age;
+                this.growthPoints = growthPoints;
+                this.hunger = hunger;
+                this.hungerMeter = hungerMeter;
+                this.happiness = happiness;
+                this.happinessMeter = happinessMeter;
+                this.energy = energy;
+                this.energyMeter = energyMeter;
+        }
+
         public int getPetID() {
                 return petID;
         }

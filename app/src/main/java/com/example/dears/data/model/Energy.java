@@ -14,6 +14,12 @@ public class Energy implements Serializable {
     @SerializedName("meterMax")
     private int meterMax;
 
+    public Energy() {};
+
+    public Energy(int mm) {
+        meterMax = mm;
+    }
+
     public int getEnergyID() {
         return energyID;
     }

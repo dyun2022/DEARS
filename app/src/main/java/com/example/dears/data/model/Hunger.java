@@ -17,6 +17,12 @@ public class Hunger implements Serializable {
     @SerializedName("meterMax")
     private int meterMax;
 
+    public Hunger() {};
+
+    public Hunger(int mm) {
+        meterMax = mm;
+    }
+
     public int getHungerID() {
         return hungerID;
     }

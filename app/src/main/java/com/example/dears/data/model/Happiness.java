@@ -17,6 +17,12 @@ public class Happiness implements Serializable {
     @SerializedName("meterMax")
     private int meterMax;
 
+    public Happiness() {};
+
+    public Happiness(int mm) {
+        meterMax = mm;
+    }
+
     public int getHappinessID() {
         return happinessID;
     }
