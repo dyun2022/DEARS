@@ -44,6 +44,9 @@ public class Hunger {
     public int getMeterMax() {
         return meter_max;
     }
+    public void setMeterMax(int meter_max) {
+        this.meter_max = meter_max;
+    }
     public void setHungerPoints(int meter_max) {
         this.meter_max = meter_max;
     }

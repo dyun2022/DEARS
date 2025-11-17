@@ -110,4 +110,64 @@ public class Pet implements Serializable {
         public boolean isReadyToGrow() {
                 return readyToGrow;
         }
+
+        public void setPetID(int petID) {
+                this.petID = petID;
+        }
+
+        public void setName(String name) {
+                this.name = name;
+        }
+
+        public void setType(String type) {
+                this.type = type;
+        }
+
+        public void setUser(User user) {
+                this.user = user;
+        }
+
+        public void setAge(AgeStage age) {
+                this.age = age;
+        }
+
+        public void setGrowthPoints(int growthPoints) {
+                this.growthPoints = growthPoints;
+        }
+
+        public void setHunger(Hunger hunger) {
+                this.hunger = hunger;
+        }
+
+        public void setHungerMeter(int hungerMeter) {
+                this.hungerMeter = hungerMeter;
+        }
+
+        public void setHappiness(Happiness happiness) {
+                this.happiness = happiness;
+        }
+
+        public void setHappinessMeter(int happinessMeter) {
+                this.happinessMeter = happinessMeter;
+        }
+
+        public void setEnergy(Energy energy) {
+                this.energy = energy;
+        }
+
+        public void setEnergyMeter(int energyMeter) {
+                this.energyMeter = energyMeter;
+        }
+
+        public void setFull(boolean full) {
+                this.full = full;
+        }
+
+        public void setHappy(boolean happy) {
+                this.happy = happy;
+        }
+
+        public void setReadyToGrow(boolean readyToGrow) {
+                this.readyToGrow = readyToGrow;
+        }
 }

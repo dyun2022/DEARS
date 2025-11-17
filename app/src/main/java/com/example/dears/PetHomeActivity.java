@@ -261,7 +261,7 @@ public class PetHomeActivity extends AppCompatActivity {
         runClock(); // restart clock when resuming
     }
 
-    private void wakeUp() {
+    public void wakeUp() {
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
@@ -327,7 +327,7 @@ public class PetHomeActivity extends AppCompatActivity {
             setPetImage("default");
         }, 500);
     }
-    private void petSleep() {
+    public void petSleep() {
         Call<Pet> petSleep = interfaceAPI.sleepPet(pet.getPetID());
 
         petSleep.enqueue(new Callback<Pet>() {
@@ -345,7 +345,7 @@ public class PetHomeActivity extends AppCompatActivity {
         });
     }
 
-    private void petFeed(String food) {
+    public void petFeed(String food) {
         // This is admittedly bad coding practice
         // Might make more robust in a later version
         Map<String, Integer> foodToId = Map.of(
@@ -386,7 +386,7 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onFailure(Call<Pet> call, Throwable t) { fail(); }
         });
     }
-    private void updateEnergyBar() {
+    public void updateEnergyBar() {
         View barEnergy = findViewById(R.id.barEnergy);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
         double barPercent = ((double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax();
@@ -397,7 +397,7 @@ public class PetHomeActivity extends AppCompatActivity {
         barEnergy.setLayoutParams(params);
     }
 
-    private void updateHungerBar() {
+    public void updateHungerBar() {
         View barHunger = findViewById(R.id.barHunger);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
         double barPercent = ((double) pet.getHungerMeter()) / pet.getHunger().getMeterMax();
@@ -423,7 +423,8 @@ public class PetHomeActivity extends AppCompatActivity {
         int decay = 1;
         int energyDecay = Math.max(pet.getEnergyMeter() - decay, 0);
         int hungerDecay = Math.max(pet.getHungerMeter() - decay, 0);
-        int happinessDecay = Math.max(pet.getHappinessMeter() - decay, 0);
+        //int happinessDecay = Math.max(pet.getHappinessMeter() - decay, 0);
+        int happinessDecay = (int) (pet.getHappiness().getMeterMax() * 0.9);
         updatePetRequest upr = new updatePetRequest(hungerDecay, happinessDecay, energyDecay);
         Call<Pet> updatePet = interfaceAPI.updatePet(pet.getPetID(), upr);
 
@@ -443,11 +444,11 @@ public class PetHomeActivity extends AppCompatActivity {
         });
     }
 
-    private void fail() {
+    public void fail() {
         Toast.makeText(PetHomeActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
     }
 
-    private void updateBars() {
+    public void updateBars() {
         updateEnergyBar();
         updateHappinessBar();
         updateHungerBar();
