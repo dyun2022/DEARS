@@ -39,7 +39,7 @@ public class JournalActivity extends AppCompatActivity {
     String day;
 
     InterfaceAPI interfaceAPI;
-
+    private boolean isCreatingEntry = false;
 
     // In order to make demo easier
     final LocalDate defaultDate = LocalDate.of(2025, 11, 5);
@@ -84,6 +84,12 @@ public class JournalActivity extends AppCompatActivity {
                             Log.d("JOURNALLOG", j.getDate().toString() + " vs " + day);
 
                             if (j.getDate().equals(day)) needCreateJournal = false;
+
+                            String entryDate = String.valueOf(j.getDate());
+                            if (entryDate != null && entryDate.trim().equals(day.trim())) {
+                                Log.d("JOURNAL", "Entry already exists for today");
+                                needCreateJournal = false;
+                            }
                         }
                     }
 
