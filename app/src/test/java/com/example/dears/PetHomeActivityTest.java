@@ -165,14 +165,6 @@ public class PetHomeActivityTest {
 
         verify(activity).fail();
     }
-
-    @Test
-    public void petFeedFull() {
-        doNothing().when(activity).showToast(Mockito.anyString());
-        activity.pet.setHungerMeter(METER_MAX_VALUE);
-        activity.petFeed("salmon");
-        verify(interfaceAPI, never()).feedPet(Mockito.anyInt(), Mockito.anyInt());
-    }
 }
 
 

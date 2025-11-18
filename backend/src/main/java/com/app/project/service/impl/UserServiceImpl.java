@@ -69,4 +69,12 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         return userRepository.save(user);
     }
+
+    @Override
+    public void deleteUser(int user_id) {
+        if (!userRepository.existsById(user_id)) {
+            throw new RuntimeException("Pet not found with id: " + user_id);
+        }
+        userRepository.deleteUserById(user_id);
+    }
 }

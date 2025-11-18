@@ -15,6 +15,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -50,6 +51,9 @@ public interface InterfaceAPI {
     @PUT("users/{id}/username")
     Call<User> updateUsername(@Path("id") int userId, @Body Map<String, String> body);
 
+    @DELETE("users/delete/{id}")
+    Call<Void> deleteUser(@Path("id") int userId);
+
     // PET
     @GET("pet/user/{id}")
     Call<Pet> getPetById(@Path("id") int userId);
@@ -59,6 +63,9 @@ public interface InterfaceAPI {
 
     @PATCH("pet/{id}")
     Call<Pet> updatePet(@Path("id") int petId, @Body updatePetRequest updatePetRequest);
+
+    @DELETE("pet/delete/{id}")
+    Call<Void> deletePet(@Path("id") int petId);
 
     @PATCH("pet/{id}/sleep")
     Call<Pet> sleepPet(@Path("id") int petId);

@@ -38,7 +38,7 @@ public class PetHomeActivity extends AppCompatActivity {
     int userId;
     int clock;
     // The width of the status bars *IN DP*
-    final int barWidth = 120;
+    static public final int barWidth = 120;
     int timesChatted = 0;
     int timesFed = 0;
     int timesSleep = 0;
@@ -200,6 +200,10 @@ public class PetHomeActivity extends AppCompatActivity {
 
         // Food logic
         btnFeed.setOnClickListener( v -> {
+            if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
+                showToast("Pet is too full to eat!");
+                return;
+            }
             timesFed += 1;
             btnFeed.setVisibility(View.GONE);
             btnChat.setVisibility(View.GONE);
@@ -237,7 +241,7 @@ public class PetHomeActivity extends AppCompatActivity {
                     else petSleep();
                 }
                 // TO-DO: Implement non-buggy status decay while sleeping
-                else statusDecay();
+                else if (clock % 3 == 0) statusDecay();
 
                 // New "day" every 5 minutes
                 if (clock % 300 == 0) {
@@ -372,10 +376,6 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public void petFeed(String food) {
-        if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
-            showToast("Pet is too full to eat!");
-            return;
-        }
         // This is admittedly bad coding practice
         // Might make more robust in a later version
         Map<String, Integer> foodToId = Map.of(
@@ -454,7 +454,7 @@ public class PetHomeActivity extends AppCompatActivity {
         PetUIHelper.updateHappinessBar(barHappiness, pet, this, meterMax);
     }
 
-    public int getUpdatedWidth(int value, int max, int width) {
+    static public int getUpdatedWidth(int value, int max, int width) {
 
         double percent = ((double) value) / max;
         return (int) (width * percent);

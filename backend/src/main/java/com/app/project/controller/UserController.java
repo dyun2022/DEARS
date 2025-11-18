@@ -145,6 +145,11 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/delete/{userID}")
+    public void deleteUser(@PathVariable("userID") int userID) {
+        userService.deleteUser(userID);
+    }
+
     @PutMapping("/{id}/username")
     public ResponseEntity<?> editUsername(@PathVariable("id") int userID,
                                           @RequestBody Map<String, String> request) {

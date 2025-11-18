@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -65,6 +64,11 @@ public class PetController {
         Optional<Pet> pet = petService.getPetByUserID(userID);
         return pet.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/delete/{petID}")
+    public void deletePet(@PathVariable("petID") int petID) {
+        petService.deletePet(petID);
     }
 
     @PostMapping("/user/{user_id}")

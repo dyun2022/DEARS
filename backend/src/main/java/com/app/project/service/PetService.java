@@ -16,4 +16,6 @@ public interface PetService {
     public Optional<Pet> getPetByUserID(int userID);
     public Pet createPet(int user_id, AgeStage age, String type, String name, int growthPoints, Hunger hunger, int hungerMeter, Happiness happiness, int happinessMeter, Energy energy, int energyMeter);
     public Pet updatePet(int pet_id, Pet updatedPet);
+    void deletePet(int pet_id);
+
 }
