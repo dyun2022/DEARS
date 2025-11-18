@@ -38,6 +38,9 @@ public class JournalActivity extends AppCompatActivity {
     int timesSleep;
     String day;
 
+    JournalLogic jl;
+    LLMInference llm;
+
     InterfaceAPI interfaceAPI;
     private boolean isCreatingEntry = false;
 
@@ -52,6 +55,10 @@ public class JournalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_journal);
         interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
+        if (llm == null) {
+            llm = new LLMInference(this);
+        }
+
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
         userId = intent.getIntExtra("userId", -1);
@@ -60,6 +67,7 @@ public class JournalActivity extends AppCompatActivity {
         timesSleep = intent.getIntExtra("timesSleep", 0);
         day = dateformatter.format(today);
 
+        jl = new JournalLogic(pet, userId, timesChatted, timesFed, timesSleep, day);
         setPetImage();
 
         ImageButton btnBack = findViewById(R.id.btnBack);
@@ -120,37 +128,31 @@ public class JournalActivity extends AppCompatActivity {
         });
     }
 
-    private String createEntryObj(int journalId) {
+    public String createEntryObj(int journalId) {
         Log.d("JOURNALLOG", "triggered");
-
-        LLMInference llm = new LLMInference(this);
 
         // put the llm call on a thread so it doesn't hog all of the resources
         new Thread(() -> {
             try {
                 llm.generateJournalEntry(
-                        pet.getAge().getAgeStage(),
-                        pet.getType(),
-                        ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
-                        ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
-                        ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
-                        new LLMInference.LLMCallback() {
+                    pet.getAge().getAgeStage(),
+                    pet.getType(),
+                    ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
+                    ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
+                    ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
+                    new LLMInference.LLMCallback() {
                     @Override
                     public void onComplete(String llmResult) {
-                        System.out.println(llmResult);
+                        // System.out.println(llmResult);
                         runOnUiThread(() -> {
                             try {
                                 Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
                                 String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
                                 Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
                                 JSONObject json = new JSONObject(processedResult);
-                                String response = day + "\n";
                                 String summary = json.getString("summary");
                                 int mood = json.getInt("mood");
-                                response += summary;
-                                if (timesChatted != 0) response += " You chatted with me " + timesChatted + " time" + ((timesChatted == 1) ? "!" : "s!");
-                                if (timesFed != 0) response += " You fed me " + timesFed + " time" + ((timesFed == 1) ? "!" : "s!") ;
-                                if (timesSleep != 0) response += " I napped " + timesSleep + " time" + ((timesSleep == 1) ? "!" : "s!") ;
+                                String response = jl.writeEntry(day, summary, timesChatted, timesFed, timesSleep);
 
                                 Log.d("JOURNALLOG", response);
                                 LinearLayout entries = findViewById(R.id.entriesContainer);
@@ -198,7 +200,7 @@ public class JournalActivity extends AppCompatActivity {
         return "";
     }
 
-    private void setPetImage() {
+    public void setPetImage() {
         ImageView petImage = findViewById(R.id.petImage);
 
         // Dictionary to make grabbing the image easier
@@ -211,16 +213,13 @@ public class JournalActivity extends AppCompatActivity {
                 Map.entry("baby_deer_default", R.drawable.baby_deer_default)
         );
 
-        String key = "";
-        key += pet.getAge().getAgeStage() + "_";
-        key += pet.getType().toLowerCase() + "_";
-        key += "default";
+        String key = jl.getPetImageKey();
 
         Integer img = petImages.get(key);
         if (img != null) petImage.setImageResource(img);
     }
 
-    private TextView createEntryView (String entry) {
+    public TextView createEntryView (String entry) {
         TextView entryView = new TextView(this);
         entryView.setText(entry);
         entryView.setTextSize(16);
