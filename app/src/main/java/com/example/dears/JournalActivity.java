@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
+import com.example.dears.data.model.AgeStage;
+import com.example.dears.data.model.Energy;
+import com.example.dears.data.model.Happiness;
+import com.example.dears.data.model.Hunger;
 import com.example.dears.data.model.Journal;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
@@ -66,6 +70,11 @@ public class JournalActivity extends AppCompatActivity {
         timesFed = intent.getIntExtra("timesFed", 0);
         timesSleep = intent.getIntExtra("timesSleep", 0);
         day = dateformatter.format(today);
+
+        // for testing
+        if (pet == null) {
+            pet = new Pet(1, "dears", "deer", new AgeStage(1, "baby", 20), 10, new Hunger(), 10, new Happiness(), 10, new Energy(), 10);
+        }
 
         jl = new JournalLogic(pet, userId, timesChatted, timesFed, timesSleep, day);
         setPetImage();
@@ -239,5 +248,9 @@ public class JournalActivity extends AppCompatActivity {
 
     private void fail() {
         Toast.makeText(JournalActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setPet(Pet pet) {
+        this.pet = pet;
     }
 }
