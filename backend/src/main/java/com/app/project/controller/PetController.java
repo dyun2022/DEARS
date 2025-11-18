@@ -15,6 +15,7 @@ import com.app.project.repository.PetRepository;
 import com.app.project.service.PetService;
 import com.app.project.service.UserService;
 import com.app.project.model.User;
+import com.app.project.service.impl.PetServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

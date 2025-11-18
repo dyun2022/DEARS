@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - PetGrowthTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>PetGrowthTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.app.project.controller.html">com.app.project.controller</a> &gt; PetGrowthTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">1</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.144s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Failed tests</a>
+</li>
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+<li>
+<a href="#">Standard error</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="testPetGrowthWhenMetersHigh()"></a>
+<h3 class="failures">testPetGrowthWhenMetersHigh()</h3>
+<span class="code">
+<pre>java.lang.AssertionError: JSON path &quot;$.age.ageID&quot; expected:&lt;2&gt; but was:&lt;1&gt;
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:61)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:128)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:172)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:112)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.app.project.controller.PetGrowthTest.testPetGrowthWhenMetersHigh(PetGrowthTest.java:124)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.base/java.util.ArrayList.forEach(Unknown Source)
+	at java.base/java.util.ArrayList.forEach(Unknown Source)
+</pre>
+</span>
+</div>
+</div>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">testPetGrowthWhenMetersHigh()</td>
+<td class="failures">0.144s</td>
+<td class="failures">failed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>21:47:41.806 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.app.project.controller.PetGrowthTest]: PetGrowthTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:47:41.914 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.app.project.DearsApplication for test class com.app.project.controller.PetGrowthTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2025-11-17T21:47:42.166-08:00  INFO 3845 --- [project] [    Test worker] c.app.project.controller.PetGrowthTest   : Starting PetGrowthTest using Java 21.0.6 with PID 3845 (started by danahyun in /Users/danahyun/DEARS/backend)
+2025-11-17T21:47:42.167-08:00  INFO 3845 --- [project] [    Test worker] c.app.project.controller.PetGrowthTest   : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2025-11-17T21:47:42.547-08:00  INFO 3845 --- [project] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-17T21:47:42.597-08:00  INFO 3845 --- [project] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 43 ms. Found 10 JPA repository interfaces.
+2025-11-17T21:47:43.699-08:00  INFO 3845 --- [project] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-11-17T21:47:44.003-08:00  INFO 3845 --- [project] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4c9d833
+2025-11-17T21:47:44.004-08:00  INFO 3845 --- [project] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-11-17T21:47:44.059-08:00  INFO 3845 --- [project] [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-17T21:47:44.102-08:00  INFO 3845 --- [project] [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-11-17T21:47:44.125-08:00  INFO 3845 --- [project] [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-11-17T21:47:44.202-08:00  INFO 3845 --- [project] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-17T21:47:44.272-08:00  INFO 3845 --- [project] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-17T21:47:44.806-08:00  INFO 3845 --- [project] [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-17T21:47:44.913-08:00  INFO 3845 --- [project] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+Hibernate: select count(*) from chat_choices cc1_0
+Hibernate: select count(*) from food f1_0
+2025-11-17T21:47:45.554-08:00  WARN 3845 --- [project] [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-17T21:47:45.804-08:00  INFO 3845 --- [project] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-11-17T21:47:45.804-08:00  INFO 3845 --- [project] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-11-17T21:47:45.805-08:00  INFO 3845 --- [project] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-11-17T21:47:45.828-08:00  INFO 3845 --- [project] [    Test worker] c.app.project.controller.PetGrowthTest   : Started PetGrowthTest in 3.831 seconds (process running for 4.69)
+
+MockHttpServletRequest:
+      HTTP Method = PATCH
+      Request URI = /api/pet/1
+       Parameters = {}
+          Headers = [Content-Type:&quot;application/json;charset=UTF-8&quot;, Content-Length:&quot;58&quot;]
+             Body = {&quot;happiness_meter&quot;:20,&quot;energy_meter&quot;:20,&quot;hunger_meter&quot;:20}
+    Session Attrs = {}
+
+Handler:
+             Type = com.app.project.controller.PetController
+           Method = com.app.project.controller.PetController#updatePet(int, Map)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:&quot;application/json&quot;]
+     Content type = application/json
+             Body = {&quot;name&quot;:&quot;Fluffy&quot;,&quot;type&quot;:&quot;Cat&quot;,&quot;user&quot;:null,&quot;age&quot;:{&quot;ageStage&quot;:&quot;baby&quot;,&quot;ageID&quot;:1,&quot;meterMax&quot;:10},&quot;hunger&quot;:{&quot;meterMax&quot;:10,&quot;hungerID&quot;:0},&quot;happiness&quot;:{&quot;happinessID&quot;:0,&quot;meterMax&quot;:10},&quot;energy&quot;:{&quot;energyID&quot;:0,&quot;meterMax&quot;:10},&quot;petID&quot;:0,&quot;hungerMeter&quot;:20,&quot;energyMeter&quot;:20,&quot;readyToGrow&quot;:false,&quot;happy&quot;:true,&quot;full&quot;:true,&quot;happinessMeter&quot;:20,&quot;growthPoints&quot;:5}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+</pre>
+</span>
+</div>
+<div class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/danahyun/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.7/fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da/byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.13</a> at Nov 17, 2025, 9:47:46 PM</p>
+</div>
+</div>
+</body>
+</html>

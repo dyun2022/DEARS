@@ -45,8 +45,6 @@ public class PetLevelUpTest {
     PetHomeActivity activity;
     Pet pet;
 
-    final int METER_MAX_VALUE = 20;
-
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
