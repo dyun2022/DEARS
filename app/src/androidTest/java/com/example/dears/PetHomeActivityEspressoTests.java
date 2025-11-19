@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 
@@ -208,40 +209,161 @@ public class PetHomeActivityEspressoTests {
         onView(withId(R.id.btnFeed)).check(matches(isDisplayed()));
         onView(withId(R.id.btnChat)).check(matches(isDisplayed()));
 
-        try {
-            Thread.sleep(3100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        onView(isRoot()).perform(waitForWidthChange(R.id.barHunger));
 
+        onView(withId(R.id.btnFeed)).perform(click());
         onView(withId(R.id.highFood)).perform(click());
-        onView(withId(R.id.barHunger)).check(hasRatio(1, 0.1));
+        onView(withId(R.id.barHunger)).check(hasRatio(1, 0.15));
+
+        onView(withId(R.id.btnFeed)).perform(click());
+        onView(withId(R.id.lowFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.midFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.highFood)).check(matches(not(isDisplayed())));
     }
 
     @Test public void feedBear() {
-        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
+        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(bearIntent);
 
+        onView(withId(R.id.btnFeed)).perform(click());
 
+        onView(withId(R.id.btnSleep)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnFeed)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnChat)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.lowFood)).check(matches(isDisplayed()));
+        onView(withId(R.id.midFood)).check(matches(isDisplayed()));
+        onView(withId(R.id.highFood)).check(matches(isDisplayed()));
+        onView(withId(R.id.lowFood))
+                .check(matches(DrawableMatcher.withDrawable(R.drawable.honey)));
+        onView(withId(R.id.midFood))
+                .check(matches(DrawableMatcher.withDrawable(R.drawable.berries)));
+        onView(withId(R.id.highFood))
+                .check(matches(DrawableMatcher.withDrawable(R.drawable.salmon)));
+
+        onView(withId(R.id.lowFood)).perform(click());
+        onView(withId(R.id.barHunger)).check(hasRatio(0.5, 0.1));
+
+        onView(withId(R.id.lowFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.midFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.highFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnSleep)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnFeed)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnChat)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.btnFeed)).perform(click());
+        onView(withId(R.id.highFood)).perform(click());
+        onView(withId(R.id.barHunger)).check(hasRatio(1, 0.15));
+
+        onView(withId(R.id.btnFeed)).perform(click());
+        onView(withId(R.id.lowFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.midFood)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.highFood)).check(matches(not(isDisplayed())));
     }
 
     @Test public void sleepDeer() {
         ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
 
+        // Sleep the pet
+        onView(withId(R.id.btnSleep)).perform(click());
 
+        // Check graphics are correct
+        onView(withId(R.id.btnFeed)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnChat)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnJournal)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnSettings)).check(matches(not(isDisplayed())));
+
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_deer_sleep)));
+
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        onView(withId(R.id.barEnergy)).check(hasRatio(0.5, 0.1));
+
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        // Pet auto-wakes up.
+        onView(withId(R.id.barEnergy)).check(hasRatio(1, 0.1));
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_deer_default)));
+
+        // Try to sleep at full energy; fail
+        onView(withId(R.id.btnSleep)).perform(click());
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_deer_default)));
+
+        // Wait a bit for decay.
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        // Check wake up button works.
+        onView(withId(R.id.btnSleep)).perform(click());
+        onView(withId(R.id.btnSleep)).perform(click());
+
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_deer_default)));
     }
 
     @Test public void sleepBear() {
-        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
+        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(bearIntent);
 
+        // Sleep the pet
+        onView(withId(R.id.btnSleep)).perform(click());
 
+        // Check graphics are correct
+        onView(withId(R.id.btnFeed)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnChat)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnJournal)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.btnSettings)).check(matches(not(isDisplayed())));
+
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_bear_sleep)));
+
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        onView(withId(R.id.barEnergy)).check(hasRatio(0.5, 0.1));
+
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        // Pet auto-wakes up.
+        onView(withId(R.id.barEnergy)).check(hasRatio(1, 0.1));
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_bear_default)));
+
+        // Try to sleep at full energy; fail
+        onView(withId(R.id.btnSleep)).perform(click());
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_bear_default)));
+
+        // Wait a bit for decay.
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
+
+        // Check wake up button works.
+        onView(withId(R.id.btnSleep)).perform(click());
+        onView(withId(R.id.btnSleep)).perform(click());
+
+        onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_bear_default)));
     }
 
     @Test public void hungerDecay() {
+        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
 
+        onView(withId(R.id.btnFeed)).perform(click());
+        onView(withId(R.id.highFood)).perform(click());
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Decay occurs at some point
+        onView(isRoot()).perform(waitForWidthChange(R.id.barHunger));
     }
 
     @Test public void energyDecay() {
+        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
 
+        onView(withId(R.id.btnSleep)).perform(click());
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Decay occurs at some point
+        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
     }
 
     @AfterClass
@@ -303,6 +425,31 @@ public class PetHomeActivityEspressoTests {
             @Override
             public void perform(UiController uiController, View view) {
                 uiController.loopMainThreadUntilIdle();
+            }
+        };
+    }
+
+    public static ViewAction waitForWidthChange(final int viewId) {
+        return new ViewAction() {
+            @Override public Matcher<View> getConstraints() { return isRoot(); }
+
+            @Override public String getDescription() {
+                return "wait for width of view to change";
+            }
+
+            @Override public void perform(UiController uiController, View rootView) {
+                View target = rootView.findViewById(viewId);
+                if (target == null) throw new AssertionError("View not found");
+
+                int initial = target.getWidth();
+                long timeout = System.currentTimeMillis() + 5000;
+
+                do {
+                    if (target.getWidth() != initial) return;
+                    uiController.loopMainThreadForAtLeast(50);
+                } while (System.currentTimeMillis() < timeout);
+
+                throw new AssertionError("Width did not change");
             }
         };
     }

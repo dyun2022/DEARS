@@ -48,6 +48,7 @@ public class PetHomeActivity extends AppCompatActivity {
     InterfaceAPI interfaceAPI;
     private Handler handler = new Handler();
     private Runnable clockRunnable;
+    private boolean clockRunning;
     private static final int REQUEST_CHAT = 1001;
 
     private ActivityResultLauncher<Intent> chatLauncher;
@@ -183,6 +184,11 @@ public class PetHomeActivity extends AppCompatActivity {
 
         // Sleep logic
         btnSleep.setOnClickListener(v -> {
+            if (pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) {
+                showToast("Pet is too energized to sleep!");
+                return;
+            }
+
             timesSleep += 1;
             // TO-DO Make pet not sleep if energy is at max
             if (!isSleeping) {
@@ -231,6 +237,9 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     private void runClock() {
+        if (clockRunning) return;
+
+        clockRunning = true;
         clockRunnable = new Runnable() {
             @Override
             public void run() {
@@ -270,6 +279,7 @@ public class PetHomeActivity extends AppCompatActivity {
         editor.putInt("timesChatted", timesChatted);
         editor.putInt("timesSleep", timesSleep);
         editor.apply();
+        clockRunning = false;
     }
 
     @Override
@@ -358,6 +368,8 @@ public class PetHomeActivity extends AppCompatActivity {
         }, 500);
     }
     public void petSleep() {
+        if (isSleeping && pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) return;
+
         Call<Pet> petSleep = interfaceAPI.sleepPet(pet.getPetID());
 
         petSleep.enqueue(new Callback<Pet>() {
@@ -367,6 +379,10 @@ public class PetHomeActivity extends AppCompatActivity {
                     pet = response.body();
                     // mainViewModel.setPet(pet);
                     updateEnergyBar();
+
+                    if (pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) {
+                        wakeUp();
+                    }
                 }
             }
 
