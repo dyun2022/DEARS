@@ -32,6 +32,12 @@ public class LLMInference {
         this.modelPath = new File(context.getFilesDir(), "llm/gemma3-1b-it-int4.task").getAbsolutePath();
     }
 
+    public LLMInference() {
+        this.context = null;
+        ensureModelCopied();
+        this.modelPath = new File(context.getFilesDir(), "llm/gemma3-1b-it-int4.task").getAbsolutePath();
+    }
+
     public void callLLM(String prompt, LLMCallback callback) {
         new Thread(() -> {
             try {

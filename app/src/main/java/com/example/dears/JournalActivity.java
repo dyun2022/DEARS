@@ -253,4 +253,12 @@ public class JournalActivity extends AppCompatActivity {
     public void setPet(Pet pet) {
         this.pet = pet;
     }
+
+    public void setLLMInference(LLMInference llm) {
+        this.llm = llm;
+    }
+
+    public void setInterfaceAPI(InterfaceAPI api) {
+        this.interfaceAPI = api;
+    }
 }
