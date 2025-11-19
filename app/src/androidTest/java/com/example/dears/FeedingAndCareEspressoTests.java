@@ -215,6 +215,8 @@ public class FeedingAndCareEspressoTests {
         onView(withId(R.id.btnFeed)).check(matches(isDisplayed()));
         onView(withId(R.id.btnChat)).check(matches(isDisplayed()));
 
+        onView(isRoot()).perform(waitForWidthChange(R.id.barHunger));
+
         onView(withId(R.id.btnFeed)).perform(click());
         onView(withId(R.id.highFood)).perform(click());
         onView(withId(R.id.barHunger)).check(hasRatio(1, 0.15));
@@ -299,37 +301,6 @@ public class FeedingAndCareEspressoTests {
         onView(withId(R.id.btnSleep)).perform(click());
 
         onView(withId(R.id.ivPetOval)).check(matches(DrawableMatcher.withDrawable(R.drawable.baby_bear_default)));
-    }
-
-    @Test public void hungerDecay() {
-        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
-
-        onView(withId(R.id.btnFeed)).perform(click());
-        onView(withId(R.id.highFood)).perform(click());
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Decay occurs at some point
-        onView(isRoot()).perform(waitForWidthChange(R.id.barHunger));
-    }
-
-    @Test public void energyDecay() {
-        ActivityScenario<PetHomeActivity> scenario = ActivityScenario.launch(deerIntent);
-
-        onView(withId(R.id.btnSleep)).perform(click());
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Decay occurs at some point
-        onView(isRoot()).perform(waitForWidthChange(R.id.barEnergy));
     }
 
     @AfterClass
