@@ -37,4 +37,11 @@ public class AgeStage implements Serializable {
     public List<Pet> getPets() {
         return pets;
     }
+
+    public void setAgeID(int i) {
+        this.ageID = i;
+    }
+    public void setAgeStage(String s) {
+        this.ageStage = s;
+    }
 }

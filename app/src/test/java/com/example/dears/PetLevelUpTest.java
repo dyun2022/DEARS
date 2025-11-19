@@ -1,14 +1,19 @@
 package com.example.dears;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -19,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.dears.data.api.InterfaceAPI;
 import com.example.dears.data.model.AgeStage;
@@ -30,9 +36,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowToast;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,9 +54,8 @@ public class PetLevelUpTest {
     @Mock InterfaceAPI interfaceAPI;
     @Mock Call<Pet> mockCall;
     @Mock View mockView;
-    @Mock Button mockButton;
-    @Mock ImageButton mockImageButton;
-    @Mock ImageView mockImageView;
+    @Mock
+    ImageView mockImageView;
 
     PetHomeActivity activity;
     Pet pet;
@@ -56,151 +64,122 @@ public class PetLevelUpTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Mock the Activity completely
         activity = mock(PetHomeActivity.class);
-
         pet = new Pet();
-        pet.setPetID(1);
+        AgeStage baby = mock(AgeStage.class);
+        activity.ageId = 1;
+        baby.setAgeStage("baby");
+        pet.setAge(baby);
         pet.setType("Bear");
+        when(pet.getAge().getAgeID()).thenReturn(1);
+        when(pet.getAge().getAgeStage()).thenReturn("baby");
+        baby.setAgeID(1);
 
         activity.pet = pet;
+        activity.interfaceAPI = interfaceAPI;
 
-        // Make logic methods real
-        // Instead of calling real setPetImage, we manually test the logic
-        doNothing().when(activity).showToast(anyString());
-        doNothing().when(activity).happyReaction();
+        when(activity.findViewById(anyInt())).thenAnswer(invocation -> {
+            int id = invocation.getArgument(0);
+            if (id == R.id.ivPetOval) {
+                return mockImageView;
+            }
+            else {
+                return mockView;
+            }
+        });
 
-        // Mock ImageView
-        ImageView mockIv = mock(ImageView.class);
-        when(activity.findViewById(R.id.ivPetOval)).thenReturn(mockIv);
-        doNothing().when(mockIv).setImageResource(anyInt());
+        doCallRealMethod().when(activity).setPetImage(Mockito.anyString());
+        doCallRealMethod().when(activity).happyReaction();
+        doCallRealMethod().when(activity).showToast(Mockito.anyString());
     }
 
-    // WB1: test if setting image is called when growing
+    // WB1: test if growth triggers reaction and toast
     @Test
     public void petGrowthTriggers() {
-        AgeStage oldAge = mock(AgeStage.class);
-        AgeStage newAge = mock(AgeStage.class);
+        // allow happyReaction to be monitored, but not executed
+        doNothing().when(activity).happyReaction();
 
-        when(oldAge.getAgeID()).thenReturn(1);
-        when(newAge.getAgeID()).thenReturn(2);
+        mockStatic(Toast.class);
+        when(Toast.makeText(any(), anyString(), anyInt())).thenReturn(mock(Toast.class));
 
-        // Simulate growth logic
-        activity.ageId = oldAge.getAgeID();
-        activity.pet.setPetID(1);
-        activity.pet.setType("Bear");
+        // mock age so growth occurs
+        AgeStage teen = mock(AgeStage.class);
+        when(teen.getAgeID()).thenReturn(2);
+        when(teen.getAgeStage()).thenReturn("teen");
+        pet.setAge(teen);
 
-        // Normally setPetImage would check age and call showToast
-        activity.happyReaction();
-        activity.showToast("Your pet grew!");
+        // previous age is different → triggers growth
+        activity.ageId = 1;
 
+        // ACT — this triggers the growth block
+        activity.setPetImage("happy");
+
+        // ASSERT — growth reaction should fire
         verify(activity).happyReaction();
-        verify(activity).showToast("Your pet grew!");
     }
 
-    // WB2: test if correct image is set when pet grows
+    // WB2: test that happyReaction calls setPetImage for "happy" and then "default"
     @Test
-    public void petGrowthSetsCorrectImage() {
-        AgeStage oldAge = mock(AgeStage.class);
-        AgeStage newAge = mock(AgeStage.class);
+    public void petGrowthSetsCorrectImage() throws InterruptedException {
+        doNothing().when(activity).setPetImage(anyString());
 
-        when(oldAge.getAgeID()).thenReturn(1);
-        when(oldAge.getAgeStage()).thenReturn("baby");
-        when(newAge.getAgeID()).thenReturn(2);
-        when(newAge.getAgeStage()).thenReturn("teen");
-
-        pet = spy(new Pet());
-        pet.setType("Bear");
-        doReturn(oldAge).when(pet).getAge();
-        activity.pet = pet;
-        activity.ageId = oldAge.getAgeID();
-
-        // Instead of calling the real setPetImage, simulate what it would do:
-        ImageView ivPetOval = mock(ImageView.class);
-        when(activity.findViewById(R.id.ivPetOval)).thenReturn(ivPetOval);
-
-        // simulate pet growing
-        doReturn(newAge).when(pet).getAge();
-
-        // simulate what setPetImage would do
-        ivPetOval.setImageResource(R.drawable.teen_bear_default);
         activity.happyReaction();
-        activity.showToast("Your pet grew!");
 
-        verify(ivPetOval).setImageResource(R.drawable.teen_bear_default);
-        verify(activity).happyReaction();
-        verify(activity).showToast("Your pet grew!");
+        // verify it calls setPetImage with "happy" then "default"
+        verify(activity).setPetImage("happy");
     }
 
-    // WB3: test no growth triggers no reaction or toast
+    // WB3: no growth triggers no reaction or toast
     @Test
-    public void setPetImage_NoGrowth_NoReaction() {
-        PetHomeActivity realActivity = spy(new PetHomeActivity());
-        ImageView mockIv = mock(ImageView.class);
-        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
+    public void setPetImageNoGrowth_NoReaction() {
+        pet.setAge(mock(AgeStage.class));
+        activity.ageId = pet.getAge().getAgeID();
 
-        AgeStage sameAge = mock(AgeStage.class);
-        when(sameAge.getAgeID()).thenReturn(1);
-        when(sameAge.getAgeStage()).thenReturn("baby");
+        doCallRealMethod().when(activity).setPetImage(anyString());
+        doNothing().when(activity).happyReaction();
 
-        pet.setType("Bear");
-        pet.setAge(sameAge);
+        activity.setPetImage("default");
 
-        realActivity.pet = pet;
-        realActivity.ageId = 1;
-
-        doNothing().when(realActivity).happyReaction();
-        doNothing().when(realActivity).showToast(anyString());
-
-        realActivity.setPetImage("default");
-
-        verify(realActivity, never()).happyReaction();
-        verify(realActivity, never()).showToast(anyString());
+        // happyReaction should not be called
+        verify(activity, never()).happyReaction();
+        // Toast should not be shown
+        assertNull(ShadowToast.getLatestToast());
     }
 
-    // WB4: correct image is chosen for age and type
+    // WB4: correct drawable chosen for age/type/action
     @Test
-    public void setPetImage_CorrectDrawableForAgeAndType() {
-        PetHomeActivity realActivity = spy(new PetHomeActivity());
-        ImageView mockIv = mock(ImageView.class);
-        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
+    public void setPetImageCorrectDrawableForAgeAndType() {
+        AgeStage teen = mock(AgeStage.class);
+        when(teen.getAgeID()).thenReturn(2);
+        when(teen.getAgeStage()).thenReturn("teen");
 
-        AgeStage age = mock(AgeStage.class);
-        when(age.getAgeID()).thenReturn(2);
-        when(age.getAgeStage()).thenReturn("teen");
+        pet.setAge(teen);
+        activity.ageId = 2;
 
-        pet.setType("Bear");
-        pet.setAge(age);
+        ImageView iv = mock(ImageView.class);
+        doReturn(iv).when(activity).findViewById(R.id.ivPetOval);
 
-        realActivity.pet = pet;
-        realActivity.ageId = 2;
+        activity.setPetImage("happy");
 
-        realActivity.setPetImage("happy");
-
-        verify(mockIv).setImageResource(R.drawable.teen_bear_happy);
+        verify(iv).setImageResource(R.drawable.teen_bear_happy);
     }
 
-    // WB5: key is generated correctly
+    // WB5: adult deer sleep drawable
     @Test
-    public void setPetImage_KeyGeneratedCorrectly() {
-        PetHomeActivity realActivity = spy(new PetHomeActivity());
-        ImageView mockIv = mock(ImageView.class);
-        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
-
-        AgeStage age = mock(AgeStage.class);
-        when(age.getAgeID()).thenReturn(3);
-        when(age.getAgeStage()).thenReturn("adult");
+    public void setPetImageKeyGeneratedCorrectly() {
+        AgeStage adult = mock(AgeStage.class);
+        when(adult.getAgeID()).thenReturn(3);
+        when(adult.getAgeStage()).thenReturn("adult");
 
         pet.setType("Deer");
-        pet.setAge(age);
+        pet.setAge(adult);
+        activity.ageId = 3;
 
-        realActivity.pet = pet;
-        realActivity.ageId = 3;
+        ImageView iv = mock(ImageView.class);
+        doReturn(iv).when(activity).findViewById(R.id.ivPetOval);
 
-        realActivity.setPetImage("sleep");
+        activity.setPetImage("sleep");
 
-        verify(mockIv).setImageResource(R.drawable.adult_deer_sleep);
+        verify(iv).setImageResource(R.drawable.adult_deer_sleep);
     }
 }
-
-

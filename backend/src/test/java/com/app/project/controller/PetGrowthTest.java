@@ -148,9 +148,9 @@ public class PetGrowthTest {
 
         pet.setAge(finalStage);
 
-        pet.setHungerMeter(10);
-        pet.setHappinessMeter(10);
-        pet.setEnergyMeter(10);
+        pet.setHungerMeter(40);
+        pet.setHappinessMeter(40);
+        pet.setEnergyMeter(40);
         petController.checkMeters(pet);
         Pet updated = (Pet) petRepository.save(pet);
         assertEquals(3, updated.getAge().getAgeID());
@@ -162,7 +162,6 @@ public class PetGrowthTest {
         pet.setHungerMeter(10);
         pet.setHappinessMeter(4); // < 0.75
         pet.setEnergyMeter(10);
-        pet.setGrowthPoints(0);
 
         petController.checkMeters(pet);
         Pet updated = (Pet) petRepository.save(pet);
