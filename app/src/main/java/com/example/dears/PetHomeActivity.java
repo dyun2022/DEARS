@@ -470,13 +470,13 @@ public class PetHomeActivity extends AppCompatActivity {
         PetUIHelper.updateHappinessBar(barHappiness, pet, this, meterMax);
     }
 
-    static public int getUpdatedWidth(int value, int max, int width) {
+    public int getUpdatedWidth(int value, int max, int width) {
 
         double percent = ((double) value) / max;
         return (int) (width * percent);
     }
 
-    private void statusDecay() {
+    public void statusDecay() {
         int decay = 1;
         int energyDecay = Math.max(pet.getEnergyMeter() - decay, 0);
         int hungerDecay = Math.max(pet.getHungerMeter() - decay, 0);

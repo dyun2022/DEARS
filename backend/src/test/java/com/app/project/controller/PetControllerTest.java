@@ -28,9 +28,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-@SpringBootTest(classes = DearsApplication.class)
 @ExtendWith(MockitoExtension.class)
 class PetControllerTest {
     @InjectMocks
@@ -167,6 +168,48 @@ class PetControllerTest {
             Pet updated = (Pet) response.getBody();
 
             assertEquals(MOCK_METER_MAX, updated.getEnergyMeter());
+            verify(petRepository).save(pet);
+        }
+    }
+
+    @Nested
+    @DisplayName("updatePet() tests")
+    class updatePetTests {
+        @Test
+        void updateNothing() {
+            when(petRepository.save(any(Pet.class))).thenAnswer(i -> i.getArgument(0));
+            when(petRepository.findById(any())).thenReturn(Optional.of(pet));
+            Map<String, Object> update = new HashMap<>();
+            ResponseEntity<?> response = controller.updatePet(1, update);
+            Pet updated = (Pet) response.getBody();
+
+            assertEquals(updated, pet);
+            verify(petRepository).save(pet);
+        }
+
+        @Test
+        void updateEverything() {
+            when(petRepository.save(any(Pet.class))).thenAnswer(i -> i.getArgument(0));
+            when(petRepository.findById(any())).thenReturn(Optional.of(pet));
+
+            Map<String, Object> update = new HashMap<>();
+            pet.setName("newName");
+            update.put("name", "newName");
+            pet.setHunger(new Hunger(pet.getAge(), 25));
+            update.put("hunger", new Hunger(pet.getAge(), 25));
+            pet.setHungerMeter(5);
+            update.put("hunger_meter", 5);
+            pet.setHappinessMeter(5);
+            update.put("happiness_meter", 5);
+            pet.setEnergyMeter(5);
+            update.put("energy_meter", 5);
+            pet.setGrowthPoints(5);
+            update.put("growthPoints", 5);
+
+            ResponseEntity<?> response = controller.updatePet(1, update);
+            Pet updated = (Pet) response.getBody();
+
+            assertEquals(updated, pet);
             verify(petRepository).save(pet);
         }
     }

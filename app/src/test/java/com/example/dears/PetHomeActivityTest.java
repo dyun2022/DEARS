@@ -1,6 +1,7 @@
 package com.example.dears;
 
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -19,8 +20,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.example.dears.data.api.InterfaceAPI;
+import com.example.dears.data.model.Energy;
 import com.example.dears.data.model.Hunger;
 import com.example.dears.data.model.Pet;
+import com.example.dears.data.request.updatePetRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +67,11 @@ public class PetHomeActivityTest {
         Hunger h = new Hunger();
         h.setMeterMax(METER_MAX_VALUE);
         pet.setHunger(h);
+        pet.setEnergyMeter(0);
+        Energy e = new Energy();
+        e.setMeterMax(METER_MAX_VALUE);
+        pet.setEnergy(e);
+
         pet.setPetID(1);
 
         activity.pet = pet;
@@ -85,6 +93,7 @@ public class PetHomeActivityTest {
         doCallRealMethod().when(activity).petSleep();
         doCallRealMethod().when(activity).petFeed(Mockito.anyString());
         doCallRealMethod().when(activity).wakeUp();
+        doCallRealMethod().when(activity).statusDecay();
         doCallRealMethod().when(activity).getUpdatedWidth(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt());
     }
 
@@ -164,6 +173,39 @@ public class PetHomeActivityTest {
         captor.getValue().onFailure(mockCall, new Throwable("Network error"));
 
         verify(activity).fail();
+    }
+
+    @Test
+    public void statusDecayStayAtZero() {
+        when(interfaceAPI.updatePet(anyInt(), any())).thenReturn(mockCall);
+
+        activity.statusDecay();
+
+        ArgumentCaptor<Callback<Pet>> captor = ArgumentCaptor.forClass(Callback.class);
+        verify(mockCall).enqueue(captor.capture());
+
+        captor.getValue().onResponse(mockCall, Response.success(pet));
+
+        updatePetRequest upr = new updatePetRequest(0, 0, 0);
+        verify(interfaceAPI).updatePet(Mockito.anyInt(), eq(upr));
+    }
+
+    @Test
+    public void statusDecayProperlyDecays() {
+        when(interfaceAPI.updatePet(anyInt(), any())).thenReturn(mockCall);
+        pet.setEnergyMeter(3);
+        pet.setHappinessMeter(4);
+        pet.setHungerMeter(5);
+
+        activity.statusDecay();
+
+        ArgumentCaptor<Callback<Pet>> captor = ArgumentCaptor.forClass(Callback.class);
+        verify(mockCall).enqueue(captor.capture());
+
+        captor.getValue().onResponse(mockCall, Response.success(pet));
+
+        updatePetRequest upr = new updatePetRequest(4, 3, 2);
+        verify(interfaceAPI).updatePet(Mockito.anyInt(), eq(upr));
     }
 }
 
