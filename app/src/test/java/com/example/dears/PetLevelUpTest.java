@@ -1,5 +1,6 @@
 package com.example.dears;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -25,14 +27,19 @@ import com.example.dears.data.model.Pet;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = Build.VERSION_CODES.P)
 public class PetLevelUpTest {
 
     @Mock InterfaceAPI interfaceAPI;
@@ -91,6 +98,7 @@ public class PetLevelUpTest {
         verify(activity).showToast("Your pet grew!");
     }
 
+    // WB2: test if correct image is set when pet grows
     @Test
     public void petGrowthSetsCorrectImage() {
         AgeStage oldAge = mock(AgeStage.class);
@@ -122,6 +130,76 @@ public class PetLevelUpTest {
         verify(ivPetOval).setImageResource(R.drawable.teen_bear_default);
         verify(activity).happyReaction();
         verify(activity).showToast("Your pet grew!");
+    }
+
+    // WB3: test no growth triggers no reaction or toast
+    @Test
+    public void setPetImage_NoGrowth_NoReaction() {
+        PetHomeActivity realActivity = spy(new PetHomeActivity());
+        ImageView mockIv = mock(ImageView.class);
+        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
+
+        AgeStage sameAge = mock(AgeStage.class);
+        when(sameAge.getAgeID()).thenReturn(1);
+        when(sameAge.getAgeStage()).thenReturn("baby");
+
+        pet.setType("Bear");
+        pet.setAge(sameAge);
+
+        realActivity.pet = pet;
+        realActivity.ageId = 1;
+
+        doNothing().when(realActivity).happyReaction();
+        doNothing().when(realActivity).showToast(anyString());
+
+        realActivity.setPetImage("default");
+
+        verify(realActivity, never()).happyReaction();
+        verify(realActivity, never()).showToast(anyString());
+    }
+
+    // WB4: correct image is chosen for age and type
+    @Test
+    public void setPetImage_CorrectDrawableForAgeAndType() {
+        PetHomeActivity realActivity = spy(new PetHomeActivity());
+        ImageView mockIv = mock(ImageView.class);
+        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
+
+        AgeStage age = mock(AgeStage.class);
+        when(age.getAgeID()).thenReturn(2);
+        when(age.getAgeStage()).thenReturn("teen");
+
+        pet.setType("Bear");
+        pet.setAge(age);
+
+        realActivity.pet = pet;
+        realActivity.ageId = 2;
+
+        realActivity.setPetImage("happy");
+
+        verify(mockIv).setImageResource(R.drawable.teen_bear_happy);
+    }
+
+    // WB5: key is generated correctly
+    @Test
+    public void setPetImage_KeyGeneratedCorrectly() {
+        PetHomeActivity realActivity = spy(new PetHomeActivity());
+        ImageView mockIv = mock(ImageView.class);
+        doReturn(mockIv).when(realActivity).findViewById(R.id.ivPetOval);
+
+        AgeStage age = mock(AgeStage.class);
+        when(age.getAgeID()).thenReturn(3);
+        when(age.getAgeStage()).thenReturn("adult");
+
+        pet.setType("Deer");
+        pet.setAge(age);
+
+        realActivity.pet = pet;
+        realActivity.ageId = 3;
+
+        realActivity.setPetImage("sleep");
+
+        verify(mockIv).setImageResource(R.drawable.adult_deer_sleep);
     }
 }
 

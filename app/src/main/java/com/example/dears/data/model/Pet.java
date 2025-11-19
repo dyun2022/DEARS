@@ -169,4 +169,8 @@ public class Pet implements Serializable {
         public void setReadyToGrow(boolean readyToGrow) {
                 this.readyToGrow = readyToGrow;
         }
+
+        public void setAge(AgeStage newAge) {
+                this.age = newAge;
+        }
 }
