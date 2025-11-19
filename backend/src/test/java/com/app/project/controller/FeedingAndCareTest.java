@@ -2,7 +2,6 @@ package com.app.project.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.app.project.DearsApplication;
 import com.app.project.model.AgeStage;
 import com.app.project.model.Energy;
 import com.app.project.model.Food;
@@ -25,7 +24,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
@@ -33,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class PetControllerTest {
+class FeedingAndCareTest {
     @InjectMocks
     private PetController controller;
 
@@ -67,22 +65,6 @@ class PetControllerTest {
         pet.setEnergy(e);
         pet.setHunger(h);
         pet.setHappiness(ha);
-    }
-
-    @Test
-    void getPetByID() {
-    }
-
-    @Test
-    void getPetByUserID() {
-    }
-
-    @Test
-    void createPet() {
-    }
-
-    @Test
-    void updatePet() {
     }
 
     @Nested
@@ -212,9 +194,5 @@ class PetControllerTest {
             assertEquals(updated, pet);
             verify(petRepository).save(pet);
         }
-    }
-
-    @Test
-    void chatPet() {
     }
 }

@@ -4,10 +4,7 @@ import static org.hamcrest.Matchers.not;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
@@ -16,24 +13,16 @@ import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
-import com.example.dears.data.model.AgeStage;
-import com.example.dears.data.model.Energy;
-import com.example.dears.data.model.Happiness;
-import com.example.dears.data.model.Hunger;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.changeUserRequest;
-import com.example.dears.data.request.createJournalRequest;
 import com.example.dears.data.request.createPetRequest;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +43,7 @@ import retrofit2.Response;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class PetHomeActivityEspressoTests {
+public class FeedingAndCareEspressoTests {
 
     private static Intent deerIntent;
     private static Intent bearIntent;
@@ -78,21 +67,6 @@ public class PetHomeActivityEspressoTests {
         deerIntent = new Intent(context, PetHomeActivity.class);
         bearIntent = new Intent(context, PetHomeActivity.class);
 
-        // *** FIX THIS
-        /*Energy e = new Energy(METER_MAX_VALUE);
-        Hunger h = new Hunger(METER_MAX_VALUE);
-        Happiness ha = new Happiness(METER_MAX_VALUE);
-        AgeStage a = new AgeStage(1, "baby", METER_MAX_VALUE);
-
-        Pet deer = new Pet(949545, "name", "Deer", a, 0, h, 0, ha, 0, e, 0);
-        Pet bear = new Pet(949545, "name", "Bear", a, 0, h, 0, ha, 0, e, 0);
-        int userIdDeer = 1;
-        int userIdBear = 2;
-
-        deerIntent.putExtra("pet", deer);
-        deerIntent.putExtra("userId", userIdDeer);
-        bearIntent.putExtra("pet", bear);
-        bearIntent.putExtra("userId", userIdBear);*/
         CountDownLatch latch = new CountDownLatch(1);
 
         InterfaceAPI api = APIClient.getClient().create(InterfaceAPI.class);
@@ -156,14 +130,6 @@ public class PetHomeActivityEspressoTests {
 
         latch.await();
     }
-
-    /*@Before
-    public void disableAnimations() {
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Settings.Global.putFloat(context.getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 0f);
-        Settings.Global.putFloat(context.getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, 0f);
-        Settings.Global.putFloat(context.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 0f);
-    }*/
 
     @Test
     public void verifyDeerPetImage() {

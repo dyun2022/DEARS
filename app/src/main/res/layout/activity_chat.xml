@@ -11,115 +11,120 @@
     <TextView
         android:id="@+id/LLMResults"
         android:layout_width="250dp"
-        android:layout_height="300sp"
-        android:textColor="@color/white"
-        android:text="Click an option to chat!"
+        android:layout_height="50sp"
+        android:autoSizeMaxTextSize="100sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="2sp"
+        android:autoSizeTextType="uniform"
         android:background="@color/my_custom_orange"
+        android:gravity="center"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp"
+        android:text="Click an option to chat!"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85"
-        android:gravity="center"
-        android:autoSizeTextType="uniform"
-        android:autoSizeMinTextSize="12sp"
-        android:autoSizeMaxTextSize="100sp"
-        android:autoSizeStepGranularity="2sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        />
+        app:layout_constraintVertical_bias="0.41" />
 
-<!--    <Button-->
-<!--        android:id="@+id/Generate"-->
-<!--        android:layout_width="120dp"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:layout_marginBottom="72dp"-->
-<!--        android:backgroundTint="@color/black"-->
-<!--        android:text="click to generate"-->
-<!--        android:textColor="@color/white"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.498"-->
-<!--        app:layout_constraintStart_toStartOf="parent" />-->
 
     <ImageButton
-        android:background="@android:color/transparent"
-        android:contentDescription="Back"
-        app:srcCompat="@drawable/ic_arrow_back"
         android:id="@+id/backButton"
         android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:text="⬅️"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
         android:backgroundTint="@color/my_custom_orange"
+        android:contentDescription="Back"
+        android:text="⬅️"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.09"
-        />
+        app:srcCompat="@drawable/ic_arrow_back" />
 
     <ImageView
         android:id="@+id/petPicture"
         android:layout_width="203dp"
         android:layout_height="224dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.15"
         app:srcCompat="@drawable/honey"
         tools:layout_editor_absoluteX="104dp"
-        tools:layout_editor_absoluteY="104dp"
+        tools:layout_editor_absoluteY="104dp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonLayout"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollMessages"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.15"/>
+        android:gravity="center"
 
-    <Button
-        android:id="@+id/chatGreeting"
-        android:layout_width="81dp"
-        android:layout_height="95dp"
-        android:text="How are you?"
-        android:backgroundTint="@color/my_custom_orange"
-        tools:layout_editor_absoluteX="165dp"
-        tools:layout_editor_absoluteY="354dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+        android:layout_margin="8dp"
+        >
+        <Button
+            android:id="@+id/chatHello"
+            android:layout_width="81dp"
+            android:layout_height="95dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/my_custom_orange"
+            android:text="Hello!"
+            android:textSize="12sp"
+            />
+        <Button
+            android:id="@+id/chatGreeting"
+            android:layout_width="81dp"
+            android:layout_height="95dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/my_custom_orange"
+            android:text="How are you?"
+           />
+
+        <Button
+            android:id="@+id/chatJoke"
+            android:layout_width="81dp"
+            android:layout_height="95dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/my_custom_orange"
+            android:text="Tell me a joke!"
+             />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/scrollMessages"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintTop_toBottomOf="@id/LLMResults"
+        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45"/>
+        android:backgroundTint="@color/white"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        >
 
-    <Button
-        android:id="@+id/chatHello"
-        android:layout_width="81dp"
-        android:layout_height="95dp"
-        android:text="Hello!"
-        android:textSize="12sp"
-        android:backgroundTint="@color/my_custom_orange"
-        tools:layout_editor_absoluteX="72dp"
-        tools:layout_editor_absoluteY="354dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45"/>
-
-    <Button
-        android:id="@+id/chatJoke"
-        android:layout_width="81dp"
-        android:layout_height="95dp"
-        android:text="Tell me a joke!"
-        tools:layout_editor_absoluteX="259dp"
-        android:backgroundTint="@color/my_custom_orange"
-        tools:layout_editor_absoluteY="354dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45"/>
-
+        <LinearLayout
+            android:id="@+id/messageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
