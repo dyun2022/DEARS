@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
     private String petType = null;
     private int petID = -1;
     private int userId;
-    private Pet pet;
+    Pet pet;
     private int hunger;
     private int energy;
     private int happiness;
@@ -51,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     int timesChatted = 0;
 
     private ScrollView scrollView;
-    private LinearLayout linearLayout;
+     LinearLayout messageLayout;
     private ArrayList<LinearLayout> messagesList = new ArrayList<>();
 
     InterfaceAPI interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
@@ -94,7 +94,7 @@ public class ChatActivity extends AppCompatActivity {
         setPetImage("default");
 
         scrollView = findViewById(R.id.scrollMessages);
-        linearLayout = findViewById(R.id.messageLayout);
+
 
         scrollView.setVerticalScrollBarEnabled(true);
         scrollView.setScrollbarFadingEnabled(false);
@@ -158,7 +158,7 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
         timesChatted += 1;
-        final LinearLayout messageLayout = findViewById(R.id.messageLayout);
+          messageLayout = findViewById(R.id.messageLayout);
         if (messageLayout == null) {
             Log.e("ChatActivity", "messageLayout is null");
             return;
@@ -172,7 +172,7 @@ public class ChatActivity extends AppCompatActivity {
         messageText.setText(prompt);
         senderText.setGravity(Gravity.END);
 
-        LinearLayout messageComponent = v.findViewById(R.id.messageComponent);
+     LinearLayout messageComponent = v.findViewById(R.id.messageComponent);
         messageComponent.setVisibility(View.VISIBLE);
         messagesList.add(messageComponent);
 
