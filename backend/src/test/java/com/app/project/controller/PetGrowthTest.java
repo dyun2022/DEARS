@@ -103,24 +103,140 @@ public class PetGrowthTest {
         Mockito.when(energyRepository.findById(2)).thenReturn(Optional.of(new Energy(teenAge, 20)));
     }
 
+    // BBT1: meters increase but pet doesn't grow yet
     @Test
     public void testPetGrowthWhenMetersHigh() throws Exception {
         // Set meters high to trigger growth
-        pet.setHungerMeter(20);
-        pet.setHappinessMeter(20);
-        pet.setEnergyMeter(20);
+        pet.setHungerMeter(8);
+        pet.setHappinessMeter(8);
+        pet.setEnergyMeter(8);
 
         mockMvc.perform(patch("/api/pet/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new java.util.HashMap<String, Object>() {{
-                                    put("hunger_meter", 20);
-                                    put("happiness_meter", 20);
-                                    put("energy_meter", 20);
+                                    put("hunger_meter", 8);
+                                    put("happiness_meter", 8);
+                                    put("energy_meter", 8);
                                 }}
                         )))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.growthPoints").value(5))
-                .andExpect(jsonPath("$.age.ageID").value(2));
+                .andExpect(jsonPath("$.age.ageID").value(1));
     }
+
+    // BBT2: meters increase
+    @Test
+    public void testCheckMetersIncreasesGrowthPoints() throws Exception {
+        // 75% threshold based on meterMax = 10
+        pet.setHungerMeter(8);
+        pet.setHappinessMeter(8);
+        pet.setEnergyMeter(8);
+        pet.setGrowthPoints(0);
+
+        mockMvc.perform(patch("/api/pet/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new java.util.HashMap<String, Object>() {{
+                                    put("hunger_meter", 8);
+                                    put("happiness_meter", 8);
+                                    put("energy_meter", 8);
+                                }}
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.growthPoints").value(5));    // ✔ checkMeters()
+    }
+
+    // BBT3: pet grows to next stage
+    @Test
+    public void testCheckGrowthMovesToNextAge() throws Exception {
+        // Ratios all >= 0.75
+        pet.setHungerMeter(10);
+        pet.setHappinessMeter(10);
+        pet.setEnergyMeter(10);
+        pet.setGrowthPoints(5);   // Enough to grow because meterMax = 10
+
+        mockMvc.perform(patch("/api/pet/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new java.util.HashMap<String, Object>() {{
+                                    put("hunger_meter", 10);
+                                    put("happiness_meter", 10);
+                                    put("energy_meter", 10);
+                                }}
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.age.ageID").value(2)) // ✔ moved to next stage
+                .andExpect(jsonPath("$.growthPoints").value(0)); // ✔ reset by checkGrowth()
+    }
+
+    // BBT4: pet stays at max age if at max age
+    @Test
+    public void testCheckGrowthStopsAtMaxAge() throws Exception {
+        AgeStage finalStage = new AgeStage("adult", 40);
+        finalStage.setAgeID(3);
+        Mockito.when(ageStageRepository.findById(3))
+                .thenReturn(Optional.of(finalStage));
+
+        pet.setAge(finalStage);
+
+        mockMvc.perform(patch("/api/pet/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new java.util.HashMap<String, Object>() {{
+                                    put("hunger_meter", 10);
+                                    put("happiness_meter", 10);
+                                    put("energy_meter", 10);
+                                }}
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.age.ageID").value(3)) // ✔ stays final
+                .andExpect(jsonPath("$.growthPoints").value(5)); // ✔ never reset
+    }
+
+    // BBT5: meters don't increase if one meter isn't 0.75 or above
+    @Test
+    public void testCheckMetersNoIncrementIfOneLow() throws Exception {
+        pet.setHungerMeter(10);
+        pet.setHappinessMeter(4); // < 0.75
+        pet.setEnergyMeter(10);
+        pet.setGrowthPoints(0);
+
+        mockMvc.perform(patch("/api/pet/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new java.util.HashMap<String, Object>() {{
+                                    put("hunger_meter", 10);
+                                    put("happiness_meter", 4);
+                                    put("energy_meter", 10);
+                                }}
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.growthPoints").value(0)); // ✔ no increment
+    }
+
+    // BBT6: meters reset if pet grows
+    @Test
+    public void testCheckGrowthResetsMeters() throws Exception {
+        pet.setHungerMeter(10);
+        pet.setHappinessMeter(10);
+        pet.setEnergyMeter(10);
+        pet.setGrowthPoints(10); // enough to evolve
+
+        mockMvc.perform(patch("/api/pet/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new java.util.HashMap<String, Object>() {{
+                                    put("hunger_meter", 10);
+                                    put("happiness_meter", 10);
+                                    put("energy_meter", 10);
+                                }}
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.age.ageID").value(2))
+                .andExpect(jsonPath("$.hungerMeter").value(0))      // ✔ reset
+                .andExpect(jsonPath("$.happinessMeter").value(0))   // ✔ reset
+                .andExpect(jsonPath("$.energyMeter").value(0));     // ✔ reset
+    }
+
 }
