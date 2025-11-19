@@ -1,13 +1,18 @@
 // java
 package com.example.dears;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,11 +28,13 @@ import com.example.dears.data.model.Pet;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import android.util.TypedValue;
 
 public class ChatActivity extends AppCompatActivity {
     private String age;
@@ -42,6 +49,10 @@ public class ChatActivity extends AppCompatActivity {
     private int meterMax;
     private String name;
     int timesChatted = 0;
+
+    private ScrollView scrollView;
+    private LinearLayout linearLayout;
+    private ArrayList<LinearLayout> messagesList = new ArrayList<>();
 
     InterfaceAPI interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
@@ -82,6 +93,17 @@ public class ChatActivity extends AppCompatActivity {
 
         setPetImage("default");
 
+        scrollView = findViewById(R.id.scrollMessages);
+        linearLayout = findViewById(R.id.messageLayout);
+
+        scrollView.setVerticalScrollBarEnabled(true);
+        scrollView.setScrollbarFadingEnabled(false);
+
+        int pxSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            scrollView.setScrollBarSize(pxSize); // API 29+
+        }
+
         final TextView textView = findViewById(R.id.LLMResults);
 
         final Button hiButton = findViewById(R.id.chatHello);
@@ -121,6 +143,7 @@ public class ChatActivity extends AppCompatActivity {
     public void updateTextView(String prompt) {
         final TextView textView = findViewById(R.id.LLMResults);
 
+
         if (pet == null || pet.getAge() == null) {
             Log.e("ChatActivity", "updateTextView: missing pet or age");
             return;
@@ -135,7 +158,45 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
         timesChatted += 1;
+        final LinearLayout messageLayout = findViewById(R.id.messageLayout);
+        if (messageLayout == null) {
+            Log.e("ChatActivity", "messageLayout is null");
+            return;
+        }
+        LayoutInflater mInf = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = mInf.inflate(R.layout.message, messageLayout, false);
+        TextView senderText = v.findViewById(R.id.sender);
+        TextView messageText = v.findViewById(R.id.message_body);
+        senderText.setText("You");
+        senderText.setGravity(Gravity.END);
+        messageText.setText(prompt);
+        senderText.setGravity(Gravity.END);
 
+        LinearLayout messageComponent = v.findViewById(R.id.messageComponent);
+        messageComponent.setVisibility(View.VISIBLE);
+        messagesList.add(messageComponent);
+
+        int marginDpEnd = 30;
+        int marginDpStart=70;
+        int marginDpOther = 8;
+
+        int startPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpStart, getResources().getDisplayMetrics());
+        int otherPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpOther, getResources().getDisplayMetrics());
+        int endPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpEnd, getResources().getDisplayMetrics());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = Gravity.END;
+        params.setMargins(startPx, otherPx, endPx, otherPx);
+        messageComponent.setLayoutParams(params);
+        messageComponent.setGravity(Gravity.END);
+
+
+        messageLayout.addView(v);
+        messageLayout.requestLayout();
+        scrollView.post(()-> scrollView.fullScroll(View.FOCUS_DOWN));
 
         // optimistic local increment and UI refresh
         int increment = Math.max(1, Math.round(meterMax * 0.25f));
@@ -194,7 +255,46 @@ public class ChatActivity extends AppCompatActivity {
                                 String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
                                 JSONObject json = new JSONObject(processedResult);
                                 String response = json.getString("response");
+
+
+                                LayoutInflater mInf = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                View v = mInf.inflate(R.layout.message, messageLayout, false);
+                                TextView senderText = v.findViewById(R.id.sender);
+                                TextView messageText = v.findViewById(R.id.message_body);
+                                senderText.setText(name);
+                                messageText.setText(response);
+                                senderText.setGravity(Gravity.START);
+                                messageText.setGravity(Gravity.START);
+
+                                LinearLayout messageComponent = v.findViewById(R.id.messageComponent);
+                                messageComponent.setVisibility(View.VISIBLE);
+
+                                int marginDpStart=70;
+                                int marginDpOther = 8;
+                                int marginDpEnd = 30;
+
+                                int startPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpStart, getResources().getDisplayMetrics());
+                                int otherPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpOther, getResources().getDisplayMetrics());
+                                int endPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDpEnd, getResources().getDisplayMetrics());
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                );
+                                params.setMargins(endPx, otherPx, startPx, otherPx);
+                                params.gravity = Gravity.START;
+                                messageComponent.setLayoutParams(params);
+                                messageComponent.setGravity(Gravity.START);
+
+
+//                                messagesList.add(messageComponent);
+
+                                messageLayout.addView(v);
+                                messageLayout.requestLayout();
+                                scrollView.post(()-> scrollView.fullScroll(View.FOCUS_DOWN));
+                                //make sure to delete at end since chat should replace this
                                 textView.setText(response);
+                                textView.setText("Thanks for chatting with " + name + "!");
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Toast.makeText(getApplicationContext(), "Error parsing LLM output", Toast.LENGTH_SHORT).show();
