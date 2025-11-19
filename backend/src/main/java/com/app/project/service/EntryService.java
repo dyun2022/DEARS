@@ -5,6 +5,8 @@ import com.app.project.model.Food;
 import com.app.project.model.Pet;
 import com.app.project.model.User;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 import java.util.Optional;
 import com.app.project.service.PetService;
 
@@ -12,5 +14,6 @@ import com.app.project.service.PetService;
 public interface EntryService {
     Entry getEntryById(int id);
     Entry saveEntry(Entry entry);
+    Entry createEntry(Map<String, String> entryData);
     Pet getPetById(int petId);
 }

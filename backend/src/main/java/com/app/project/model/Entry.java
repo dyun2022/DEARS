@@ -68,4 +68,5 @@ public class Entry {
     public void setJournal(Journal journal) { this.journal = journal; }
     public void setJournalId(int journalId) { this.journalId = journalId; }
 
+    public void setEntryId(int i) {  this.entry_id = i;  }
 }

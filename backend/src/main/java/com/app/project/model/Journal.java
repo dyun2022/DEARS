@@ -41,4 +41,7 @@ public class Journal {
     public Pet getPet() { return pet; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public void setJournalId(int i) { this.journal_id = i;
+    }
 }

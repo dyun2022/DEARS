@@ -14,7 +14,9 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EntryServiceImpl implements EntryService {
@@ -37,5 +39,10 @@ public class EntryServiceImpl implements EntryService {
     public Pet getPetById(int petId) {
         return petService.getPetByID(petId).orElse(null);
     }
+
+    public Entry createEntry(Map<String, String> entryData) {
+        return new Entry();
+    }
+
 
 }
