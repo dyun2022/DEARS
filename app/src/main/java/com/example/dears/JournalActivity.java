@@ -225,7 +225,11 @@ public class JournalActivity extends AppCompatActivity {
         String key = jl.getPetImageKey();
 
         Integer img = petImages.get(key);
-        if (img != null) petImage.setImageResource(img);
+        if (img != null) {
+            petImage.setImageResource(img);
+        } else {
+            petImage.setImageResource(R.drawable.mushroom);
+        }
     }
 
     public TextView createEntryView (String entry) {

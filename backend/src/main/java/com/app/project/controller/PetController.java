@@ -260,7 +260,8 @@ public class PetController {
     }
 
 
-    void checkMeters(Pet pet) {
+
+    public void checkMeters(Pet pet) {
         double hungerRatio = (double) pet.getHungerMeter() / pet.getHunger().getMeterMax();
         double happyRatio = (double) pet.getHappinessMeter() / pet.getHappiness().getMeterMax();
         double energyRatio = (double) pet.getEnergyMeter() / pet.getEnergy().getMeterMax();

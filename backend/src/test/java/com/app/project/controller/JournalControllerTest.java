@@ -71,7 +71,7 @@ class JournalControllerTest {
     @Test
     void testGetJournalByIdNotFound() {
         ResponseEntity<Map<String, Object>> response = controller.getJournalById(0);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -105,17 +105,6 @@ class JournalControllerTest {
         assertEquals(2, response.getBody().size());
 
         verify(service, times(1)).getAllEntries();
-    }
-
-    @Test
-    public void testSaveEntry() {
-        // mock entry
-        Entry entry1 = new Entry();
-        entry1.setEntryId(1);
-        entry1.setEntryDate(LocalDate.of(2025, 11, 17));
-        entry1.setSummary("Test entry 1");
-        entry1.setJournalId(1);
-        entry1.setPet(pet);
     }
 
   }

@@ -133,4 +133,17 @@ public class JournalActivityTest extends TestCase {
 
     }
 
+    // testing setPetImage for a non valid pet
+    @Test
+    public void testSetPetImageNotValid() {
+        pet = new Pet();
+        pet.setType("dog");
+        pet.setAge(new AgeStage(5,"elder", 50));
+        tester.pet = pet;
+        String response = tester.getPetImageKey();
+
+        assertTrue(response.contains("err"));
+
+    }
+
 }
