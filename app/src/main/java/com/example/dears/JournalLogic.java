@@ -77,6 +77,12 @@ public class JournalLogic {
         String ageStage = pet.getAge().getAgeStage();
         String type = pet.getType().toLowerCase();
 
+        if (type != "deer" && type != "bear") {
+            return "err";
+        } else if (ageStage != "baby" && ageStage != "teen" && ageStage != "adult") {
+            return "err";
+        }
+
         return ageStage + "_" + type.toLowerCase() + "_default";
     }
 }

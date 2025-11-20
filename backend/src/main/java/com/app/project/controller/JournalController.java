@@ -95,22 +95,22 @@ public class JournalController {
         return new ResponseEntity<>(entriesDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/date/{date}")
-    public ResponseEntity<List<Map<String, Object>>> getEntryByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<Entry> entries = journalService.getEntriesByDate(date);
-
-        List<Map<String, Object>> entriesDtos = entries.stream()
-                .map(entry -> {
-                    Map<String, Object> dto = new HashMap<>();
-                    dto.put("entry_id", entry.getEntryId());
-                    dto.put("date", entry.getEntryDate());
-                    dto.put("summary", entry.getSummary());
-                    return dto;
-                })
-                .toList();
-
-        return new ResponseEntity<>(entriesDtos, HttpStatus.OK);
-    }
+//    @GetMapping("/date/{date}")
+//    public ResponseEntity<List<Map<String, Object>>> getEntryByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//        List<Entry> entries = journalService.getEntriesByDate(date);
+//
+//        List<Map<String, Object>> entriesDtos = entries.stream()
+//                .map(entry -> {
+//                    Map<String, Object> dto = new HashMap<>();
+//                    dto.put("entry_id", entry.getEntryId());
+//                    dto.put("date", entry.getEntryDate());
+//                    dto.put("summary", entry.getSummary());
+//                    return dto;
+//                })
+//                .toList();
+//
+//        return new ResponseEntity<>(entriesDtos, HttpStatus.OK);
+//    }
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createJournal(@RequestBody Map<String, Object> journalData) {

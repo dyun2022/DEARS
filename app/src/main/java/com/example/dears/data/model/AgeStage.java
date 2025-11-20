@@ -37,11 +37,20 @@ public class AgeStage implements Serializable {
         return ageStage;
     }
 
+
     public int getMeterMax() {
         return meterMax;
     }
 
     public List<Pet> getPets() {
         return pets;
+    }
+
+    public void setAgeStage(String age) {
+        this.ageStage = age;
+    }
+
+    public void setAgeID(int i) {
+        this.ageID = i;
     }
 }

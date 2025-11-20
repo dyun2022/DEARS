@@ -56,6 +56,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="1431105085">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="207" />
+                  <entry key="Pixel_8" value="236" />
+                  <entry key="Tests" value="476" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="1969565005">
           <value>
             <AndroidTestResultsTableState>

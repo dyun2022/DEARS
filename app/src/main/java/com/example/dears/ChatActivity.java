@@ -56,6 +56,12 @@ public class ChatActivity extends AppCompatActivity {
 
     InterfaceAPI interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
+
+    @SuppressWarnings("WeakerAccess")
+    protected LLMInference createLLMInference() throws Exception {
+        // Production returns the real LLMInference; tests can override to return null.
+        return new LLMInference(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,9 +155,9 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
-        LLMInference llm;
+        LLMInference llm = null;
         try {
-            llm = new LLMInference(this);
+            llm = createLLMInference();
         } catch (Exception e) {
             Log.e("ChatActivity", "LLM init failed", e);
             Toast.makeText(this, "LLM init error", Toast.LENGTH_SHORT).show();
@@ -244,10 +250,14 @@ public class ChatActivity extends AppCompatActivity {
                 fail();
             }
         });
-
+        if (llm == null) {
+            Log.i("ChatActivity", "Skipping LLM inference (test mode)");
+            return;
+        }
+        final LLMInference llmFinal = llm;
         new Thread(() -> {
             try {
-                llm.respondToChat(age, petType, happiness, hunger, energy, prompt, new LLMInference.LLMCallback() {
+                llmFinal.respondToChat(age, petType, happiness, hunger, energy, prompt, new LLMInference.LLMCallback() {
                     @Override
                     public void onComplete(String llmResult) {
                         runOnUiThread(() -> {
@@ -321,7 +331,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setPetImage(String action) {
         ImageView petPicture = findViewById(R.id.petPicture);
-        if (petPicture == null || pet == null) return;
+        if (petPicture == null || pet == null || pet.getAge() == null || pet.getType() == null) return;
+
 
         Map<String, Integer> petImages = Map.ofEntries(
                 Map.entry("adult_bear_default", R.drawable.adult_bear_default),
