@@ -202,6 +202,20 @@ public class FeedingAndCareTests {
         updatePetRequest upr = new updatePetRequest(4, 3, 2);
         verify(interfaceAPI).updatePet(Mockito.anyInt(), eq(upr));
     }
+
+    @Test
+    public void statusDecayFail() {
+        when(interfaceAPI.updatePet(anyInt(), any())).thenReturn(mockCall);
+
+        activity.statusDecay();
+
+        ArgumentCaptor<Callback<Pet>> captor = ArgumentCaptor.forClass(Callback.class);
+        verify(mockCall).enqueue(captor.capture());
+
+        captor.getValue().onFailure(mockCall, new Throwable("Network error"));
+
+        verify(activity).fail();
+    }
 }
 
 
