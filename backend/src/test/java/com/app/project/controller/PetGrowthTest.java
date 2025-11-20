@@ -222,11 +222,11 @@ public class PetGrowthTest {
         when(ageStageRepository.findById(4)).thenReturn(Optional.empty()); // next age doesn't exist
 
         pet.setAge(adult);
-        pet.setGrowthPoints(50); // exceeds max
+        pet.setGrowthPoints(40); // exceeds max
         petController.checkGrowth(pet);
 
         assertEquals(adult, pet.getAge()); // still adult
-        assertEquals(50, pet.getGrowthPoints()); // unchanged
+        assertEquals(40, pet.getGrowthPoints()); // unchanged
     }
 
     // WB3: partial meter increase does not trigger growth
