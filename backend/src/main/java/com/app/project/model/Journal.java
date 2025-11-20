@@ -44,4 +44,7 @@ public class Journal {
 
     public void setJournalId(int i) { this.journal_id = i;
     }
+
+    public void setPet(Pet pet) { this.pet = pet;
+    }
 }

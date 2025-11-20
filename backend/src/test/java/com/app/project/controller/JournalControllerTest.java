@@ -1,6 +1,7 @@
 package com.app.project.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import com.app.project.model.Energy;
 import com.app.project.model.Entry;
 import com.app.project.model.Happiness;
 import com.app.project.model.Hunger;
+import com.app.project.model.Journal;
 import com.app.project.model.Pet;
 import com.app.project.repository.JournalRepository;
 import com.app.project.service.JournalService;
@@ -26,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,6 +108,51 @@ class JournalControllerTest {
         assertEquals(2, response.getBody().size());
 
         verify(service, times(1)).getAllEntries();
+    }
+
+    @Test
+    void testGetAllEntriesNoEntries() {
+        ArrayList<Entry> mockEntries = new ArrayList<>();
+        // mock calls
+        when(service.getAllEntries()).thenReturn(mockEntries);
+        ResponseEntity<List<Map<String, Object>>> response = controller.getAllEntries();
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(0, response.getBody().size());
+
+        verify(service, times(1)).getAllEntries();
+    }
+
+    @Test
+    void testCreateJournal() {
+        Map<String, Object> journalData = new HashMap<>();
+        journalData.put("pet_id", 1);
+
+        Pet mockPet = new Pet();
+        mockPet.setPetID(1);
+        when(service.getPetById(1)).thenReturn(mockPet);
+
+        Journal savedJournal = new Journal(mockPet);
+        savedJournal.setJournalId(100);
+        savedJournal.setName("Daily Journal");
+        savedJournal.setPet(mockPet);
+        when(service.saveJournal(any(Journal.class))).thenReturn(savedJournal);
+
+        ResponseEntity<Map<String, Object>> response = controller.createJournal(journalData);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        assertEquals(100, response.getBody().get("journal_id"));
+        assertEquals("Daily Journal", response.getBody().get("name"));
+        assertTrue(response.getBody().containsKey("entries"));
+        assertTrue(((List<?>) response.getBody().get("entries")).isEmpty());
+
+        verify(service, times(1)).getPetById(1);
+        verify(service, times(1)).saveJournal(any(Journal.class));
     }
 
   }
