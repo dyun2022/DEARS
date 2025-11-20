@@ -193,4 +193,64 @@ public class PetGrowthTest {
         assertEquals(0, finalUpdated.getHappinessMeter());
         assertEquals(0, finalUpdated.getEnergyMeter());
     }
+
+    // WB1: checkGrowth resets all meters exactly when growth triggers
+    @Test
+    public void testCheckGrowthResetsMetersOnThreshold() {
+        AgeStage teen = new AgeStage("teen", 20);
+        teen.setAgeID(2);
+        when(ageStageRepository.findById(2)).thenReturn(Optional.of(teen));
+
+        pet.setGrowthPoints(10); // >= baby.meterMax
+        petController.checkGrowth(pet);
+
+        // Verify age advanced
+        assertEquals(teen, pet.getAge());
+        // Verify meters reset
+        assertEquals(0, pet.getHungerMeter());
+        assertEquals(0, pet.getHappinessMeter());
+        assertEquals(0, pet.getEnergyMeter());
+        // Verify growth points reset
+        assertEquals(0, pet.getGrowthPoints());
+    }
+
+    // WB2: checkGrowth does nothing if at max age
+    @Test
+    public void testCheckGrowthDoesNothingAtMaxAge() {
+        AgeStage adult = new AgeStage("adult", 40);
+        adult.setAgeID(3);
+        when(ageStageRepository.findById(4)).thenReturn(Optional.empty()); // next age doesn't exist
+
+        pet.setAge(adult);
+        pet.setGrowthPoints(50); // exceeds max
+        petController.checkGrowth(pet);
+
+        assertEquals(adult, pet.getAge()); // still adult
+        assertEquals(50, pet.getGrowthPoints()); // unchanged
+    }
+
+    // WB3: partial meter increase does not trigger growth
+    @Test
+    public void testCheckMetersPartialIncreaseNoGrowth() {
+        // only hunger and happiness above 0.75, energy below
+        pet.setHungerMeter(8);
+        pet.setHappinessMeter(8);
+        pet.setEnergyMeter(2);
+
+        petController.checkMeters(pet);
+
+        assertEquals(0, pet.getGrowthPoints()); // no growth yet
+        assertEquals(1, pet.getAge().getAgeID()); // age unchanged
+    }
+
+    // WB4: checkMeters increments growthPoints exactly by 5 when all meters >= 0.75
+    @Test
+    public void testCheckMetersIncrementGrowthPoints() {
+        pet.setHungerMeter(8);
+        pet.setHappinessMeter(8);
+        pet.setEnergyMeter(8);
+        int before = pet.getGrowthPoints();
+        petController.checkMeters(pet);
+        assertEquals(before + 5, pet.getGrowthPoints());
+    }
 }

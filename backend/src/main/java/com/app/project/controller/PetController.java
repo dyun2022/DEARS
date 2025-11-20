@@ -226,7 +226,7 @@ public class PetController {
     }
 
     // if reached growth meter max, update all meter maxes
-    private void checkGrowth(Pet pet) {
+    void checkGrowth(Pet pet) {
         while (pet.getGrowthPoints() >= pet.getAge().getMeterMax()) {
             int nextAgeID = pet.getAge().getAgeID() + 1;
             Optional<AgeStage> nextAgeStage = ageStageRepository.findById(nextAgeID);

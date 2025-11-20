@@ -106,7 +106,7 @@ public class PetLevelUpTest {
 
     // WB2: test that happyReaction calls setPetImage for "happy" and then "default"
     @Test
-    public void petGrowthSetsCorrectImage() {
+    public void petHappyReaction() {
         // Make setPetImage observable
         doNothing().when(activity).setPetImage(anyString());
 
