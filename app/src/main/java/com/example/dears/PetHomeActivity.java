@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -434,6 +435,8 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public void updateEnergyBar() {
+        TextView energyTextView = findViewById(R.id.tvEnergy);
+        energyTextView.setText("energy: " + pet.getEnergyMeter() + " / " + pet.getEnergy().getMeterMax());
         View barEnergy = findViewById(R.id.barEnergy);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
 
@@ -443,6 +446,8 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public void updateHungerBar() {
+        TextView hungerTextView = findViewById(R.id.tvHunger);
+        hungerTextView.setText("hunger: " + pet.getHungerMeter() + " / " + pet.getHunger().getMeterMax());
         View barHunger = findViewById(R.id.barHunger);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
 
@@ -466,6 +471,8 @@ public class PetHomeActivity extends AppCompatActivity {
         if (barHappiness == null || pet == null || pet.getAge() == null) {
             return;
         }
+        TextView happyTextView = findViewById(R.id.tvHappiness);
+        happyTextView.setText("happiness: " + pet.getHappinessMeter() + " / " + pet.getHappiness().getMeterMax());
         int meterMax = pet.getAge().getMeterMax();
         PetUIHelper.updateHappinessBar(barHappiness, pet, this, meterMax);
     }
