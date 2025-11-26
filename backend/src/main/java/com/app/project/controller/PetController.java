@@ -240,19 +240,19 @@ public class PetController {
             int nextHungerID = pet.getHunger().getHungerID() + 1;
             hungerRepository.findById(nextHungerID).ifPresent(nextHunger -> {
                 pet.setHunger(nextHunger);
-                pet.setHungerMeter(0);
+                pet.setHungerMeter(pet.getHungerMeter());
             });
 
             int nextHappinessID = pet.getHappiness().getHappinessID() + 1;
             happinessRepository.findById(nextHappinessID).ifPresent(nextHappiness -> {
                 pet.setHappiness(nextHappiness);
-                pet.setHappinessMeter(0);
+                pet.setHappinessMeter(pet.getHappinessMeter());
             });
 
             int nextEnergyID = pet.getEnergy().getEnergyID() + 1;
             energyRepository.findById(nextEnergyID).ifPresent(nextEnergy -> {
                 pet.setEnergy(nextEnergy);
-                pet.setEnergyMeter(0);
+                pet.setEnergyMeter(pet.getEnergyMeter());
             });
 
             pet.setGrowthPoints(0);
