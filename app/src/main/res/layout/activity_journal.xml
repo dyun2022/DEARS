@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@drawable/notepaper"
+    android:background="@drawable/chatpet_background"
     tools:context=".JournalActivity">
 
     <ImageButton
@@ -25,9 +25,14 @@
         app:layout_constraintVertical_bias="0.09" />
 
     <ImageView
-        android:id="@+id/petImage"
-        android:layout_width="360dp"
+
+        android:layout_width="260dp"
         android:layout_height="360dp"
+        android:background="@drawable/bg_oval_light"
+        android:scaleType="centerInside"
+        android:paddingTop="35dp"
+
+        android:id="@+id/petImage"
         app:srcCompat="@drawable/adult_deer_default"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

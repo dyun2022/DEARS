@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.updatePetRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -51,6 +53,7 @@ public class PetHomeActivity extends AppCompatActivity {
     private Runnable clockRunnable;
     private boolean clockRunning;
     private static final int REQUEST_CHAT = 1001;
+    private User user;
 
     private ActivityResultLauncher<Intent> chatLauncher;
 
@@ -89,6 +92,7 @@ public class PetHomeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
+        user = (User) intent.getSerializableExtra("user");
         userId = intent.getIntExtra("userId", -1);
         if(intent.getBooleanExtra("updateHappiness", false)){
             updateHappinessBar();
@@ -118,6 +122,9 @@ public class PetHomeActivity extends AppCompatActivity {
         Button btnChat = findViewById(R.id.btnChat);
         ImageButton btnJournal = findViewById(R.id.btnJournal);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
+
+
+
         ImageView lowFood = findViewById(R.id.lowFood);
         ImageView midFood = findViewById(R.id.midFood);
         ImageView highFood = findViewById(R.id.highFood);
@@ -170,6 +177,17 @@ public class PetHomeActivity extends AppCompatActivity {
         ivPetOval.bringToFront();
 
         setPetImage("default");
+//        interfaceAPI.getUserById(userId).enqueue(new Callback<User>() {
+//            @Override public void onResponse(Call<User> call, Response<User> resp) {
+//                if (!resp.isSuccessful() || resp.body() == null) return;
+//                user = resp.body();
+//
+//            }
+//            @Override public void onFailure(Call<User> call, Throwable t) {}
+//        });
+
+
+
         updateBars();
 
         // Initialize foods.
@@ -520,4 +538,6 @@ public class PetHomeActivity extends AppCompatActivity {
         updateHappinessBar();
         updateHungerBar();
     }
+
+
 }

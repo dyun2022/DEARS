@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/notepaper"
+    android:background="@drawable/chatpet_background"
     tools:context=".ChatActivity">
 
     <TextView
@@ -16,7 +16,7 @@
         android:autoSizeMinTextSize="14sp"
         android:autoSizeStepGranularity="2sp"
         android:autoSizeTextType="uniform"
-        android:background="@color/my_custom_orange"
+        android:background="@color/my_custom_green"
         android:gravity="center"
         android:paddingStart="10dp"
         android:paddingTop="8dp"
@@ -29,38 +29,44 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.41" />
+        app:layout_constraintVertical_bias="0.57" />
 
 
     <ImageButton
         android:id="@+id/backButton"
-        android:layout_width="70dp"
-        android:layout_height="48dp"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
         android:background="@android:color/transparent"
-        android:backgroundTint="@color/my_custom_orange"
         android:contentDescription="Back"
-        android:text="⬅️"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/ic_arrow_back"
+        app:tint="#000000"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.09"
-        app:srcCompat="@drawable/ic_arrow_back" />
+
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintVertical_bias="0.09" />
 
     <ImageView
         android:id="@+id/petPicture"
-        android:layout_width="203dp"
-        android:layout_height="224dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="-60dp"
+
+        android:layout_width="260dp"
+        android:layout_height="340dp"
+        android:background="@drawable/bg_oval_light"
+        android:scaleType="centerInside"
+
+
+        app:layout_constraintBottom_toTopOf="@id/LLMResults"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backButton"
         app:layout_constraintVertical_bias="0.15"
         app:srcCompat="@drawable/honey"
-        tools:layout_editor_absoluteX="104dp"
-        tools:layout_editor_absoluteY="104dp" />
+        />
 
 
     <LinearLayout
@@ -74,16 +80,14 @@
         app:layout_constraintTop_toBottomOf="@id/scrollMessages"
         app:layout_constraintHorizontal_bias="0.5"
         android:gravity="center"
-
-
-        android:layout_margin="8dp"
+        android:layout_marginBottom="55dp"
         >
         <Button
             android:id="@+id/chatHello"
             android:layout_width="81dp"
             android:layout_height="95dp"
             android:layout_margin="8dp"
-            android:backgroundTint="@color/my_custom_orange"
+            android:backgroundTint="@color/my_custom_green"
             android:text="Hello!"
             android:textSize="12sp"
             />
@@ -92,7 +96,7 @@
             android:layout_width="81dp"
             android:layout_height="95dp"
             android:layout_margin="8dp"
-            android:backgroundTint="@color/my_custom_orange"
+            android:backgroundTint="@color/my_custom_green"
             android:text="How are you?"
            />
 
@@ -101,7 +105,7 @@
             android:layout_width="81dp"
             android:layout_height="95dp"
             android:layout_margin="8dp"
-            android:backgroundTint="@color/my_custom_orange"
+            android:backgroundTint="@color/my_custom_green"
             android:text="Tell me a joke!"
              />
     </LinearLayout>

@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="my_custom_orange">#FF9459</color>
     <color name ="my_custom_blue">#DDF0FF</color>
+    <color name ="my_custom_beige">#F5E5D6</color>
+    <color name ="my_custom_green">#3F5743</color>
+    <color name="my_custom_slate">#D9D9D9</color>
 </resources>
