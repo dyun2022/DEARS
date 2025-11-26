@@ -259,8 +259,6 @@ public class PetController {
         }
     }
 
-
-
     public void checkMeters(Pet pet) {
         double hungerRatio = (double) pet.getHungerMeter() / pet.getHunger().getMeterMax();
         double happyRatio = (double) pet.getHappinessMeter() / pet.getHappiness().getMeterMax();
@@ -271,5 +269,22 @@ public class PetController {
         }
 
         checkGrowth(pet);
+    }
+
+    public void playPet(Pet pet) {
+        pet.setHappinessMeter(pet.getHappinessMeter() + 5);
+        if (pet.getHappinessMeter() > pet.getHappiness().getMeterMax()) {
+            pet.setHappinessMeter(pet.getHappiness().getMeterMax());
+        }
+
+        pet.setEnergyMeter(pet.getEnergyMeter() - 5);
+        if (pet.getEnergyMeter() < 0) {
+            pet.setEnergyMeter(0);
+        }
+
+        pet.setHungerMeter(pet.getHungerMeter() - 5);
+        if (pet.getHungerMeter() < 0) {
+            pet.setHungerMeter(0);
+        }
     }
 }
