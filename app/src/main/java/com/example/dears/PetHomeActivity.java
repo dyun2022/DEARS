@@ -46,7 +46,6 @@ public class PetHomeActivity extends AppCompatActivity {
     int day = 1;
     boolean isSleeping = false;
     boolean isHappy = false;
-    // NEW: flag to protect animation from being overwritten
     private boolean isPlayingAnimation = false;
 
     InterfaceAPI interfaceAPI;
@@ -241,9 +240,7 @@ public class PetHomeActivity extends AppCompatActivity {
             petFeed(food);
         });
 
-        // PLAY: +5 happiness, -5 hunger, -5 energy
         btnPlay.setOnClickListener(v -> {
-            // avoid overlapping play animations
             if (isPlayingAnimation) return;
 
             playAnimation();
@@ -281,8 +278,6 @@ public class PetHomeActivity extends AppCompatActivity {
 
         runClock();
     }
-
-    // ---- PLAY ANIMATION: protect from other updates while running ----
     private void playAnimation() {
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
 
@@ -297,8 +292,6 @@ public class PetHomeActivity extends AppCompatActivity {
         isPlayingAnimation = true;
 
         Handler animationHandler = new Handler();
-
-        // Run each animation frame
         for (int i = 0; i < frames.length; i++) {
             int frameIndex = i;
             animationHandler.postDelayed(() -> {
@@ -306,7 +299,6 @@ public class PetHomeActivity extends AppCompatActivity {
             }, frameIndex * delay);
         }
 
-        // After the last frame, end animation and restore default pet image
         animationHandler.postDelayed(() -> {
             isPlayingAnimation = false;
             if (!isSleeping) {
@@ -400,7 +392,6 @@ public class PetHomeActivity extends AppCompatActivity {
 
     // Action: happy, sleep, or default
     public void setPetImage(String action) {
-        // 🔒 Do not override frames while a play animation is running
         if (isPlayingAnimation) {
             return;
         }
@@ -442,7 +433,6 @@ public class PetHomeActivity extends AppCompatActivity {
         if (ageId != newAgeId) {
             isSleeping = false;
             ageId = newAgeId;
-            // You removed happyReaction usage except here; kept as-is.
             happyReaction();
             Toast.makeText(PetHomeActivity.this, "Your pet grew!", Toast.LENGTH_SHORT).show();
         }
