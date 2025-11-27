@@ -17,11 +17,9 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dears.data.api.APIClient;
 import com.example.dears.data.api.InterfaceAPI;
-import com.example.dears.data.model.MainViewModel;
 import com.example.dears.data.model.Pet;
 import com.example.dears.data.model.User;
 import com.example.dears.data.request.updatePetRequest;
@@ -48,6 +46,9 @@ public class PetHomeActivity extends AppCompatActivity {
     int day = 1;
     boolean isSleeping = false;
     boolean isHappy = false;
+    // NEW: flag to protect animation from being overwritten
+    private boolean isPlayingAnimation = false;
+
     InterfaceAPI interfaceAPI;
     private Handler handler = new Handler();
     private Runnable clockRunnable;
@@ -81,10 +82,10 @@ public class PetHomeActivity extends AppCompatActivity {
                         Pet updated = (Pet) data.getSerializableExtra("pet");
                         if (data != null && data.hasExtra("pet")) {
                             pet = updated;
-                           runOnUiThread(()-> {;
-                               updateBars();
-                               setPetImage("default");
-                           });
+                            runOnUiThread(() -> {
+                                updateBars();
+                                setPetImage("default");
+                            });
                         }
                     }
                 }
@@ -94,25 +95,9 @@ public class PetHomeActivity extends AppCompatActivity {
         pet = (Pet) intent.getSerializableExtra("pet");
         user = (User) intent.getSerializableExtra("user");
         userId = intent.getIntExtra("userId", -1);
-        if(intent.getBooleanExtra("updateHappiness", false)){
+        if (intent.getBooleanExtra("updateHappiness", false)) {
             updateHappinessBar();
         }
-
-        // Smarter way to persist data; right now, going to rely on intents
-        /*if (pet != null) { mann idk
-            mainViewModel.setPet(pet);
-            mainViewModel.setUserId(userId);
-        }
-        else {
-            mainViewModel.getPet().observe(this, p -> {
-                if (p != null) {
-                    pet = p;
-                    updateBars();
-                }
-            });
-
-            mainViewModel.getUserId().observe(this, id -> userId = id);
-        }*/
 
         ageId = pet.getAge().getAgeID();
 
@@ -120,6 +105,7 @@ public class PetHomeActivity extends AppCompatActivity {
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
+        Button btnPlay = findViewById(R.id.btnPlay);
         ImageButton btnJournal = findViewById(R.id.btnJournal);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
 
@@ -156,11 +142,13 @@ public class PetHomeActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<User> call, Throwable t) { fail(); }
+                public void onFailure(Call<User> call, Throwable t) {
+                    fail();
+                }
             });
         });
 
-        btnJournal.setOnClickListener( v -> {
+        btnJournal.setOnClickListener(v -> {
             Intent i = new Intent(PetHomeActivity.this, JournalActivity.class);
             i.putExtra("userId", userId);
             i.putExtra("pet", pet);
@@ -209,12 +197,12 @@ public class PetHomeActivity extends AppCompatActivity {
             }
 
             timesSleep += 1;
-            // TO-DO Make pet not sleep if energy is at max
             if (!isSleeping) {
                 btnFeed.setVisibility(View.GONE);
                 btnChat.setVisibility(View.GONE);
                 btnJournal.setVisibility(View.GONE);
                 btnSettings.setVisibility(View.GONE);
+                btnPlay.setVisibility(View.GONE);
                 btnSleep.setText("It's time to wake up!");
                 setPetImage("sleep");
                 isSleeping = true;
@@ -224,7 +212,7 @@ public class PetHomeActivity extends AppCompatActivity {
         });
 
         // Food logic
-        btnFeed.setOnClickListener( v -> {
+        btnFeed.setOnClickListener(v -> {
             if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
                 showToast("Pet is too full to eat!");
                 return;
@@ -233,6 +221,7 @@ public class PetHomeActivity extends AppCompatActivity {
             btnFeed.setVisibility(View.GONE);
             btnChat.setVisibility(View.GONE);
             btnSleep.setVisibility(View.GONE);
+            btnPlay.setVisibility(View.GONE);
             lowFood.setVisibility(View.VISIBLE);
             midFood.setVisibility(View.VISIBLE);
             highFood.setVisibility(View.VISIBLE);
@@ -252,7 +241,78 @@ public class PetHomeActivity extends AppCompatActivity {
             petFeed(food);
         });
 
+        // PLAY: +5 happiness, -5 hunger, -5 energy
+        btnPlay.setOnClickListener(v -> {
+            // avoid overlapping play animations
+            if (isPlayingAnimation) return;
+
+            playAnimation();
+
+            int curHappy = pet.getHappinessMeter();
+            int curHunger = pet.getHungerMeter();
+            int curEnergy = pet.getEnergyMeter();
+
+            int maxHappy = pet.getHappiness().getMeterMax();
+            int maxHunger = pet.getHunger().getMeterMax();
+            int maxEnergy = pet.getEnergy().getMeterMax();
+
+            int newHappy = Math.min(curHappy + 5, maxHappy);
+            int newHunger = Math.max(curHunger - 5, 0);
+            int newEnergy = Math.max(curEnergy - 5, 0);
+
+            updatePetRequest upr = new updatePetRequest(newHunger, newHappy, newEnergy);
+
+            Call<Pet> updatePet = interfaceAPI.updatePet(pet.getPetID(), upr);
+            updatePet.enqueue(new Callback<Pet>() {
+                @Override
+                public void onResponse(Call<Pet> call, Response<Pet> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        pet = response.body();
+                        updateBars();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Pet> call, Throwable t) {
+                    fail();
+                }
+            });
+        });
+
         runClock();
+    }
+
+    // ---- PLAY ANIMATION: protect from other updates while running ----
+    private void playAnimation() {
+        ImageView ivPetOval = findViewById(R.id.ivPetOval);
+
+        int[] frames = {
+                R.drawable.play_placeholder1,
+                R.drawable.play_placeholder2,
+                R.drawable.play_placeholder3
+        };
+
+        int delay = 1000; // 1 second between frames
+
+        isPlayingAnimation = true;
+
+        Handler animationHandler = new Handler();
+
+        // Run each animation frame
+        for (int i = 0; i < frames.length; i++) {
+            int frameIndex = i;
+            animationHandler.postDelayed(() -> {
+                ivPetOval.setImageResource(frames[frameIndex]);
+            }, frameIndex * delay);
+        }
+
+        // After the last frame, end animation and restore default pet image
+        animationHandler.postDelayed(() -> {
+            isPlayingAnimation = false;
+            if (!isSleeping) {
+                setPetImage("default");
+            }
+        }, frames.length * delay);
     }
 
     private void runClock() {
@@ -324,6 +384,7 @@ public class PetHomeActivity extends AppCompatActivity {
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
+        Button btnPlay = findViewById(R.id.btnPlay);
         ImageButton btnJournal = findViewById(R.id.btnJournal);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
 
@@ -331,6 +392,7 @@ public class PetHomeActivity extends AppCompatActivity {
         btnChat.setVisibility(View.VISIBLE);
         btnJournal.setVisibility(View.VISIBLE);
         btnSettings.setVisibility(View.VISIBLE);
+        btnPlay.setVisibility(View.VISIBLE);
         btnSleep.setText("Sleepy time!");
         setPetImage("default");
         isSleeping = false;
@@ -338,6 +400,11 @@ public class PetHomeActivity extends AppCompatActivity {
 
     // Action: happy, sleep, or default
     public void setPetImage(String action) {
+        // 🔒 Do not override frames while a play animation is running
+        if (isPlayingAnimation) {
+            return;
+        }
+
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
 
         // Dictionary to make grabbing the image easier
@@ -375,6 +442,7 @@ public class PetHomeActivity extends AppCompatActivity {
         if (ageId != newAgeId) {
             isSleeping = false;
             ageId = newAgeId;
+            // You removed happyReaction usage except here; kept as-is.
             happyReaction();
             Toast.makeText(PetHomeActivity.this, "Your pet grew!", Toast.LENGTH_SHORT).show();
         }
@@ -382,10 +450,9 @@ public class PetHomeActivity extends AppCompatActivity {
 
     public void happyReaction() {
         setPetImage("happy");
-        new Handler().postDelayed(() -> {
-            setPetImage("default");
-        }, 500);
+        new Handler().postDelayed(() -> setPetImage("default"), 500);
     }
+
     public void petSleep() {
         if (isSleeping && pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) return;
 
@@ -396,7 +463,6 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
-                    // mainViewModel.setPet(pet);
                     updateEnergyBar();
 
                     if (pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) {
@@ -406,13 +472,13 @@ public class PetHomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
+            public void onFailure(Call<Pet> call, Throwable t) {
+                fail();
+            }
         });
     }
 
     public void petFeed(String food) {
-        // This is admittedly bad coding practice
-        // Might make more robust in a later version
         Map<String, Integer> foodToId = Map.of(
                 "bark", 1,
                 "berries", 2,
@@ -426,6 +492,7 @@ public class PetHomeActivity extends AppCompatActivity {
         Button btnSleep = findViewById(R.id.btnSleep);
         Button btnFeed = findViewById(R.id.btnFeed);
         Button btnChat = findViewById(R.id.btnChat);
+        Button btnPlay = findViewById(R.id.btnPlay);
 
         Call<Pet> petFeed = interfaceAPI.feedPet(pet.getPetID(), foodToId.get(food));
 
@@ -434,12 +501,12 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
-                    // mainViewModel.setPet(pet);
                     setPetImage("default");
                     updateHungerBar();
                     btnFeed.setVisibility(View.VISIBLE);
                     btnChat.setVisibility(View.VISIBLE);
                     btnSleep.setVisibility(View.VISIBLE);
+                    btnPlay.setVisibility(View.VISIBLE);
                     lowFood.setVisibility(View.GONE);
                     midFood.setVisibility(View.GONE);
                     highFood.setVisibility(View.GONE);
@@ -448,7 +515,9 @@ public class PetHomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
+            public void onFailure(Call<Pet> call, Throwable t) {
+                fail();
+            }
         });
     }
 
@@ -475,16 +544,6 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     private void updateHappinessBar() {
-
-//        View barHappiness = findViewById(R.id.barHappiness);
-//        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
-//        double barPercent = ((double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax();
-//        int updatedWidth = (int) (barMax * barPercent);
-//
-//        ViewGroup.LayoutParams params = barHappiness.getLayoutParams();
-//        params.width = updatedWidth;
-//        barHappiness.setLayoutParams(params);
-
         View barHappiness = findViewById(R.id.barHappiness);
         if (barHappiness == null || pet == null || pet.getAge() == null) {
             return;
@@ -496,7 +555,6 @@ public class PetHomeActivity extends AppCompatActivity {
     }
 
     public int getUpdatedWidth(int value, int max, int width) {
-
         double percent = ((double) value) / max;
         return (int) (width * percent);
     }
@@ -514,14 +572,15 @@ public class PetHomeActivity extends AppCompatActivity {
             public void onResponse(Call<Pet> call, Response<Pet> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     pet = response.body();
-                    // mainViewModel.setPet(pet);
                     setPetImage("default");
                     updateBars();
                 }
             }
 
             @Override
-            public void onFailure(Call<Pet> call, Throwable t) { fail(); }
+            public void onFailure(Call<Pet> call, Throwable t) {
+                fail();
+            }
         });
     }
 

@@ -130,71 +130,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <ImageView
         android:id="@+id/ivPetOval"
         android:layout_width="260dp"
         android:layout_height="360dp"
         android:background="@drawable/bg_oval_light"
         android:scaleType="centerInside"
-        android:layout_marginBottom="-60dp"
+        android:layout_marginBottom="-30dp"
         app:layout_constraintBottom_toTopOf="@id/ground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 
     <ImageView
         android:id="@+id/ivPetOval2"
         android:layout_width="260dp"
         android:layout_height="360dp"
-        android:layout_marginBottom="-60dp"
+        android:layout_marginBottom="-30dp"
         android:background="@drawable/bg_oval_light"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@id/ground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- BUTTONS: compact, vertically packed chain -->
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnFeed"
-        android:layout_width="220dp"
-        android:layout_height="44dp"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
         android:text="Feed"
         android:textColor="#000000"
         app:backgroundTint="#E69758"
         app:cornerRadius="6dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toTopOf="@id/ground"
         app:layout_constraintBottom_toTopOf="@id/btnSleep"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        app:layout_constraintVertical_chainStyle="spread" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSleep"
-        android:layout_width="220dp"
-        android:layout_height="44dp"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
         android:text="Sleepy time!"
         android:textColor="#000000"
         app:backgroundTint="#E69758"
         app:cornerRadius="6dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/btnFeed"
+        app:layout_constraintBottom_toTopOf="@id/btnPlay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPlay"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:text="Play"
+        android:textColor="#000000"
+        app:backgroundTint="#E69758"
+        app:cornerRadius="6dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/btnSleep"
         app:layout_constraintBottom_toTopOf="@id/btnChat"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnChat"
-        android:layout_width="220dp"
-        android:layout_height="44dp"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
         android:text="I want to chat!"
         android:textColor="#000000"
         app:backgroundTint="#E69758"
         app:cornerRadius="6dp"
-        app:layout_constraintTop_toBottomOf="@id/btnSleep"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/btnPlay"
         app:layout_constraintBottom_toBottomOf="@id/ground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="20dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Food options (unchanged) -->
 
     <ImageView
         android:id="@+id/lowFood"
@@ -241,6 +259,5 @@
         app:layout_constraintStart_toEndOf="@id/midFood"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_bias="0.5" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
