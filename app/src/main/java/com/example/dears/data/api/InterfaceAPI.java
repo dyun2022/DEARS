@@ -92,6 +92,6 @@ public interface InterfaceAPI {
     Call<Object> createEntry(@Path("date") String localDate, @Body createEntryRequest createEntryRequest);
 
 
-    @PATCH("pet/{id}/feed")
+    @PATCH("pet/{id}/chat")
     Call<Pet> chatPet(@Path("id") int petId);
 }

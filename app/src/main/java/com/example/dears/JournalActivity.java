@@ -44,9 +44,11 @@ public class JournalActivity extends AppCompatActivity {
 
     JournalLogic jl;
     LLMInference llm;
-
     InterfaceAPI interfaceAPI;
     private boolean isCreatingEntry = false;
+    Call<Journal[]> jReq;
+    LinearLayout entries;
+    boolean needCreateJournal = true;
 
     // In order to make demo easier
     final LocalDate defaultDate = LocalDate.of(2025, 11, 5);
@@ -59,9 +61,9 @@ public class JournalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_journal);
         interfaceAPI = APIClient.getClient().create(InterfaceAPI.class);
 
-        if (llm == null) {
-            llm = new LLMInference(this);
-        }
+        Log.e("JournalActivity", "About to create LLMInference");
+        llm = new LLMInference(this);
+        Log.e("JournalActivity", "LLMInference created successfully");
 
         Intent intent = getIntent();
         pet = (Pet) intent.getSerializableExtra("pet");
@@ -79,18 +81,16 @@ public class JournalActivity extends AppCompatActivity {
         jl = new JournalLogic(pet, userId, timesChatted, timesFed, timesSleep, day);
         setPetImage();
 
+        // back button
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> onBackPressed());
 
-        LinearLayout entries = findViewById(R.id.entriesContainer);
-
-        Call<Journal[]> jReq = interfaceAPI.getAllJournals();
-
+        entries = findViewById(R.id.entriesContainer);
+        jReq = interfaceAPI.getAllJournals();
         jReq.enqueue(new Callback<Journal[]>() {
             @Override
             public void onResponse(Call<Journal[]> call, Response<Journal[]> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    boolean needCreateJournal = true;
                     Journal[] journals = response.body();
 
                     Log.d("JOURNALLOG", Integer.toString(journals.length));
@@ -109,95 +109,104 @@ public class JournalActivity extends AppCompatActivity {
                             }
                         }
                     }
-
-                    if (needCreateJournal) {
-                        Call<Journal> cjReq = interfaceAPI.getJournalByPetID(pet.getPetID());
-
-                        cjReq.enqueue(new Callback<Journal>() {
-                            @Override
-                            public void onResponse(Call<Journal> call, Response<Journal> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    createEntryObj(response.body().getJournalId());
-                                } else {
-                                    fail();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Journal> call, Throwable t) {
-                                fail();
-                            }
-                        });
-                    }
                 } else { fail(); }
             }
 
             @Override
             public void onFailure(Call<Journal[]> call, Throwable t) { fail(); }
         });
+
+        // generate new entry button
+        final Button newEntryBtn = findViewById(R.id.generateEntryBtn);
+        newEntryBtn.setOnClickListener(v -> {
+
+            genNewEntry();
+        });
+    }
+
+    public void genNewEntry() {
+        if (needCreateJournal) {
+            Call<Journal> cjReq = interfaceAPI.getJournalByPetID(pet.getPetID());
+
+            cjReq.enqueue(new Callback<Journal>() {
+                @Override
+                public void onResponse(Call<Journal> call, Response<Journal> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        createEntryObj(response.body().getJournalId());
+                    } else {
+                        fail();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Journal> call, Throwable t) {
+                    fail();
+                }
+            });
+        }
     }
 
     public String createEntryObj(int journalId) {
-        Log.d("JOURNALLOG", "triggered");
+        Log.d("JOURNALLOG", "createEntryObj triggered");
 
         // put the llm call on a thread so it doesn't hog all of the resources
         new Thread(() -> {
             try {
                 llm.generateJournalEntry(
-                    pet.getAge().getAgeStage(),
-                    pet.getType(),
-                    ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
-                    ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
-                    ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
-                    new LLMInference.LLMCallback() {
-                    @Override
-                    public void onComplete(String llmResult) {
-                        // System.out.println(llmResult);
-                        runOnUiThread(() -> {
-                            try {
-                                Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
-                                String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
-                                Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
-                                JSONObject json = new JSONObject(processedResult);
-                                String summary = json.getString("summary");
-                                int mood = json.getInt("mood");
-                                String response = jl.writeEntry(day, summary, timesChatted, timesFed, timesSleep);
+                        pet.getAge().getAgeStage(),
+                        pet.getType(),
+                        ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
+                        ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
+                        ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
+                        new LLMInference.LLMCallback() {
+                            @Override
+                            public void onComplete(String llmResult) {
+                                // System.out.println(llmResult);
+                                runOnUiThread(() -> {
+                                    try {
+                                        Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
+                                        String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
+                                        Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
+                                        JSONObject json = new JSONObject(processedResult);
+                                        String summary = json.getString("summary");
+                                        int mood = json.getInt("mood");
+                                        String response = jl.writeEntry(day, summary, timesChatted, timesFed, timesSleep);
 
-                                Log.d("JOURNALLOG", response);
-                                LinearLayout entries = findViewById(R.id.entriesContainer);
-                                entries.addView(createEntryView(response));
+                                        Log.d("JOURNALLOG", response);
+                                        LinearLayout entries = findViewById(R.id.entriesContainer);
+                                        entries.addView(createEntryView(response));
 
-                                createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
-                                Call<Object> creRes = interfaceAPI.createEntry(day, creReq);
-                                creRes.enqueue(new Callback<Object>() {
-                                    @Override
-                                    public void onResponse(Call<Object> call, Response<Object> response) {
-                                        if (response.isSuccessful() && response.body() != null) {
-                                        } else {
-                                            fail();
-                                        }
-                                    }
+                                        createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
+                                        Call<Object> creRes = interfaceAPI.createEntry(day, creReq);
+                                        creRes.enqueue(new Callback<Object>() {
+                                            @Override
+                                            public void onResponse(Call<Object> call, Response<Object> response) {
+                                                if (response.isSuccessful() && response.body() != null) {
+                                                } else {
+                                                    fail();
+                                                }
+                                            }
 
-                                    @Override
-                                    public void onFailure(Call<Object> call, Throwable t) {
-                                        fail();
+                                            @Override
+                                            public void onFailure(Call<Object> call, Throwable t) {
+                                                fail();
+                                            }
+                                        });
+                                    } catch (Exception e) {
+                                        Log.d("JOURNALLOG", "exception");
+                                        e.printStackTrace();
+                                        Toast.makeText(getApplicationContext(),"Error parsing LLM output", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                            } catch (Exception e) {
-                                Log.d("JOURNALLOG", "exception");
-                                e.printStackTrace();
-                                Toast.makeText(getApplicationContext(),"Error parsing LLM output", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                runOnUiThread(() ->
+                                        Toast.makeText(getApplicationContext(),"Error generating response", Toast.LENGTH_SHORT).show()
+                                );
                             }
                         });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        runOnUiThread(() ->
-                                Toast.makeText(getApplicationContext(),"Error generating response", Toast.LENGTH_SHORT).show()
-                        );
-                    }
-                });
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -225,11 +234,7 @@ public class JournalActivity extends AppCompatActivity {
         String key = jl.getPetImageKey();
 
         Integer img = petImages.get(key);
-        if (img != null) {
-            petImage.setImageResource(img);
-        } else {
-            petImage.setImageResource(R.drawable.mushroom);
-        }
+        if (img != null) petImage.setImageResource(img);
     }
 
     public TextView createEntryView (String entry) {

@@ -22,21 +22,45 @@ import java.net.URL;
 import java.util.Date;
 
 public class LLMInference {
-    private String modelPath = "/data/local/tmp/llm/gemma3-1b-it-int4.task";
+    private String modelPath;
     private Context context;
     private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String TAG = "LLMInference";
 
     public LLMInference(Context context) {
+        Log.e(TAG, "========== CONSTRUCTOR STARTING ==========");
+
+        if (context == null) {
+            Log.e(TAG, "ERROR: Context is null!");
+            throw new IllegalArgumentException("Context cannot be null");
+        }
+
+        Log.e(TAG, "Context is valid");
         this.context = context;
+
+        Log.e(TAG, "About to call ensureModelCopied()");
         ensureModelCopied();
+        Log.e(TAG, "ensureModelCopied() completed");
+
         this.modelPath = new File(context.getFilesDir(), "llm/gemma3-1b-it-int4.task").getAbsolutePath();
+        Log.e(TAG, "Final modelPath = " + modelPath);
+
+        File modelFile = new File(modelPath);
+        Log.e(TAG, "Model exists? " + modelFile.exists());
+        Log.e(TAG, "Model size: " + modelFile.length() + " bytes");
+        Log.e(TAG, "Model can read? " + modelFile.canRead());
+
+        if (!modelFile.exists()) {
+            Log.e(TAG, "CRITICAL: MODEL FILE DOES NOT EXIST!");
+        } else if (modelFile.length() == 0) {
+            Log.e(TAG, "CRITICAL: MODEL FILE IS EMPTY!");
+        } else {
+            Log.e(TAG, "Model file looks OK");
+        }
+
+        Log.e(TAG, "========== CONSTRUCTOR FINISHED ==========");
     }
 
-    public LLMInference() {
-        this.context = null;
-        ensureModelCopied();
-        this.modelPath = new File(context.getFilesDir(), "llm/gemma3-1b-it-int4.task").getAbsolutePath();
-    }
 
     public void callLLM(String prompt, LLMCallback callback) {
         new Thread(() -> {
@@ -58,6 +82,7 @@ public class LLMInference {
                 }
 
             } catch (Exception e) {
+                Log.e("LLMInference", "callLLM failed: " + e.getMessage(), e);
                 callback.onError(e);
             }
         }).start();
@@ -90,7 +115,7 @@ public class LLMInference {
                 "Generate a response to the input, " + input +  " in the voice of a " + age + " " + type +
                 " with happiness level: " + happiness + ", hunger satisfaction level: " + hunger + ", and amount of sleep gotten " + sleep +
                 ". If hunger, sleep, or happiness levels are low, make it sound angrier. If happiness is high, make it sound cheerful."
-        + " You are to output ONLY valid JSON (no explanations, no markdown)." +
+                + " You are to output ONLY valid JSON (no explanations, no markdown)." +
                 "\nUse the following fields exactly:\n" +
                 "{\n" +
                 "  \"response\": \"<string>\"\n" +
@@ -157,20 +182,82 @@ public class LLMInference {
     }
 
     private void ensureModelCopied() {
+        Log.e(TAG, "--- ensureModelCopied START ---");
+
+        if (context == null) {
+            Log.e(TAG, "Context is null in ensureModelCopied");
+            return;
+        }
+
         File llmDir = new File(context.getFilesDir(), "llm");
-        if (!llmDir.exists()) llmDir.mkdirs();
+        Log.e(TAG, "llmDir path = " + llmDir.getAbsolutePath());
+        Log.e(TAG, "llmDir exists? " + llmDir.exists());
+
+        if (!llmDir.exists()) {
+            boolean created = llmDir.mkdirs();
+            Log.e(TAG, "Created llmDir: " + created);
+        }
 
         File modelFile = new File(llmDir, "gemma3-1b-it-int4.task");
-        if (modelFile.exists()) return;
+        Log.e(TAG, "modelFile path = " + modelFile.getAbsolutePath());
+        Log.e(TAG, "modelFile exists before copy? " + modelFile.exists());
 
-        try (InputStream in = context.getAssets().open("llm/gemma3-1b-it-int4.task");
-             OutputStream out = new FileOutputStream(modelFile)) {
+        if (modelFile.exists()) {
+            Log.e(TAG, "Model already exists! Size: " + modelFile.length());
+            Log.e(TAG, "--- ensureModelCopied END (skipped copy) ---");
+            return;
+        }
+
+        Log.e(TAG, "Model doesn't exist, starting copy from assets...");
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            Log.e(TAG, "Opening asset: llm/gemma3-1b-it-int4.task");
+            in = context.getAssets().open("llm/gemma3-1b-it-int4.task");
+            Log.e(TAG, "Asset opened successfully");
+
+            Log.e(TAG, "Creating FileOutputStream");
+            out = new FileOutputStream(modelFile);
+            Log.e(TAG, "FileOutputStream created");
+
             byte[] buf = new byte[8192];
             int len;
-            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
-            Log.d("LLMInference", "Model copied to " + modelFile.getAbsolutePath());
+            long totalBytes = 0;
+            int chunks = 0;
+
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+                totalBytes += len;
+                chunks++;
+
+                // Log progress every 10MB
+                if (chunks % 1280 == 0) {
+                    Log.e(TAG, "Copied " + (totalBytes / 1024 / 1024) + " MB so far...");
+                }
+            }
+
+            Log.e(TAG, "Copy complete! Total bytes: " + totalBytes);
+            Log.e(TAG, "Total MB: " + (totalBytes / 1024 / 1024));
+            Log.e(TAG, "Final file size: " + modelFile.length());
+
         } catch (IOException e) {
-            Log.e("LLMInference", "Failed to copy model", e);
+            Log.e(TAG, "EXCEPTION during copy: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                    Log.e(TAG, "InputStream closed");
+                }
+                if (out != null) {
+                    out.close();
+                    Log.e(TAG, "OutputStream closed");
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Exception closing streams", e);
+            }
         }
+
+        Log.e(TAG, "--- ensureModelCopied END ---");
     }
 }
