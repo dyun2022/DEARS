@@ -130,6 +130,10 @@ public class PetHomeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     if (response.isSuccessful() && response.body() != null) {
+                        User user = response.body();
+                        ImageButton btnSettings = findViewById(R.id.btnSettings);
+                        setAvatarImage(btnSettings, user.getAvatar());
+
                         Intent i = new Intent(PetHomeActivity.this, SettingsActivity.class);
                         i.putExtra("userId", userId);
                         i.putExtra("pet", pet);
@@ -586,7 +590,33 @@ public class PetHomeActivity extends AppCompatActivity {
         updateEnergyBar();
         updateHappinessBar();
         updateHungerBar();
+        updateExpBar();
     }
 
+    public void updateExpBar() {
+        TextView expTextView = findViewById(R.id.tvExp);
+        expTextView.setText("exp: " + pet.getGrowthPoints() + " / " + pet.getAge());
+
+        View barExp = findViewById(R.id.barExp);
+        int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
+
+        ViewGroup.LayoutParams params = barExp.getLayoutParams();
+        params.width = getUpdatedWidth(pet.getGrowthPoints(), pet.getAge().getMeterMax(), barMax);
+        barExp.setLayoutParams(params);
+    }
+
+    private void setAvatarImage(ImageButton button, String avatarName) {
+        if (avatarName == null) return;
+
+        // looks for drawable with the SAME NAME as the avatar
+        int imageResId = getResources().getIdentifier(avatarName.toLowerCase(), "drawable", getPackageName());
+
+        if (imageResId != 0) {
+            button.setImageResource(imageResId);
+        } else {
+            // fallback image if name doesn't match drawable
+            button.setImageResource(R.drawable.mushroom);
+        }
+    }
 
 }

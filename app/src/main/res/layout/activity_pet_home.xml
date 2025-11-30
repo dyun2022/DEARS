@@ -9,6 +9,33 @@
     android:background="#E8F3FF">
 
     <TextView
+        android:id="@+id/tvExp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="growth points"
+        android:textColor="#6B3A2E"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/barExpGray"
+        android:layout_width="120dp"
+        android:layout_height="10dp"
+        android:background="#DDDDDD"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/tvExp"
+        app:layout_constraintTop_toBottomOf="@id/tvExp">
+
+        <View
+            android:id="@+id/barExp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#7BA6FF" />
+    </FrameLayout>
+
+    <TextView
         android:id="@+id/tvEnergy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +44,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/barExpGray" />
 
     <FrameLayout
         android:id="@+id/barEnergyGray"
@@ -93,7 +120,7 @@
         android:layout_height="36dp"
         android:background="@drawable/bg_square_light"
         android:contentDescription="settings"
-        app:srcCompat="@drawable/ic_gear"
+        android:scaleType="centerCrop"
         app:tint="#000000"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
