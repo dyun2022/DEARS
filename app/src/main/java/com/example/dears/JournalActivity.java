@@ -166,6 +166,7 @@ public class JournalActivity extends AppCompatActivity {
                                     try {
                                         Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
                                         String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
+                                        processedResult = processedResult.replace("“", "\"").replace("”", "\"");
                                         Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
                                         JSONObject json = new JSONObject(processedResult);
                                         String summary = json.getString("summary");
