@@ -195,7 +195,7 @@ public class PetHomeActivity extends AppCompatActivity {
         // Sleep logic
         btnSleep.setOnClickListener(v -> {
             if (pet.getEnergyMeter() >= pet.getEnergy().getMeterMax()) {
-                showToast("Pet is too energized to sleep!");
+                showToast(pet.getName() + " is too energized to sleep!");
                 return;
             }
 
@@ -217,7 +217,7 @@ public class PetHomeActivity extends AppCompatActivity {
         // Food logic
         btnFeed.setOnClickListener(v -> {
             if (pet.getHungerMeter() >= pet.getHunger().getMeterMax()) {
-                showToast("Pet is too full to eat!");
+                showToast(pet.getName() + " is too full to eat!");
                 return;
             }
             timesFed += 1;
@@ -246,6 +246,18 @@ public class PetHomeActivity extends AppCompatActivity {
 
         btnPlay.setOnClickListener(v -> {
             if (isPlayingAnimation) return;
+            if (pet.getEnergyMeter() < 5) {
+                showToast(pet.getName() + " is too tired to play.");
+                return;
+            }
+            if (pet.getHungerMeter() < 5) {
+                showToast(pet.getName() + " is too hungry to play.");
+                return;
+            }
+            if (pet.getHappinessMeter() >= pet.getHappiness().getMeterMax()) {
+                showToast(pet.getName() + " is happy and has no need for play!");
+                return;
+            }
 
             playAnimation();
 
@@ -284,12 +296,9 @@ public class PetHomeActivity extends AppCompatActivity {
     }
     private void playAnimation() {
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
-
-        int[] frames = {
-                R.drawable.play_placeholder1,
-                R.drawable.play_placeholder2,
-                R.drawable.play_placeholder3
-        };
+        int[] frames = pet.getType().equals("Deer")
+                ? new int[]{ R.drawable.play_placeholder1 }
+                : new int[]{ R.drawable.play_placeholder2 };
 
         int delay = 1000; // 1 second between frames
 
