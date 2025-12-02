@@ -296,6 +296,7 @@ public class PetHomeActivity extends AppCompatActivity {
     }
     private void playAnimation() {
         ImageView ivPetOval = findViewById(R.id.ivPetOval);
+
         int[] frames = pet.getType().equals("Deer")
                 ? new int[]{ R.drawable.play_placeholder1 }
                 : new int[]{ R.drawable.play_placeholder2 };
@@ -308,7 +309,8 @@ public class PetHomeActivity extends AppCompatActivity {
         for (int i = 0; i < frames.length; i++) {
             int frameIndex = i;
             animationHandler.postDelayed(() -> {
-                ivPetOval.setImageResource(frames[frameIndex]);
+                // ivPetOval.setImageResource(frames[frameIndex]);
+                setPetImage("play");
             }, frameIndex * delay);
         }
 
@@ -405,7 +407,7 @@ public class PetHomeActivity extends AppCompatActivity {
 
     // Action: happy, sleep, or default
     public void setPetImage(String action) {
-        if (isPlayingAnimation) {
+        if (isPlayingAnimation && !action.equals("play")) {
             return;
         }
 
@@ -416,21 +418,27 @@ public class PetHomeActivity extends AppCompatActivity {
                 Map.entry("adult_bear_default", R.drawable.adult_bear_default),
                 Map.entry("adult_bear_happy", R.drawable.adult_bear_happy),
                 Map.entry("adult_bear_sleep", R.drawable.adult_bear_sleep),
+                Map.entry("adult_bear_play", R.drawable.adult_bear_play),
                 Map.entry("teen_bear_default", R.drawable.teen_bear_default),
                 Map.entry("teen_bear_happy", R.drawable.teen_bear_happy),
                 Map.entry("teen_bear_sleep", R.drawable.teen_bear_sleep),
+                Map.entry("teen_bear_play", R.drawable.teen_bear_play),
                 Map.entry("baby_bear_default", R.drawable.baby_bear_default),
                 Map.entry("baby_bear_happy", R.drawable.baby_bear_happy),
                 Map.entry("baby_bear_sleep", R.drawable.baby_bear_sleep),
+                Map.entry("baby_bear_play", R.drawable.baby_bear_play),
                 Map.entry("adult_deer_default", R.drawable.adult_deer_default),
                 Map.entry("adult_deer_happy", R.drawable.adult_deer_happy),
                 Map.entry("adult_deer_sleep", R.drawable.adult_deer_sleep),
+                Map.entry("adult_deer_play", R.drawable.adult_deer_play),
                 Map.entry("teen_deer_default", R.drawable.teen_deer_default),
                 Map.entry("teen_deer_happy", R.drawable.teen_deer_happy),
                 Map.entry("teen_deer_sleep", R.drawable.teen_deer_sleep),
+                Map.entry("teen_deer_play", R.drawable.teen_deer_play),
                 Map.entry("baby_deer_default", R.drawable.baby_deer_default),
                 Map.entry("baby_deer_happy", R.drawable.baby_deer_happy),
-                Map.entry("baby_deer_sleep", R.drawable.baby_deer_sleep)
+                Map.entry("baby_deer_sleep", R.drawable.baby_deer_sleep),
+                Map.entry("baby_deer_play", R.drawable.baby_deer_play)
         );
 
         String key = "";
