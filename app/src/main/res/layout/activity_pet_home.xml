@@ -32,7 +32,8 @@
             android:id="@+id/barExp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#DDDDDD" />
+            android:background="#DDDDDD"
+            android:layout_gravity="right"/>
     </FrameLayout>
 
     <TextView
