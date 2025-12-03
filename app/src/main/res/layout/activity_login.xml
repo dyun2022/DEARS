@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="72dp" />
+        android:layout_marginTop="300dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilUsername"

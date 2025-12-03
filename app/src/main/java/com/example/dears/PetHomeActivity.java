@@ -612,7 +612,7 @@ public class PetHomeActivity extends AppCompatActivity {
 
     public void updateExpBar() {
         TextView expTextView = findViewById(R.id.tvExp);
-        expTextView.setText("exp: " + pet.getGrowthPoints() + " / " + pet.getAge());
+        expTextView.setText("exp: " + pet.getGrowthPoints() + " / " + pet.getAge().getMeterMax());
 
         View barExp = findViewById(R.id.barExp);
         int barMax = (int) (barWidth * getResources().getDisplayMetrics().density);
