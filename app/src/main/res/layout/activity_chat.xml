@@ -64,7 +64,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/backButton"
-        app:layout_constraintVertical_bias="0.15"
+        app:layout_constraintVertical_bias="0.11"
         app:srcCompat="@drawable/honey"
         />
 
