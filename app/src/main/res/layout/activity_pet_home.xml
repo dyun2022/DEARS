@@ -128,7 +128,6 @@
         android:background="@drawable/bg_square_light"
         android:contentDescription="settings"
         android:scaleType="centerCrop"
-        app:tint="#000000"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"

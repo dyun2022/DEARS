@@ -94,6 +94,24 @@ public class PetHomeActivity extends AppCompatActivity {
         pet = (Pet) intent.getSerializableExtra("pet");
         user = (User) intent.getSerializableExtra("user");
         userId = intent.getIntExtra("userId", -1);
+
+        Call<User> getAUser = interfaceAPI.getUserById(userId);
+        getAUser.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    user = response.body();
+                    ImageButton btnSettings = findViewById(R.id.btnSettings);
+                    setAvatarImage(btnSettings, user.getAvatar());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                fail();
+            }
+        });
+
         if (intent.getBooleanExtra("updateHappiness", false)) {
             updateHappinessBar();
         }
@@ -108,7 +126,9 @@ public class PetHomeActivity extends AppCompatActivity {
         ImageButton btnJournal = findViewById(R.id.btnJournal);
         ImageButton btnSettings = findViewById(R.id.btnSettings);
 
-
+        if (user != null) {
+            setAvatarImage(btnSettings, user.getAvatar());
+        }
 
         ImageView lowFood = findViewById(R.id.lowFood);
         ImageView midFood = findViewById(R.id.midFood);
@@ -635,5 +655,4 @@ public class PetHomeActivity extends AppCompatActivity {
             button.setImageResource(R.drawable.mushroom);
         }
     }
-
 }
