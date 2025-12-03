@@ -50,7 +50,7 @@
         android:id="@+id/barEnergyGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#DDDDDD"
+       android:background="@drawable/temperature_gradient"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvEnergy"
         app:layout_constraintTop_toBottomOf="@id/tvEnergy">
@@ -59,7 +59,9 @@
             android:id="@+id/barEnergy"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#9AD24D" />
+            android:background="#DDDDDD"
+            android:layout_gravity="right"
+             />
     </FrameLayout>
 
     <TextView
@@ -76,7 +78,7 @@
         android:id="@+id/barHungerGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#DDDDDD"
+       android:background="@drawable/temperature_gradient"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvHunger"
         app:layout_constraintTop_toBottomOf="@id/tvHunger">
@@ -85,7 +87,9 @@
             android:id="@+id/barHunger"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#E48F47" />
+            android:background="#DDDDDD"
+            android:layout_gravity="right"
+             />
     </FrameLayout>
 
     <TextView
@@ -102,7 +106,7 @@
         android:id="@+id/barHappinessGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#DDDDDD"
+        android:background="@drawable/temperature_gradient"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvHappiness"
         app:layout_constraintTop_toBottomOf="@id/tvHappiness">
@@ -111,7 +115,9 @@
             android:id="@+id/barHappiness"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#F4F665" />
+            android:background="#DDDDDD"
+            android:layout_gravity="right"
+            />
     </FrameLayout>
 
     <ImageButton

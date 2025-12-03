@@ -48,7 +48,8 @@ public class PetUIHelper {
                 }
 
                 float fraction = Math.max(0f, Math.min(1f, (float) pet.getHappinessMeter() / (float) meterMax));
-                int newWidth = (int) (totalWidth * fraction);
+                float emptyFraction = 1f - fraction;
+                int newWidth = (int) (totalWidth * emptyFraction);
 
                 ViewGroup.LayoutParams params = fillBar.getLayoutParams();
                 if (params != null) {

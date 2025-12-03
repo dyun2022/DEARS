@@ -178,7 +178,6 @@ public class PetHomeActivity extends AppCompatActivity {
 //        });
 
 
-
         updateBars();
 
         // Initialize foods.
@@ -567,7 +566,8 @@ public class PetHomeActivity extends AppCompatActivity {
 
     public int getUpdatedWidth(int value, int max, int width) {
         double percent = ((double) value) / max;
-        return (int) (width * percent);
+        double emptyPercent = 1.0 - percent;
+        return (int) (width * emptyPercent);
     }
 
     public void statusDecay() {
