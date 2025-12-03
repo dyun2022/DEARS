@@ -23,7 +23,7 @@
         android:id="@+id/barExpGray"
         android:layout_width="120dp"
         android:layout_height="10dp"
-        android:background="#DDDDDD"
+        android:background="@drawable/temperature_gradient"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/tvExp"
         app:layout_constraintTop_toBottomOf="@id/tvExp">
@@ -32,7 +32,7 @@
             android:id="@+id/barExp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#7BA6FF" />
+            android:background="#DDDDDD" />
     </FrameLayout>
 
     <TextView
