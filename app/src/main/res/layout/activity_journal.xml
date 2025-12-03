@@ -39,7 +39,7 @@
     <ScrollView
         android:id="@+id/scrollEntries"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="400dp"
         app:layout_constraintTop_toBottomOf="@id/petImage"
         app:layout_constraintBottom_toTopOf="@id/generateEntryBtn"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,7 @@
         android:layout_height="50dp"
         android:layout_margin="60dp"
         android:backgroundTint="#6B3A2E"
-        android:text="Generate today's entry"
+        android:text="Write entry"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

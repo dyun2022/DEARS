@@ -11,7 +11,7 @@ public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pet_id")
-    private int petId;
+    public int petId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -71,6 +71,9 @@ public class Pet {
 
     // Getters and Setters
     public int getPetID() {
+        return petId;
+    }
+    public int getPetId() {
         return petId;
     }
     public void setPetID(int pet_id) {

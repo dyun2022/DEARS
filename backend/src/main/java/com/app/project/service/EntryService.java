@@ -1,14 +1,13 @@
 package com.app.project.service;
 
 import com.app.project.model.Entry;
-import com.app.project.model.Food;
 import com.app.project.model.Pet;
-import com.app.project.model.User;
+
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import com.app.project.service.PetService;
 
 @Service
 public interface EntryService {
@@ -16,4 +15,7 @@ public interface EntryService {
     Entry saveEntry(Entry entry);
     Entry createEntry(Map<String, String> entryData);
     Pet getPetById(int petId);
-}
+
+    List<Entry> getEntryByDate(LocalDate date);
+
+    Entry findByDateAndPet_pet_idAndJournal_journal_id(LocalDate date, int petId, int journalId);}

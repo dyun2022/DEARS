@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -49,6 +51,7 @@ public class JournalActivity extends AppCompatActivity {
     Call<Journal[]> jReq;
     LinearLayout entries;
     boolean needCreateJournal = true;
+    TextView todayEntry;
 
     // In order to make demo easier
     final LocalDate defaultDate = LocalDate.of(2025, 11, 5);
@@ -93,18 +96,25 @@ public class JournalActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Journal[] journals = response.body();
 
-                    Log.d("JOURNALLOG", Integer.toString(journals.length));
-
+                    // get journal entries that correspond to this pet
                     for (Journal j : response.body()) {
                         if (j.getPetId() == pet.getPetID()) {
-                            entries.addView(createEntryView(j.getSummary()));
-                            Log.d("JOURNALLOG", j.getDate().toString() + " vs " + day);
+                            TextView tv = createEntryView(j.getDate() + "\n" + j.getSummary());
+                            entries.addView(tv);
 
-                            if (j.getDate().equals(day)) needCreateJournal = false;
-
+                            // entry to be updated later potentially
                             String entryDate = String.valueOf(j.getDate());
+                            Log.d("JOURNAL", "entry date: " + entryDate);
+                            Log.d("JOURNAL", "day: " + day);
+                            if (entryDate.equals(day)) {
+                                todayEntry = tv;
+                                Log.d("JOURNAL", "Entry already exists for today 1");
+                                Log.d("JOURNAL", todayEntry.getText().toString());
+                                needCreateJournal = false;
+                            }
+
                             if (entryDate != null && entryDate.trim().equals(day.trim())) {
-                                Log.d("JOURNAL", "Entry already exists for today");
+                                Log.d("JOURNAL", "Entry already exists for today 2");
                                 needCreateJournal = false;
                             }
                         }
@@ -119,8 +129,8 @@ public class JournalActivity extends AppCompatActivity {
         // generate new entry button
         final Button newEntryBtn = findViewById(R.id.generateEntryBtn);
         newEntryBtn.setOnClickListener(v -> {
-
-            genNewEntry();
+            newEntryBtn.setText("Writing...");
+            createEntryObj(pet.getPetID());
         });
     }
 
@@ -146,68 +156,124 @@ public class JournalActivity extends AppCompatActivity {
         }
     }
 
-    public String createEntryObj(int journalId) {
+    public void createEntryObj(int journalId) {
         Log.d("JOURNALLOG", "createEntryObj triggered");
 
         // put the llm call on a thread so it doesn't hog all of the resources
         new Thread(() -> {
             try {
                 llm.generateJournalEntry(
-                        pet.getAge().getAgeStage(),
-                        pet.getType(),
-                        ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
-                        ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
-                        ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
-                        new LLMInference.LLMCallback() {
-                            @Override
-                            public void onComplete(String llmResult) {
-                                // System.out.println(llmResult);
-                                runOnUiThread(() -> {
-                                    try {
-                                        Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
-                                        String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
-                                        processedResult = processedResult.replace("“", "\"").replace("”", "\"");
-                                        Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
-                                        JSONObject json = new JSONObject(processedResult);
-                                        String summary = json.getString("summary");
-                                        int mood = json.getInt("mood");
-                                        String response = jl.writeEntry(day, summary, timesChatted, timesFed, timesSleep);
+                    pet.getAge().getAgeStage(),
+                    pet.getType(),
+                    ( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax(),
+                    ( (double) pet.getHungerMeter()) / pet.getHunger().getMeterMax(),
+                    ( (double) pet.getEnergyMeter()) / pet.getEnergy().getMeterMax(),
+                    new LLMInference.LLMCallback() {
+                        @Override
+                        public void onComplete(String llmResult) {
+                            // System.out.println(llmResult);
+                            runOnUiThread(() -> {
+                                try {
+                                    // parse through generated result
+                                    Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
+                                    String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
+                                    processedResult = processedResult.replace("“", "\"").replace("”", "\"").replace("-", " ");
+                                    Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
+                                    JSONObject json = new JSONObject(processedResult);
 
-                                        Log.d("JOURNALLOG", response);
-                                        LinearLayout entries = findViewById(R.id.entriesContainer);
-                                        entries.addView(createEntryView(response));
+                                    String summary = json.getString("summary");
+                                    int mood = json.getInt("mood");
+                                    String response = jl.writeEntry(day, summary, timesChatted, timesFed, timesSleep);
+                                    Log.d("JOURNALLOG", "line 187: "+ response);
+                                    LinearLayout entries = findViewById(R.id.entriesContainer);
 
-                                        createEntryRequest creReq = new createEntryRequest(Integer.toString(mood), response, Integer.toString(pet.getPetID()), Integer.toString(journalId));
-                                        Call<Object> creRes = interfaceAPI.createEntry(day, creReq);
-                                        creRes.enqueue(new Callback<Object>() {
-                                            @Override
-                                            public void onResponse(Call<Object> call, Response<Object> response) {
-                                                if (response.isSuccessful() && response.body() != null) {
-                                                } else {
-                                                    fail();
-                                                }
+                                    // check if entry exists
+                                    LocalDate today = LocalDate.parse(day, dateformatter);
+                                    Call<Object> checkCall = interfaceAPI.getEntryByDate(today, pet.getPetID(), journalId);
+                                    Log.d("JOURNAL", "line 192 " + checkCall.toString());
+
+                                    checkCall.enqueue(new Callback<Object>() {
+                                        @Override
+                                        public void onResponse(Call<Object> call, Response<Object> checkRes) {
+                                            Log.d("JOURNALLOG", "Checking if entry exists " + call + checkRes);
+
+                                            // if entry is already created, update existing entry
+                                            if (checkRes.code() == 200) {
+                                                Log.d("JOURNALLOG", "Entry exists → Updating");
+
+                                                Map<String, String> updateBody = new HashMap<>();
+                                                updateBody.put("pet_id", Integer.toString(pet.getPetID()));
+                                                updateBody.put("journal_id", Integer.toString(journalId));
+                                                updateBody.put("mood", Integer.toString(mood));
+                                                updateBody.put("summary", response);
+
+                                                Call<Pet> patchCall = interfaceAPI.updateEntry(day.toString(), updateBody);
+
+                                                patchCall.enqueue(new Callback<Pet>() {
+
+                                                    @Override
+                                                    public void onResponse(Call<Pet> call, Response<Pet> patchRes) {
+                                                        Log.d("JOURNALLOG", "Updated Existing Entry");
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<Pet> call, Throwable t) {
+                                                        fail();
+                                                    }
+                                                });
+                                                Log.d("JOURNALLOG", "response: " + response);
+                                                todayEntry.setText(response);
                                             }
 
-                                            @Override
-                                            public void onFailure(Call<Object> call, Throwable t) {
-                                                fail();
-                                            }
-                                        });
-                                    } catch (Exception e) {
-                                        Log.d("JOURNALLOG", "exception");
-                                        e.printStackTrace();
-                                        Toast.makeText(getApplicationContext(),"Error parsing LLM output", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
+                                            // entry doesn't exist yet, create new entry
+                                            else if (checkRes.code() == 404) {
+                                                Log.d("JOURNALLOG", "No entry found → Creating new entry");
 
-                            @Override
-                            public void onError(Exception e) {
-                                runOnUiThread(() ->
-                                        Toast.makeText(getApplicationContext(),"Error generating response", Toast.LENGTH_SHORT).show()
-                                );
-                            }
-                        });
+                                                createEntryRequest creReq = new createEntryRequest(
+                                                        Integer.toString(mood),
+                                                        response,
+                                                        Integer.toString(pet.getPetID()),
+                                                        Integer.toString(journalId)
+                                                );
+
+                                                Call<Object> creRes = interfaceAPI.createEntry(day, creReq);
+                                                creRes.enqueue(new Callback<Object>() {
+                                                    @Override
+                                                    public void onResponse(Call<Object> call, Response<Object> response) {
+                                                        if (!response.isSuccessful()) fail();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<Object> call, Throwable t) {
+                                                        fail();
+                                                    }
+                                                });
+                                                entries.addView(createEntryView(response));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Object> call, Throwable t) {
+                                            Log.d("JOURNALLOG", "Error checking entry");
+                                            fail();
+                                        }
+                                    });
+
+                                } catch (Exception e) {
+                                    Log.d("JOURNALLOG", "exception");
+                                    e.printStackTrace();
+                                    Toast.makeText(getApplicationContext(),"Error parsing LLM output", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            runOnUiThread(() ->
+                                    Toast.makeText(getApplicationContext(),"Error generating response", Toast.LENGTH_SHORT).show()
+                            );
+                        }
+                    });
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -216,10 +282,12 @@ public class JournalActivity extends AppCompatActivity {
                 );
             }
         }).start();
-        return "";
+
+        final Button newEntryBtn = findViewById(R.id.generateEntryBtn);
+        newEntryBtn.setText("Write Entry");
     }
 
-    public void setPetImage() {
+    void setPetImage() {
         ImageView petImage = findViewById(R.id.petImage);
 
         // Dictionary to make grabbing the image easier

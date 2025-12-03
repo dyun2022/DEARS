@@ -1,15 +1,10 @@
 package com.app.project.service.impl;
 
-import com.app.project.model.ChatChoices;
 import com.app.project.model.Entry;
 import com.app.project.model.Pet;
-import com.app.project.repository.ChatChoicesRepository;
 import com.app.project.repository.EntryRepository;
-import com.app.project.service.ChatChoicesService;
 import com.app.project.service.EntryService;
 import com.app.project.service.PetService;
-
-import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,5 +39,14 @@ public class EntryServiceImpl implements EntryService {
         return new Entry();
     }
 
+    @Override
+    public List<Entry> getEntryByDate(LocalDate date) {
+        return entryRepository.findByDate(date);
+    }
 
+    @Override
+    public Entry findByDateAndPet_pet_idAndJournal_journal_id(LocalDate date, int petId, int journalId) {
+        return entryRepository.findByDateAndPet_petIdAndJournal_journalId(date, petId, journalId);
+
+    }
 }

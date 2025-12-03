@@ -37,8 +37,6 @@ public class Entry {
     @JsonIgnore
     private Journal journal;
 
-    @Column(name = "journal_id")
-    private int journalId;
 
     // empty constructor for JPA
     public Entry() {}
@@ -66,7 +64,6 @@ public class Entry {
     public void setPet(Pet pet) { this.pet = pet; }
 
     public void setJournal(Journal journal) { this.journal = journal; }
-    public void setJournalId(int journalId) { this.journalId = journalId; }
 
     public void setEntryId(int i) {  this.entry_id = i;  }
 }

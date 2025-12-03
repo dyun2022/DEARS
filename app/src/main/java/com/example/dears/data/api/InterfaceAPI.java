@@ -11,6 +11,7 @@ import com.example.dears.data.request.createPetRequest;
 import com.example.dears.data.request.loginUserRequest;
 import com.example.dears.data.request.updatePetRequest;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -91,7 +92,14 @@ public interface InterfaceAPI {
     @POST("entry/create/{date}")
     Call<Object> createEntry(@Path("date") String localDate, @Body createEntryRequest createEntryRequest);
 
+    @PATCH("entry/update/{date}")
+    Call<Pet> updateEntry(@Path("date") String date, @Body Map<String, String> entryData);
 
+    @GET("entry/date/{date}/{petId}/{journalId}")
+    Call<Object> getEntryByDate(@Path("date") LocalDate date, @Path("petId") int petId, @Path("journalId") int journalId);
+
+    // CHAT
     @PATCH("pet/{id}/chat")
     Call<Pet> chatPet(@Path("id") int petId);
+
 }

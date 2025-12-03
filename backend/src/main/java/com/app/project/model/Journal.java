@@ -14,7 +14,7 @@ public class Journal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "journal_id")
-    private int journal_id;
+    public int journalId;
 
     @OneToMany(mappedBy = "journal")
     @JsonManagedReference
@@ -37,13 +37,12 @@ public class Journal {
     // Getters and Setters
     public List<Entry> getEntries() { return entries; }
     public Entry getEntry(int index) { return entries.get(index); }
-    public int getJournalId() { return journal_id; }
+    public int getJournalId() { return journalId; }
     public Pet getPet() { return pet; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public void setJournalId(int i) { this.journal_id = i;
-    }
+    public void setJournalId(int i) { this.journalId = i;  }
 
     public void setPet(Pet pet) { this.pet = pet;
     }

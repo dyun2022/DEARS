@@ -263,7 +263,7 @@ public class ChatActivity extends AppCompatActivity {
                         runOnUiThread(() -> {
                             try {
                                 String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
-                                processedResult = processedResult.replace("“", "\"").replace("”", "\"");
+                                processedResult = processedResult.replace("“", "\"").replace("”", "\"").replace("-", " ");
                                 JSONObject json = new JSONObject(processedResult);
                                 String response = json.getString("response");
 
