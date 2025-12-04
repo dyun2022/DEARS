@@ -99,7 +99,7 @@ public class JournalActivity extends AppCompatActivity {
                     // get journal entries that correspond to this pet
                     for (Journal j : response.body()) {
                         if (j.getPetId() == pet.getPetID()) {
-                            TextView tv = createEntryView(j.getDate() + "\n" + j.getSummary());
+                            TextView tv = createEntryView(j.getSummary());
                             entries.addView(tv);
 
                             // entry to be updated later potentially
@@ -127,11 +127,12 @@ public class JournalActivity extends AppCompatActivity {
         });
 
         // generate new entry button
-        final Button newEntryBtn = findViewById(R.id.generateEntryBtn);
-        newEntryBtn.setOnClickListener(v -> {
-            newEntryBtn.setText("Writing...");
-            createEntryObj(pet.getPetID());
-        });
+//        final Button newEntryBtn = findViewById(R.id.generateEntryBtn);
+//        newEntryBtn.setOnClickListener(v -> {
+//            newEntryBtn.setText("Writing...");
+//            createEntryObj(pet.getPetID());
+//        });
+        createEntryObj(pet.getPetID());
     }
 
     public void genNewEntry() {
@@ -172,13 +173,13 @@ public class JournalActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(String llmResult) {
                             // System.out.println(llmResult);
+                            Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
                             runOnUiThread(() -> {
                                 try {
                                     // parse through generated result
                                     Log.d("JOURNALLOG", Double.toString(( (double) pet.getHappinessMeter()) / pet.getHappiness().getMeterMax()));
                                     String processedResult = llmResult.replace("```json", "").replace("```", "").trim();
                                     processedResult = processedResult.replace("“", "\"").replace("”", "\"").replace("-", " ");
-                                    Log.d("JOURNALLOG", "RAW LLM OUTPUT:\n" + llmResult);
                                     JSONObject json = new JSONObject(processedResult);
 
                                     String summary = json.getString("summary");
